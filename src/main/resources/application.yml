@@ -39,6 +39,7 @@ spring:
   config:
     activate:
       on-profile: dev
+    import: aws-parameterstore:/db-config/dev/
   jpa:
     hibernate:
       ddl-auto: update
@@ -66,6 +67,7 @@ spring:
   config:
     activate:
       on-profile: prod
+    import: aws-parameterstore:/db-config/prd/
   jpa:
     hibernate:
       ddl-auto: validate
