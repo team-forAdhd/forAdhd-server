@@ -7,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
 import lombok.AccessLevel;
@@ -15,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.GenericGenerator;
 
 @Getter
 @Builder
@@ -24,6 +26,9 @@ import org.hibernate.annotations.ColumnDefault;
 public class User extends BaseTimeEntity {
 
     @Id
+    @GenericGenerator(name = "uuid-generator", type = com.project.foradhd.global.util.UUIDGenerator.class)
+    @GeneratedValue(generator = "uuid-generator")
+    @Column(name = "user_id")
     private String id;
 
     @Column(nullable = false, length = 100)
@@ -33,7 +38,6 @@ public class User extends BaseTimeEntity {
     private String password;
 
     @Enumerated(value = EnumType.STRING)
-    @Column(length = 50)
     private Provider provider;
 
     @Column(nullable = false, length = 50)
@@ -47,7 +51,7 @@ public class User extends BaseTimeEntity {
 
     @Builder.Default
     @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false)
     private Gender gender = Gender.UNKNOWN;
 
     private String profileImage;
