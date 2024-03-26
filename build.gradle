@@ -35,6 +35,11 @@ dependencies {
 	//AWS Parameter Store
 	implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.1.0')
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
+
+	//JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 }
 
 tasks.named('test') {
