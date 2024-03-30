@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,18 +26,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
-        String token = headerUtil.parseToken(request)
-            .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("인증이 필요한 요청입니다."));
-        if (!jwtService.isValidTokenExpiry(token)) {
-            throw new AuthenticationCredentialsNotFoundException("인증이 필요한 요청입니다.");
-        }
-
-        String userId = jwtService.getSubject(token);
-        Collection<GrantedAuthority> authorities = jwtService.getAuthorities(token);
-        Authentication authentication = UsernamePasswordAuthenticationToken
-            .authenticated(userId, null, authorities);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
+        headerUtil.parseToken(request)
+            .ifPresent(this::authenticate);
         filterChain.doFilter(request, response);
+    }
+
+    private void authenticate(String token) {
+        if (jwtService.isValidTokenExpiry(token)) {
+            String userId = jwtService.getSubject(token);
+            Collection<GrantedAuthority> authorities = jwtService.getAuthorities(token);
+            Authentication authentication = UsernamePasswordAuthenticationToken
+                .authenticated(userId, null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
     }
 }
