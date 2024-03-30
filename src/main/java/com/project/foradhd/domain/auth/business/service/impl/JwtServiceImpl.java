@@ -1,7 +1,6 @@
 package com.project.foradhd.domain.auth.business.service.impl;
 
 import com.project.foradhd.domain.auth.business.service.JwtService;
-import com.project.foradhd.domain.user.persistence.enums.Provider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -41,7 +40,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateAccessToken(String userId, String email, Provider provider,
+    public String generateAccessToken(String userId, String email,
         Collection<GrantedAuthority> authorities) {
         Date now = new Date();
         return Jwts.builder()
