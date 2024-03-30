@@ -1,5 +1,7 @@
 package com.project.foradhd.domain.auth.business.service.impl;
 
+import static org.springframework.util.StringUtils.collectionToCommaDelimitedString;
+
 import com.project.foradhd.domain.auth.business.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -46,7 +48,7 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.builder()
             .setSubject(userId)
             .addClaims(Map.of(EMAIL_CLAIM_NAME, email,
-                AUTHORITIES_CLAIM_NAME, authorities))
+                AUTHORITIES_CLAIM_NAME, collectionToCommaDelimitedString(authorities)))
             .setIssuedAt(now)
             .setExpiration(calculateExpiration(now, accessTokenExpiry))
             .signWith(key, SignatureAlgorithm.HS256)
@@ -142,7 +144,7 @@ public class JwtServiceImpl implements JwtService {
             .parserBuilder()
             .setSigningKey(key)
             .build()
-            .parseClaimsJwt(token)
+            .parseClaimsJws(token)
             .getBody();
     }
 }
