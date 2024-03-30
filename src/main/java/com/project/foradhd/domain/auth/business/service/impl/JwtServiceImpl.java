@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.auth.business.service.impl;
 
-import com.project.foradhd.domain.auth.business.service.TokenService;
+import com.project.foradhd.domain.auth.business.service.JwtService;
+import com.project.foradhd.domain.user.persistence.enums.Provider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -11,20 +12,22 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
-import java.security.Provider;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class JwtServiceImpl implements TokenService {
+public class JwtServiceImpl implements JwtService {
 
     private static final String EMAIL_CLAIM_NAME = "email";
-    private static final String PROVIDER_CLAIM_NAME = "provider";
+    private static final String AUTHORITIES_CLAIM_NAME = "authorities";
     private final Long accessTokenExpiry;
     private final Long refreshTokenExpiry;
     private final Key key;
@@ -38,12 +41,13 @@ public class JwtServiceImpl implements TokenService {
     }
 
     @Override
-    public String generateAccessToken(String userId, String email, Provider provider) {
+    public String generateAccessToken(String userId, String email, Provider provider,
+        Collection<GrantedAuthority> authorities) {
         Date now = new Date();
         return Jwts.builder()
             .setSubject(userId)
             .addClaims(Map.of(EMAIL_CLAIM_NAME, email,
-                PROVIDER_CLAIM_NAME, provider))
+                AUTHORITIES_CLAIM_NAME, authorities))
             .setIssuedAt(now)
             .setExpiration(calculateExpiration(now, accessTokenExpiry))
             .signWith(key, SignatureAlgorithm.HS256)
@@ -64,7 +68,7 @@ public class JwtServiceImpl implements TokenService {
     @Override
     public void validateTokenExpiry(String token) {
         try {
-            parseJwt(token);
+            parseToken(token);
         } catch (UnsupportedJwtException e) {
             log.error("The claimsJwt argument does not represent an unsigned Claims JWT");
             throw e;
@@ -83,7 +87,7 @@ public class JwtServiceImpl implements TokenService {
     @Override
     public void validateTokenForm(String token) {
         try {
-            parseJwt(token);
+            parseToken(token);
         } catch (UnsupportedJwtException e) {
             log.error("The claimsJwt argument does not represent an unsigned Claims JWT");
             throw e;
@@ -97,9 +101,36 @@ public class JwtServiceImpl implements TokenService {
     }
 
     @Override
+    public boolean isValidTokenExpiry(String token) {
+        try {
+            validateTokenExpiry(token);
+            return true;
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isValidTokenForm(String token) {
+        try {
+            validateTokenForm(token);
+            return true;
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    @Override
     public String getSubject(String token) {
-        Claims claims = parseJwt(token);
+        Claims claims = parseToken(token);
         return claims.getSubject();
+    }
+
+    @Override
+    public Collection<GrantedAuthority> getAuthorities(String token) {
+        Claims claims = parseToken(token);
+        String authorityString = claims.get(AUTHORITIES_CLAIM_NAME, String.class);
+        return AuthorityUtils.commaSeparatedStringToAuthorityList(authorityString);
     }
 
     private Date calculateExpiration(Date now, Long expiry) {
@@ -107,7 +138,7 @@ public class JwtServiceImpl implements TokenService {
         return Date.from(expirationInstant);
     }
 
-    private Claims parseJwt(String token) {
+    private Claims parseToken(String token) {
         return Jwts
             .parserBuilder()
             .setSigningKey(key)
