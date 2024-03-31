@@ -70,4 +70,8 @@ public class User extends BaseTimeEntity {
     private String phoneModel;
 
     private String deviceToken;
+
+    public void updateEncodedPassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }
