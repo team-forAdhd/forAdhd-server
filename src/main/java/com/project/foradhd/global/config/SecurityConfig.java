@@ -55,6 +55,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(registry -> registry
                 .requestMatchers(SIGN_UP_API_PATH, EMAIL_AUTH_API_PATH,
                     LOGIN_API_PATH, LOGOUT_API_PATH, HEALTH_CHECK_API_PATH).permitAll()
+                .requestMatchers("/error", "/favicon.ico").permitAll()
                 .anyRequest().authenticated())
             .sessionManagement(config -> config
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
