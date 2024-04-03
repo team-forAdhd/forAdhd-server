@@ -13,6 +13,11 @@ jwt:
     refresh-token: 604800000 #7 * 24 * 60 * 60 * 1000 (7 days)
   secret-key: ${JWT_SECRET_KEY}
 
+jasypt:
+  encryptor:
+    bean: jasyptEncryptor
+    key: ${JASYPT_ENCRYPTOR_KEY}
+
 ---
 spring:
   config:
