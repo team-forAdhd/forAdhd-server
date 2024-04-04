@@ -4,9 +4,11 @@ import static org.springframework.security.core.authority.AuthorityUtils.createA
 
 import com.project.foradhd.domain.user.persistence.entity.User;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
 @Getter
@@ -23,6 +25,9 @@ public class OAuth2UserImpl extends DefaultOAuth2User {
 
     @Override
     public Collection<GrantedAuthority> getAuthorities() {
-        return (Collection<GrantedAuthority>) super.getAuthorities();
+        List<String> authorities = super.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .toList();
+        return AuthorityUtils.createAuthorityList(authorities);
     }
 }
