@@ -12,7 +12,6 @@ spring:
             client-name: Kakao
             scope:
               - account_email
-              - profile_nickname
             #비즈앱 등록 후 접근 가능
 #              - name
 #              - birthday
@@ -29,7 +28,6 @@ spring:
             scope:
               - email
               - name
-              - nickname
               - birthday
               - birthyear
               - age
