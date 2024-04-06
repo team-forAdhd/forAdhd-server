@@ -15,6 +15,10 @@ import com.project.foradhd.domain.auth.handler.OAuth2AuthenticationSuccessHandle
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -102,6 +106,20 @@ public class SecurityConfig {
         loginAuthenticationFilter.setAuthenticationSuccessHandler(loginAuthenticationSuccessHandler);
         loginAuthenticationFilter.setAuthenticationFailureHandler(loginAuthenticationFailureHandler);
         return loginAuthenticationFilter;
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER > ROLE_GUEST");
+        return roleHierarchy;
+    }
+
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
+        DefaultMethodSecurityExpressionHandler methodSecurityExpressionHandler = new DefaultMethodSecurityExpressionHandler();
+        methodSecurityExpressionHandler.setRoleHierarchy(roleHierarchy);
+        return methodSecurityExpressionHandler;
     }
 
     @Bean
