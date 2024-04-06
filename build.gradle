@@ -46,6 +46,9 @@ dependencies {
 
 	//Jasypt
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
+
+	//P6Spy (쿼리 파라미터 로그)
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1'
 }
 
 tasks.named('test') {
