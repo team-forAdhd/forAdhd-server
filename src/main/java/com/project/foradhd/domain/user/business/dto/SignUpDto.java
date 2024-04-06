@@ -5,6 +5,7 @@ import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval.UserTermsApprovalId;
 import com.project.foradhd.domain.user.persistence.enums.Provider;
+import com.project.foradhd.domain.user.persistence.enums.Role;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public class SignUpDto {
                 .birth(request.getBirth())
                 .gender(request.getGender())
                 .email(request.getEmail())
+                .role(Role.USER)
                 .provider(Provider.FOR_A)
                 .nickname(request.getNickname())
                 .profileImage(request.getProfileImage())

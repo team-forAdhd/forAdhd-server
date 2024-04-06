@@ -2,6 +2,7 @@ package com.project.foradhd.domain.user.persistence.entity;
 
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.domain.user.persistence.enums.Provider;
+import com.project.foradhd.domain.user.persistence.enums.Role;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +44,11 @@ public class User extends BaseTimeEntity {
     @Builder.Default
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
+    private Role role = Role.ANONYMOUS;
+
+    @Builder.Default
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
     private Provider provider = Provider.FOR_A;
 
     @Column(nullable = false, length = 50)
@@ -79,15 +85,20 @@ public class User extends BaseTimeEntity {
 
     private String deviceToken;
 
+    public String getAuthority() {
+        return this.role.getName();
+    }
+
     public void updateEncodedPassword(String encodedPassword) {
         this.password = encodedPassword;
     }
 
-    public void loginBySns(User snsUser) {
+    public User loginBySns(User snsUser) {
         this.name = snsUser.name;
         this.email = snsUser.email;
         this.gender = snsUser.gender;
         this.ageRange = snsUser.ageRange;
         this.birth = snsUser.birth;
+        return this;
     }
 }

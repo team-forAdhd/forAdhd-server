@@ -18,7 +18,7 @@ public class OAuth2UserImpl extends DefaultOAuth2User {
     private final String email;
 
     public OAuth2UserImpl(Map<String, Object> attributes, String nameAttributeKey, User user) {
-        super(createAuthorityList("ROLE_USER"), attributes, nameAttributeKey);
+        super(createAuthorityList(user.getAuthority()), attributes, nameAttributeKey);
         this.userId = user.getId();
         this.email = user.getEmail();
     }

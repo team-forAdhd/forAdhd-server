@@ -25,7 +25,6 @@ public class NaverOAuth2Attributes extends OAuth2Attributes {
 
     public static OAuth2Attributes of(String nameAttributesKey, Map<String, Object> attributes) {
         Map<String, Object> userInfo = (Map<String, Object>) attributes.get(nameAttributesKey);
-        System.out.println("userInfo = " + userInfo);
         return NaverOAuth2Attributes.builder()
             .id(parseId(userInfo))
             .name(parseName(userInfo))
