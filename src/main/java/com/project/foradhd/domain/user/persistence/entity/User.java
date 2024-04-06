@@ -31,14 +31,19 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private String id;
 
+    @Column(unique = true, length = 500)
+    private String snsUserId;
+
     @Column(nullable = false, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(length = 500)
     private String password;
 
+    @Builder.Default
     @Enumerated(value = EnumType.STRING)
-    private Provider provider;
+    @Column(nullable = false)
+    private Provider provider = Provider.FOR_A;
 
     @Column(nullable = false, length = 50)
     private String name;
@@ -46,8 +51,11 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String nickname;
 
-    @Column(nullable = false)
+    @Column
     private LocalDate birth;
+
+    @Column(length = 50)
+    private String ageRange;
 
     @Builder.Default
     @Enumerated(value = EnumType.STRING)
@@ -73,5 +81,13 @@ public class User extends BaseTimeEntity {
 
     public void updateEncodedPassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public void loginBySns(User snsUser) {
+        this.name = snsUser.name;
+        this.email = snsUser.email;
+        this.gender = snsUser.gender;
+        this.ageRange = snsUser.ageRange;
+        this.birth = snsUser.birth;
     }
 }
