@@ -2,26 +2,40 @@ package com.project.foradhd.domain.auth.business.userdetails;
 
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
+import com.project.foradhd.domain.user.persistence.enums.Provider;
+import com.project.foradhd.global.util.NicknameGenerator;
 import java.time.LocalDate;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public abstract class OAuth2Attributes {
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+public class OAuth2Attributes {
 
+    protected String id;
     protected String name;
     protected String email;
     protected Gender gender;
     protected String ageRange;
     protected LocalDate birth;
+    protected Provider provider;
 
     public User toEntity() {
         //TODO: 유저 role 추가
         return User.builder()
+            .snsUserId(id)
             .name(name)
+            .nickname(NicknameGenerator.generate())
             .email(email)
             .gender(gender)
-//        .ageRange(ageRange)
+            .ageRange(ageRange)
             .birth(birth)
+            .provider(provider)
             .build();
     }
 }
