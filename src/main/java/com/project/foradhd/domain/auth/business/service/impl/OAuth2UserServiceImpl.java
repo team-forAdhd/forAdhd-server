@@ -21,6 +21,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
@@ -31,11 +32,17 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
 
         OAuth2Attributes oAuth2Attributes = OAuth2AttributesFactory.of(registrationId, nameAttributeKey, attributes);
         User user = oAuth2Attributes.toEntity();
-        signUpSnsUser(user);
+        processSnsUser(user);
         return new OAuth2UserImpl(attributes, nameAttributeKey, user);
     }
 
-    private void signUpSnsUser(User user) {
-        //TODO: 유저 정보 DB 저장 로직 (insert or update)
+    private void processSnsUser(User snsUser) {
+        userRepository.findByProviderAndSnsUserId(snsUser.getProvider(), snsUser.getSnsUserId())
+            .ifPresentOrElse(user -> user.loginBySns(snsUser),
+                () -> signUpUser(snsUser));
+    }
+
+    private void signUpUser(User user) {
+        userRepository.save(user);
     }
 }
