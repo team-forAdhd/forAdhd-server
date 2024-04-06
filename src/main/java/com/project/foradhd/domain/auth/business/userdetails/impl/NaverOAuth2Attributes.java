@@ -29,6 +29,7 @@ public class NaverOAuth2Attributes extends OAuth2Attributes {
             .id(parseId(userInfo))
             .name(parseName(userInfo))
             .email(parseEmail(userInfo))
+            .isVerifiedEmail(true)
             .gender(parseGender(userInfo))
             .ageRange(parseAgeRange(userInfo))
             .birth(parseBirth(userInfo))

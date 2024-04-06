@@ -73,6 +73,11 @@ public class User extends BaseTimeEntity {
     @Builder.Default
     @ColumnDefault(value = "0")
     @Column(nullable = false)
+    private Boolean isVerifiedEmail = Boolean.FALSE;
+
+    @Builder.Default
+    @ColumnDefault(value = "0")
+    @Column(nullable = false)
     private Boolean isAdhd = Boolean.FALSE;
 
     @Builder.Default

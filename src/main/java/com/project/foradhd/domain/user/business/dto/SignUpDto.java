@@ -8,7 +8,6 @@ import com.project.foradhd.domain.user.persistence.enums.Provider;
 import com.project.foradhd.domain.user.persistence.enums.Role;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Getter;
 
 public class SignUpDto {
@@ -25,7 +24,7 @@ public class SignUpDto {
                 .birth(request.getBirth())
                 .gender(request.getGender())
                 .email(request.getEmail())
-                .role(Role.USER)
+                .role(Role.GUEST)
                 .provider(Provider.FOR_A)
                 .nickname(request.getNickname())
                 .profileImage(request.getProfileImage())
@@ -38,7 +37,7 @@ public class SignUpDto {
                     .id(mapToUserTermsApprovalId(user, termsApproval.getTermsId()))
                     .approved(termsApproval.getApproved())
                     .build())
-                .collect(Collectors.toList());
+                .toList();
         }
 
         private static UserTermsApprovalId mapToUserTermsApprovalId(User user, Long termsId) {

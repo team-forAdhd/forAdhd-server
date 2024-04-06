@@ -31,6 +31,7 @@ public class KakaoOAuth2Attributes extends OAuth2Attributes {
             .id(parseId(attributes))
             .name(parseName(profile))
             .email(parseEmail(userInfo))
+            .isVerifiedEmail(parseIsVerifiedEmail(userInfo))
             .gender(Gender.UNKNOWN)
             .ageRange("")
             .birth(LocalDate.now())
@@ -47,11 +48,12 @@ public class KakaoOAuth2Attributes extends OAuth2Attributes {
     }
 
     private static String parseEmail(Map<String, Object> userInfo) {
+        return (String) userInfo.get(EMAIL_KEY);
+    }
+
+    private static Boolean parseIsVerifiedEmail(Map<String, Object> userInfo) {
         Boolean isEmailValid = (Boolean) userInfo.get(EMAIL_VALID_KEY);
         Boolean isEmailVerified = (Boolean) userInfo.get(EMAIL_VERIFIED_KEY);
-        if (isEmailValid && isEmailVerified) {
-            return (String) userInfo.get(EMAIL_KEY);
-        }
-        return "";
+        return isEmailValid && isEmailVerified;
     }
 }

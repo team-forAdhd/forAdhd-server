@@ -21,6 +21,7 @@ public class OAuth2Attributes {
     protected String id;
     protected String name;
     protected String email;
+    protected Boolean isVerifiedEmail;
     protected Gender gender;
     protected String ageRange;
     protected LocalDate birth;
@@ -32,6 +33,7 @@ public class OAuth2Attributes {
             .name(name)
             .nickname(NicknameGenerator.generate())
             .email(email)
+            .isVerifiedEmail(isVerifiedEmail)
             .role(Role.GUEST)
             .gender(gender)
             .ageRange(ageRange)
