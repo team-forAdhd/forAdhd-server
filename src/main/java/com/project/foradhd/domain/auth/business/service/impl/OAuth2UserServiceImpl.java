@@ -31,7 +31,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
             .getUserInfoEndpoint().getUserNameAttributeName();
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        OAuth2Attributes oAuth2Attributes = OAuth2AttributesFactory.of(registrationId, nameAttributeKey, attributes);
+        OAuth2Attributes oAuth2Attributes = OAuth2AttributesFactory.valueOf(registrationId, nameAttributeKey, attributes);
         User snsUser = oAuth2Attributes.toEntity();
         User user = processSnsUser(snsUser);
         return new OAuth2UserImpl(attributes, nameAttributeKey, user);

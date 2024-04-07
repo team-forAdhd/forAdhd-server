@@ -9,7 +9,7 @@ import java.util.Map;
 
 public abstract class OAuth2AttributesFactory {
 
-    public static OAuth2Attributes of(String registrationId, String nameAttributesKey,
+    public static OAuth2Attributes valueOf(String registrationId, String nameAttributesKey,
         Map<String, Object> attributes) {
         Provider provider = Provider.from(registrationId);
         switch (provider) {
