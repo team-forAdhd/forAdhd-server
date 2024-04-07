@@ -49,6 +49,11 @@ dependencies {
 
 	//P6Spy (쿼리 파라미터 로그)
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.1'
+
+	//MapStruct
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0' //lombok annotation processor와의 충돌 제거
 }
 
 tasks.named('test') {
