@@ -1,6 +1,6 @@
 package com.project.foradhd.domain.user.business.service;
 
-import com.project.foradhd.domain.user.business.dto.SignUpDto;
+import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.persistence.entity.Terms;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
@@ -26,9 +26,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void signUp(SignUpDto.In dto, String password) {
-        User user = dto.getUser();
-        List<UserTermsApproval> userTermsApprovals = dto.getUserTermsApprovals();
+    public void signUp(SignUpData signUpData, String password) {
+        User user = signUpData.getUser();
+        List<UserTermsApproval> userTermsApprovals = signUpData.getUserTermsApprovals();
         validateNewUser(user);
         validateTermsApprovals(userTermsApprovals);
 

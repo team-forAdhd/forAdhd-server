@@ -6,12 +6,16 @@ import com.project.foradhd.domain.user.persistence.enums.Gender;
 import jakarta.validation.constraints.Email;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
 //TODO: validation 체크
-@ToString
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SignUpRequest {
 
     private String name;
@@ -36,11 +40,13 @@ public class SignUpRequest {
 
     private Boolean pushNotificationAgree;
 
-    private List<TermsApproval> termsApprovals;
+    private List<TermsApprovalRequest> termsApprovals;
 
-    @ToString
     @Getter
-    public static class TermsApproval {
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TermsApprovalRequest {
 
         private Long termsId;
 
