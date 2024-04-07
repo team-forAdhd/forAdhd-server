@@ -41,8 +41,12 @@ public class UserService {
     private void validateNewUser(User user) {
         boolean isExistingUser = userRepository.findByProviderAndEmail(Provider.FOR_A, user.getEmail())
             .isPresent();
+        boolean isDuplicatedNickname = userRepository.findByNickname(user.getNickname()).isPresent();
         if (isExistingUser) {
             throw new RuntimeException("이미 가입한 이메일입니다.");
+        }
+        if (isDuplicatedNickname) {
+            throw new RuntimeException("이미 존재하는 닉네임입니다.");
         }
     }
 
