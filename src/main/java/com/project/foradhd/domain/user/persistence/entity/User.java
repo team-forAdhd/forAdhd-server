@@ -2,6 +2,7 @@ package com.project.foradhd.domain.user.persistence.entity;
 
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.domain.user.persistence.enums.Provider;
+import com.project.foradhd.domain.user.persistence.enums.Role;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,14 +32,24 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private String id;
 
+    @Column(unique = true, length = 500)
+    private String snsUserId;
+
     @Column(nullable = false, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(length = 500)
     private String password;
 
+    @Builder.Default
     @Enumerated(value = EnumType.STRING)
-    private Provider provider;
+    @Column(nullable = false)
+    private Role role = Role.ANONYMOUS;
+
+    @Builder.Default
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private Provider provider = Provider.FOR_A;
 
     @Column(nullable = false, length = 50)
     private String name;
@@ -46,8 +57,11 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String nickname;
 
-    @Column(nullable = false)
+    @Column
     private LocalDate birth;
+
+    @Column(length = 50)
+    private String ageRange;
 
     @Builder.Default
     @Enumerated(value = EnumType.STRING)
@@ -55,6 +69,11 @@ public class User extends BaseTimeEntity {
     private Gender gender = Gender.UNKNOWN;
 
     private String profileImage;
+
+    @Builder.Default
+    @ColumnDefault(value = "0")
+    @Column(nullable = false)
+    private Boolean isVerifiedEmail = Boolean.FALSE;
 
     @Builder.Default
     @ColumnDefault(value = "0")
@@ -71,7 +90,20 @@ public class User extends BaseTimeEntity {
 
     private String deviceToken;
 
+    public String getAuthority() {
+        return this.role.getName();
+    }
+
     public void updateEncodedPassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public User loginBySns(User snsUser) {
+        this.name = snsUser.name;
+        this.email = snsUser.email;
+        this.gender = snsUser.gender;
+        this.ageRange = snsUser.ageRange;
+        this.birth = snsUser.birth;
+        return this;
     }
 }

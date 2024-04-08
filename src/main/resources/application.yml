@@ -6,12 +6,20 @@ spring:
     username: ${DATABASE_ID}
     password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  config:
+    import:
+      - application-oauth2.yml
 
 jwt:
   expiry:
     access-token: 3600000 #60 * 60 * 1000 (1 hour)
     refresh-token: 604800000 #7 * 24 * 60 * 60 * 1000 (7 days)
   secret-key: ${JWT_SECRET_KEY}
+
+jasypt:
+  encryptor:
+    bean: jasyptEncryptor
+    key: ${JASYPT_ENCRYPTOR_KEY}
 
 ---
 spring:
