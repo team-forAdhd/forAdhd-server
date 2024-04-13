@@ -1,14 +1,20 @@
 package com.project.foradhd.domain.user.web.controller;
 
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
+import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
+import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
 import com.project.foradhd.domain.user.web.mapper.UserMapper;
+import com.project.foradhd.global.AuthUserId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,8 +29,16 @@ public class UserController {
 
     @PostMapping("/sign-up")
     public ResponseEntity<Void> signUp(@RequestBody @Valid SignUpRequest request) {
-        SignUpData signUpDto = userMapper.toSignUpData(request);
-        userService.signUp(signUpDto, request.getPassword());
+        SignUpData signUpData = userMapper.toSignUpData(request);
+        userService.signUp(signUpData, request.getPassword());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/sns-sign-up")
+    public ResponseEntity<Void> snsSignUp(@AuthUserId String userId,
+        @RequestBody @Valid SnsSignUpRequest request) {
+        SnsSignUpData snsSignUpData = userMapper.toSnsSignUpData(userId, request);
+        userService.snsSignUp(userId, snsSignUpData);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

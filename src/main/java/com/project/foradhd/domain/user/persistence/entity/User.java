@@ -106,4 +106,12 @@ public class User extends BaseTimeEntity {
         this.birth = snsUser.birth;
         return this;
     }
+
+    public void snsSignUp(User user) {
+        this.role = Role.USER;
+        this.nickname = user.getNickname();
+        this.profileImage = user.getProfileImage();
+        this.isAdhd = user.getIsAdhd();
+        this.pushNotificationAgree = user.getPushNotificationAgree();
+    }
 }
