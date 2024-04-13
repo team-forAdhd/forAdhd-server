@@ -94,6 +94,12 @@ public class User extends BaseTimeEntity {
         return this.role.getName();
     }
 
+    public void updateProfile(String nickname, String profileImage, Boolean isAdhd) {
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.isAdhd = isAdhd;
+    }
+
     public void updateEncodedPassword(String encodedPassword) {
         this.password = encodedPassword;
     }

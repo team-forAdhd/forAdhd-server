@@ -1,8 +1,10 @@
 package com.project.foradhd.domain.user.web.controller;
 
+import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.service.UserService;
+import com.project.foradhd.domain.user.web.dto.request.ProfileUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
 import com.project.foradhd.domain.user.web.mapper.UserMapper;
@@ -11,8 +13,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,5 +40,13 @@ public class UserController {
         SnsSignUpData snsSignUpData = userMapper.toSnsSignUpData(userId, request);
         userService.snsSignUp(userId, snsSignUpData);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<Void> updateProfile(@AuthUserId String userId,
+        @RequestBody @Valid ProfileUpdateRequest request) {
+        ProfileUpdateData profileUpdateData = userMapper.toProfileUpdateData(request);
+        userService.updateProfile(userId, profileUpdateData);
+        return ResponseEntity.ok().build();
     }
 }

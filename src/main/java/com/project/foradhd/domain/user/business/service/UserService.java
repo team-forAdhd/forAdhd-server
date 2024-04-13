@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.user.business.service;
 
+import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.persistence.entity.Terms;
@@ -49,6 +50,14 @@ public class UserService {
         User snsUser = getUser(userId);
         snsUser.snsSignUp(user);
         userTermsApprovalRepository.saveAll(userTermsApprovals);
+    }
+
+    @Transactional
+    public void updateProfile(String userId, ProfileUpdateData profileUpdateData) {
+        User user = getUser(userId);
+        validateDuplicatedNickname(profileUpdateData.getNickname());
+        user.updateProfile(profileUpdateData.getNickname(), profileUpdateData.getProfileImage(),
+            profileUpdateData.getIsAdhd());
     }
 
     public User getUser(String userId) {

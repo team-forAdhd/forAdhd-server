@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.user.web.mapper;
 
+import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.persistence.entity.Terms;
@@ -8,6 +9,7 @@ import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval.UserTermsApprovalId;
 import com.project.foradhd.domain.user.persistence.enums.Provider;
 import com.project.foradhd.domain.user.persistence.enums.Role;
+import com.project.foradhd.domain.user.web.dto.request.ProfileUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
 import java.util.List;
@@ -72,4 +74,6 @@ public interface UserMapper {
                 .build())
             .toList();
     }
+
+    ProfileUpdateData toProfileUpdateData(ProfileUpdateRequest request);
 }
