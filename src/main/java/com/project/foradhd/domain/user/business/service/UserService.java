@@ -31,6 +31,10 @@ public class UserService {
     private final UserTermsApprovalRepository userTermsApprovalRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public boolean checkNickname(String nickname) {
+        return userRepository.findByNickname(nickname).isEmpty();
+    }
+
     @Transactional
     public void signUp(SignUpData signUpData, String password) {
         User user = signUpData.getUser();
