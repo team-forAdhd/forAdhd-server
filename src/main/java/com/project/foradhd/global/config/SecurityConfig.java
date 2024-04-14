@@ -42,8 +42,10 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @Configuration
 public class SecurityConfig {
 
+    private static final String NICKNAME_CHECK_API_PATH = "/api/v1/user/nickname-check";
     private static final String SIGN_UP_API_PATH = "/api/v1/user/sign-up";
     private static final String LOGIN_API_PATH = "/api/v1/auth/login";
+    private static final String AUTH_TOKEN_REISSUE_API_PATH = "/api/v1/auth/reissue";
     private static final String HEALTH_CHECK_API_PATH = "/api/v1/health-check";
 
     private static final String EMAIL_AUTH_API_PATH = "/api/v1/user/email-auth";
@@ -69,7 +71,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(registry -> registry
-                .requestMatchers(SIGN_UP_API_PATH, LOGIN_API_PATH, HEALTH_CHECK_API_PATH).permitAll()
+                .requestMatchers(NICKNAME_CHECK_API_PATH, SIGN_UP_API_PATH, LOGIN_API_PATH,
+                    AUTH_TOKEN_REISSUE_API_PATH, HEALTH_CHECK_API_PATH).permitAll()
                 .requestMatchers("/error", "/favicon.ico").permitAll()
                 .requestMatchers(EMAIL_AUTH_API_PATH, SNS_SIGN_UP_API_PATH, LOGOUT_API_PATH).hasRole(Role.GUEST.name())
                 .anyRequest().hasRole(Role.USER.name()))
