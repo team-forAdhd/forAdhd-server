@@ -7,6 +7,7 @@ import com.project.foradhd.domain.user.business.dto.in.PushNotificationAgreeUpda
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
+import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.web.dto.request.EmailUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.request.NicknameCheckRequest;
@@ -17,6 +18,7 @@ import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.TermsApprovalsUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.response.NicknameCheckResponse;
+import com.project.foradhd.domain.user.web.dto.response.UserProfileDetailsResponse;
 import com.project.foradhd.domain.user.web.mapper.UserMapper;
 import com.project.foradhd.global.AuthUserId;
 import jakarta.validation.Valid;
@@ -42,6 +44,13 @@ public class UserController {
     public ResponseEntity<NicknameCheckResponse> checkNickname(@RequestBody @Valid NicknameCheckRequest request) {
         boolean isValidNickname = userService.checkNickname(request.getNickname());
         return ResponseEntity.ok(new NicknameCheckResponse(isValidNickname));
+    }
+
+    @GetMapping
+    public ResponseEntity<UserProfileDetailsResponse> getUserProfileDetails(@AuthUserId String userId) {
+        UserProfileDetailsData userProfileDetailsData = userService.getUserProfileDetails(userId);
+        UserProfileDetailsResponse response = userMapper.toUserProfileDetailsResponse(userProfileDetailsData);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/sign-up")

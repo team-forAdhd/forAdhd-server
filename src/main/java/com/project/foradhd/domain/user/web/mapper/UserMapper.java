@@ -7,6 +7,7 @@ import com.project.foradhd.domain.user.business.dto.in.PushNotificationAgreeUpda
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
+import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
 import com.project.foradhd.domain.user.persistence.entity.Terms;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
@@ -20,8 +21,10 @@ import com.project.foradhd.domain.user.web.dto.request.PushNotificationAgreeUpda
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.TermsApprovalsUpdateRequest;
+import com.project.foradhd.domain.user.web.dto.response.UserProfileDetailsResponse;
 import java.util.List;
 import org.mapstruct.Context;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants.ComponentModel;
@@ -30,6 +33,27 @@ import org.mapstruct.Named;
 
 @Mapper(componentModel = ComponentModel.SPRING)
 public interface UserMapper {
+
+    @Mappings({
+        @Mapping(target = "name", source = "user.name"),
+        @Mapping(target = "birth", source = "user.birth"),
+        @Mapping(target = "gender", source = "user.gender"),
+        @Mapping(target = "email", source = "user.email"),
+        @Mapping(target = "nickname", source = "user.nickname"),
+        @Mapping(target = "profileImage", source = "user.profileImage"),
+        @Mapping(target = "isAdhd", source = "user.isAdhd"),
+        @Mapping(target = "pushNotificationAgree", source = "user.pushNotificationAgree"),
+        @Mapping(target = "termsApprovals", source = "userTermsApprovals", qualifiedByName = "mapToTermsApprovals")
+    })
+    UserProfileDetailsResponse toUserProfileDetailsResponse(UserProfileDetailsData userProfileDetailsData);
+
+    @Named("mapToTermsApprovals")
+    @IterableMapping(qualifiedByName = "mapToTermsApproval")
+    List<UserProfileDetailsResponse.TermsApprovalResponse> mapToTermsApprovals(List<UserTermsApproval> userTermsApprovals);
+
+    @Named("mapToTermsApproval")
+    @Mapping(target = "termsId", source = "id.terms.id")
+    UserProfileDetailsResponse.TermsApprovalResponse mapToTermsApproval(UserTermsApproval userTermsApprovals);
 
     default SignUpData toSignUpData(SignUpRequest request) {
         User user = User.builder()

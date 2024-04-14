@@ -7,6 +7,7 @@ import com.project.foradhd.domain.user.business.dto.in.PushNotificationAgreeUpda
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
+import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
 import com.project.foradhd.domain.user.persistence.entity.Terms;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
@@ -33,6 +34,15 @@ public class UserService {
 
     public boolean checkNickname(String nickname) {
         return userRepository.findByNickname(nickname).isEmpty();
+    }
+
+    public UserProfileDetailsData getUserProfileDetails(String userId) {
+        User user = getUser(userId);
+        List<UserTermsApproval> userTermsApprovals = userTermsApprovalRepository.findByUserId(userId);
+        return UserProfileDetailsData.builder()
+            .user(user)
+            .userTermsApprovals(userTermsApprovals)
+            .build();
     }
 
     @Transactional
