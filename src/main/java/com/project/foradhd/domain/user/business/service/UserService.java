@@ -1,8 +1,12 @@
 package com.project.foradhd.domain.user.business.service;
 
+import com.project.foradhd.domain.user.business.dto.in.EmailUpdateData;
+import com.project.foradhd.domain.user.business.dto.in.PasswordUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
+import com.project.foradhd.domain.user.business.dto.in.PushNotificationAgreeUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
+import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
 import com.project.foradhd.domain.user.persistence.entity.Terms;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
@@ -37,7 +41,7 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(password);
         user.updateEncodedPassword(encodedPassword);
         userRepository.save(user);
-        userTermsApprovalRepository.saveAll(userTermsApprovals); //TODO: UserTermsApproval 내 복합키로 인해 insert 전 select 쿼리 발생
+        userTermsApprovalRepository.saveAll(userTermsApprovals);
     }
 
     @Transactional
@@ -58,6 +62,35 @@ public class UserService {
         validateDuplicatedNickname(profileUpdateData.getNickname());
         user.updateProfile(profileUpdateData.getNickname(), profileUpdateData.getProfileImage(),
             profileUpdateData.getIsAdhd());
+    }
+
+    @Transactional
+    public void updatePassword(String userId, PasswordUpdateData passwordUpdateData) {
+        User user = getUser(userId);
+        validatePasswordMatches(passwordUpdateData.getPrevPassword(), user.getPassword());
+        String encodedNewPassword = passwordEncoder.encode(passwordUpdateData.getPassword());
+        user.updateEncodedPassword(encodedNewPassword);
+    }
+
+    @Transactional
+    public void updateEmail(String userId, EmailUpdateData emailUpdateData) {
+        validateDuplicatedEmail(Provider.FOR_A, emailUpdateData.getEmail());
+        User user = getUser(userId);
+        user.updateEmail(emailUpdateData.getEmail());
+    }
+
+    @Transactional
+    public void updatePushNotificationAgree(String userId,
+        PushNotificationAgreeUpdateData pushNotificationAgreeUpdateData) {
+        User user = getUser(userId);
+        user.updatePushNotificationAgree(pushNotificationAgreeUpdateData.getPushNotificationAgree());
+    }
+
+    @Transactional
+    public void updateTermsApprovals(TermsApprovalsUpdateData termsApprovalsUpdateData) {
+        List<UserTermsApproval> userTermsApprovals = termsApprovalsUpdateData.getUserTermsApprovals();
+        validateTermsApprovals(userTermsApprovals);
+        userTermsApprovalRepository.saveAll(userTermsApprovals); //update or insert
     }
 
     public User getUser(String userId) {
@@ -81,6 +114,12 @@ public class UserService {
         boolean isDuplicatedNickname = userRepository.findByNickname(nickname).isPresent();
         if (isDuplicatedNickname) {
             throw new RuntimeException("이미 존재하는 닉네임입니다.");
+        }
+    }
+
+    private void validatePasswordMatches(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
     }
 

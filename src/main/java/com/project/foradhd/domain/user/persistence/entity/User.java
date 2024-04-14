@@ -100,8 +100,16 @@ public class User extends BaseTimeEntity {
         this.isAdhd = isAdhd;
     }
 
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
     public void updateEncodedPassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public void updatePushNotificationAgree(Boolean pushNotificationAgree) {
+        this.pushNotificationAgree = pushNotificationAgree;
     }
 
     public User loginBySns(User snsUser) {
