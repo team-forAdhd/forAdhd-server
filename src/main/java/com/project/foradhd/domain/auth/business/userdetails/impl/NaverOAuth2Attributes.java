@@ -1,5 +1,9 @@
 package com.project.foradhd.domain.auth.business.userdetails.impl;
 
+import static com.project.foradhd.domain.user.persistence.enums.Gender.FEMALE;
+import static com.project.foradhd.domain.user.persistence.enums.Gender.MALE;
+import static com.project.foradhd.domain.user.persistence.enums.Gender.UNKNOWN;
+
 import com.project.foradhd.domain.auth.business.userdetails.OAuth2Attributes;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.domain.user.persistence.enums.Provider;
@@ -9,7 +13,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Map;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class NaverOAuth2Attributes extends OAuth2Attributes {
@@ -51,7 +57,7 @@ public class NaverOAuth2Attributes extends OAuth2Attributes {
 
     private static Gender parseGender(Map<String, Object> userInfo) {
         String gender = (String) userInfo.get(GENDER_KEY);
-        return Gender.from(gender);
+        return NaverGender.from(gender);
     }
 
     private static String parseAgeRange(Map<String, Object> userInfo) {
@@ -63,5 +69,23 @@ public class NaverOAuth2Attributes extends OAuth2Attributes {
         String birthDay = (String) userInfo.get(BIRTH_DAY_KEY);
         TemporalAccessor birthDayTemporalAccessor = BIRTH_DAY_FORMATTER.parse(birthDay);
         return MonthDay.from(birthDayTemporalAccessor).atYear(birthYear);
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    enum NaverGender {
+
+        M(MALE), F(FEMALE), U(UNKNOWN);
+
+        private final Gender gender;
+
+        public static Gender from(String value) {
+            try {
+                NaverGender naverGender = NaverGender.valueOf(value.toUpperCase());
+                return naverGender.getGender();
+            } catch (IllegalArgumentException e) {
+                return Gender.UNKNOWN;
+            }
+        }
     }
 }

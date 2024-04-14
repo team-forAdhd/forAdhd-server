@@ -6,7 +6,9 @@ import com.project.foradhd.domain.user.persistence.enums.Provider;
 import java.time.LocalDate;
 import java.util.Map;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class KakaoOAuth2Attributes extends OAuth2Attributes {
@@ -55,5 +57,23 @@ public class KakaoOAuth2Attributes extends OAuth2Attributes {
         Boolean isEmailValid = (Boolean) userInfo.get(EMAIL_VALID_KEY);
         Boolean isEmailVerified = (Boolean) userInfo.get(EMAIL_VERIFIED_KEY);
         return isEmailValid && isEmailVerified;
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    enum KakaoGender {
+
+        MALE(Gender.MALE), FEMALE(Gender.FEMALE);
+
+        private final Gender gender;
+
+        public static Gender from(String value) {
+            try {
+                KakaoGender kakaoGender = KakaoGender.valueOf(value.toUpperCase());
+                return kakaoGender.getGender();
+            } catch (IllegalArgumentException e) {
+                return Gender.UNKNOWN;
+            }
+        }
     }
 }
