@@ -44,7 +44,7 @@ public class UserService {
     private final UserAuthInfoService userAuthInfoService;
 
     public boolean checkNickname(String nickname) {
-        return userRepository.findByNickname(nickname).isEmpty();
+        return userProfileRepository.findByNickname(nickname).isEmpty();
     }
 
     public UserProfileDetailsData getUserProfileDetails(String userId) {
@@ -138,7 +138,7 @@ public class UserService {
     }
 
     private void validateDuplicatedNickname(String nickname) {
-        boolean isDuplicatedNickname = userRepository.findByNickname(nickname).isPresent();
+        boolean isDuplicatedNickname = userProfileRepository.findByNickname(nickname).isPresent();
         if (isDuplicatedNickname) {
             throw new RuntimeException("이미 존재하는 닉네임입니다.");
         }
