@@ -39,15 +39,10 @@ import org.mapstruct.Named;
 public interface UserMapper {
 
     @Mappings({
-        @Mapping(target = "name", source = "user.name"),
-        @Mapping(target = "birth", source = "user.birth"),
-        @Mapping(target = "gender", source = "user.gender"),
         @Mapping(target = "email", source = "user.email"),
         @Mapping(target = "nickname", source = "user.nickname"),
         @Mapping(target = "profileImage", source = "user.profileImage"),
-        @Mapping(target = "isAdhd", source = "user.isAdhd"),
-        @Mapping(target = "pushNotificationAgree", source = "user.pushNotificationAgree"),
-        @Mapping(target = "termsApprovals", source = "userTermsApprovals", qualifiedByName = "mapToTermsApprovals")
+        @Mapping(target = "isAdhd", source = "user.isAdhd")
     })
     UserProfileDetailsResponse toUserProfileDetailsResponse(UserProfileDetailsData userProfileDetailsData);
 

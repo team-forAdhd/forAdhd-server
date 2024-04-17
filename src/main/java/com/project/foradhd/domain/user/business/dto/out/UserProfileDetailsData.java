@@ -1,8 +1,6 @@
 package com.project.foradhd.domain.user.business.dto.out;
 
-import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
-import java.util.List;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,6 +8,5 @@ import lombok.Getter;
 @Builder
 public class UserProfileDetailsData {
 
-    private User user;
-    private List<UserTermsApproval> userTermsApprovals;
+    private UserProfile userProfile;
 }

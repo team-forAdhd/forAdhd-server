@@ -48,11 +48,9 @@ public class UserService {
     }
 
     public UserProfileDetailsData getUserProfileDetails(String userId) {
-        User user = getUser(userId);
-        List<UserTermsApproval> userTermsApprovals = userTermsApprovalRepository.findByUserId(userId);
+        UserProfile userProfile = getUserProfileFetch(userId);
         return UserProfileDetailsData.builder()
-            .user(user)
-            .userTermsApprovals(userTermsApprovals)
+            .userProfile(userProfile)
             .build();
     }
 
@@ -128,6 +126,11 @@ public class UserService {
     public User getUser(String userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+    }
+
+    private UserProfile getUserProfileFetch(String userId) {
+        return userProfileRepository.findByUserIdFetch(userId)
+            .orElseThrow(() -> new RuntimeException("해당 유저 프로필이 존재하지 않습니다."));
     }
 
     private void validateDuplicatedEmail(String email) {
