@@ -1,13 +1,13 @@
 package com.project.foradhd.domain.user.persistence.entity;
 
-import com.project.foradhd.domain.user.persistence.enums.Role;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,32 +21,31 @@ import org.hibernate.annotations.GenericGenerator;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class User extends BaseTimeEntity {
+public class UserProfile extends BaseTimeEntity {
 
     @Id
     @GenericGenerator(name = "uuid-generator", type = com.project.foradhd.global.util.UUIDGenerator.class)
     @GeneratedValue(generator = "uuid-generator")
-    @Column(name = "user_id")
+    @Column(name = "user_profile_id")
     private String id;
 
-    @Column(nullable = false, length = 100)
-    private String email;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Builder.Default
-    @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
-    private Role role = Role.ANONYMOUS;
+    @Column(nullable = false, unique = true, length = 50)
+    private String nickname;
+
+    private String profileImage;
 
     @Builder.Default
     @ColumnDefault(value = "0")
     @Column(nullable = false)
-    private Boolean isVerifiedEmail = Boolean.FALSE;
+    private Boolean isAdhd = Boolean.FALSE;
 
-    public String getAuthority() {
-        return this.role.getName();
-    }
-
-    public void updateEmail(String email) {
-        this.email = email;
+    public void updateProfile(String nickname, String profileImage, Boolean isAdhd) {
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.isAdhd = isAdhd;
     }
 }
