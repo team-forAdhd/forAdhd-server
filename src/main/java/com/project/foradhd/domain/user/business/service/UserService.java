@@ -8,17 +8,24 @@ import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
 import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
+import com.project.foradhd.domain.user.persistence.entity.PushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.Terms;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
+import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.enums.Provider;
+import com.project.foradhd.domain.user.persistence.repository.PushNotificationApprovalRepository;
 import com.project.foradhd.domain.user.persistence.repository.TermsRepository;
+import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
+import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
+import com.project.foradhd.domain.user.persistence.repository.UserPushNotificationApprovalRepository;
 import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.domain.user.persistence.repository.UserTermsApprovalRepository;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,9 +35,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserPrivacyRepository userPrivacyRepository;
+    private final UserProfileRepository userProfileRepository;
     private final TermsRepository termsRepository;
     private final UserTermsApprovalRepository userTermsApprovalRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PushNotificationApprovalRepository pushNotificationApprovalRepository;
+    private final UserPushNotificationApprovalRepository userPushNotificationApprovalRepository;
+    private final UserAuthInfoService userAuthInfoService;
 
     public boolean checkNickname(String nickname) {
         return userRepository.findByNickname(nickname).isEmpty();
@@ -46,16 +57,23 @@ public class UserService {
     }
 
     @Transactional
-    public void signUp(SignUpData signUpData, String password) {
+    public void signUp(SignUpData signUpData) {
         User user = signUpData.getUser();
+        UserPrivacy userPrivacy = signUpData.getUserPrivacy();
+        UserProfile userProfile = signUpData.getUserProfile();
         List<UserTermsApproval> userTermsApprovals = signUpData.getUserTermsApprovals();
-        validateNewUser(user);
+        List<UserPushNotificationApproval> userPushNotificationApprovals = signUpData.getUserPushNotificationApprovals();
+        validateDuplicatedEmail(user.getEmail());
+        validateDuplicatedNickname(userProfile.getNickname());
         validateTermsApprovals(userTermsApprovals);
+        validatePushNotificationApprovals(userPushNotificationApprovals);
 
-        String encodedPassword = passwordEncoder.encode(password);
-        user.updateEncodedPassword(encodedPassword);
         userRepository.save(user);
+        userPrivacyRepository.save(userPrivacy);
+        userProfileRepository.save(userProfile);
         userTermsApprovalRepository.saveAll(userTermsApprovals);
+        userPushNotificationApprovalRepository.saveAll(userPushNotificationApprovals);
+        userAuthInfoService.signUpByPassword(user, signUpData.getPassword());
     }
 
     @Transactional
@@ -112,13 +130,8 @@ public class UserService {
             .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
     }
 
-    private void validateNewUser(User user) {
-        validateDuplicatedEmail(Provider.FOR_A, user.getEmail());
-        validateDuplicatedNickname(user.getNickname());
-    }
-
-    private void validateDuplicatedEmail(Provider provider, String email) {
-        boolean isExistingUser = userRepository.findByProviderAndEmail(provider, email).isPresent();
+    private void validateDuplicatedEmail(String email) {
+        boolean isExistingUser = userRepository.findByEmail(email).isPresent();
         if (isExistingUser) {
             throw new RuntimeException("이미 가입한 이메일입니다.");
         }
@@ -128,12 +141,6 @@ public class UserService {
         boolean isDuplicatedNickname = userRepository.findByNickname(nickname).isPresent();
         if (isDuplicatedNickname) {
             throw new RuntimeException("이미 존재하는 닉네임입니다.");
-        }
-    }
-
-    private void validatePasswordMatches(String rawPassword, String encodedPassword) {
-        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
     }
 
@@ -151,6 +158,25 @@ public class UserService {
             if (!terms.getRequired() || approved) return;
             throw new RuntimeException("필수 이용 약관에 동의해야 합니다."); //TODO: 예외 처리
         }
-        throw new RuntimeException("존재하지 않은 이용 약관입니다.");
+        throw new RuntimeException("존재하지 않는 이용 약관입니다.");
+    }
+
+    private void validatePushNotificationApprovals(
+        List<UserPushNotificationApproval> userPushNotificationApprovals) {
+        List<PushNotificationApproval> pushNotificationApprovalList = pushNotificationApprovalRepository.findAll();
+        for (UserPushNotificationApproval userPushNotificationApproval : userPushNotificationApprovals) {
+            Long pushNotificationApprovalId = userPushNotificationApproval.getId().getPushNotificationApproval().getId();
+            validatePushNotificationApproval(pushNotificationApprovalId, pushNotificationApprovalList);
+        }
+    }
+
+    private void validatePushNotificationApproval(Long pushNotificationApprovalId,
+        List<PushNotificationApproval> pushNotificationApprovalList) {
+        boolean isValidPushNotificationApproval = pushNotificationApprovalList.stream()
+            .anyMatch(pushNotificationApproval ->
+                pushNotificationApproval.getId().equals(pushNotificationApprovalId));
+        if (!isValidPushNotificationApproval) {
+            throw new RuntimeException("존재하지 않는 푸시 알림 동의 항목입니다.");
+        }
     }
 }

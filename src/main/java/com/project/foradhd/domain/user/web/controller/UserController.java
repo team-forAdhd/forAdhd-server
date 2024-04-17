@@ -56,7 +56,7 @@ public class UserController {
     @PostMapping("/sign-up")
     public ResponseEntity<Void> signUp(@RequestBody @Valid SignUpRequest request) {
         SignUpData signUpData = userMapper.toSignUpData(request);
-        userService.signUp(signUpData, request.getPassword());
+        userService.signUp(signUpData);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
