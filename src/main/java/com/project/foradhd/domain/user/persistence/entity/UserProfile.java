@@ -43,9 +43,9 @@ public class UserProfile extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean isAdhd = Boolean.FALSE;
 
-    public void updateProfile(String nickname, String profileImage, Boolean isAdhd) {
-        this.nickname = nickname;
-        this.profileImage = profileImage;
-        this.isAdhd = isAdhd;
+    public void updateProfile(UserProfile newUserProfile) {
+        this.nickname = newUserProfile.getNickname();
+        this.profileImage = newUserProfile.getProfileImage();
+        this.isAdhd = newUserProfile.getIsAdhd();
     }
 }

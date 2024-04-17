@@ -49,4 +49,10 @@ public class User extends BaseTimeEntity {
     public void updateEmail(String email) {
         this.email = email;
     }
+
+    public void updateAsUserRole(boolean isDoneSnsSignUp) {
+        if (isDoneSnsSignUp && isVerifiedEmail) {
+            this.role = Role.USER;
+        }
+    }
 }

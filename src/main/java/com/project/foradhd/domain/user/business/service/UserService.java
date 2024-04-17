@@ -76,14 +76,20 @@ public class UserService {
 
     @Transactional
     public void snsSignUp(String userId, SnsSignUpData snsSignUpData) {
-        User user = snsSignUpData.getUser();
+        UserProfile userProfile = snsSignUpData.getUserProfile();
         List<UserTermsApproval> userTermsApprovals = snsSignUpData.getUserTermsApprovals();
-        validateDuplicatedNickname(user.getNickname());
+        List<UserPushNotificationApproval> userPushNotificationApprovals = snsSignUpData.getUserPushNotificationApprovals();
+        validateDuplicatedNickname(userProfile.getNickname());
         validateTermsApprovals(userTermsApprovals);
+        validatePushNotificationApprovals(userPushNotificationApprovals);
 
-        User snsUser = getUser(userId);
-        snsUser.snsSignUp(user);
+        User user = getUser(userId);
+        boolean isDoneSnsSignUp = true;
+        user.updateAsUserRole(isDoneSnsSignUp);
+
+        userProfileRepository.save(userProfile);
         userTermsApprovalRepository.saveAll(userTermsApprovals);
+        userPushNotificationApprovalRepository.saveAll(userPushNotificationApprovals);
     }
 
     @Transactional
@@ -126,6 +132,11 @@ public class UserService {
     public User getUser(String userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+    }
+
+    private UserProfile getUserProfile(String userId) {
+        return userProfileRepository.findByUserId(userId)
+            .orElseThrow(() -> new RuntimeException("해당 유저 프로필이 존재하지 않습니다."));
     }
 
     private UserProfile getUserProfileFetch(String userId) {

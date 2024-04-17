@@ -12,14 +12,22 @@ public class SnsSignUpRequest {
 
     private Boolean isAdhd;
 
-    private Boolean pushNotificationAgree;
+    private List<TermsApprovalRequest> termsApprovals;
 
-    private List<SignUpRequest.TermsApprovalRequest> termsApprovals;
+    private List<PushNotificationApprovalRequest> pushNotificationApprovals;
 
     @Getter
     public static class TermsApprovalRequest {
 
         private Long termsId;
+
+        private Boolean approved;
+    }
+
+    @Getter
+    public static class PushNotificationApprovalRequest {
+
+        private Long pushNotificationApprovalId;
 
         private Boolean approved;
     }

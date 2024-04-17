@@ -28,12 +28,10 @@ import com.project.foradhd.domain.user.web.dto.request.TermsApprovalsUpdateReque
 import com.project.foradhd.domain.user.web.dto.response.UserProfileDetailsResponse;
 import java.util.List;
 import org.mapstruct.Context;
-import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants.ComponentModel;
 import org.mapstruct.Mappings;
-import org.mapstruct.Named;
 
 @Mapper(componentModel = ComponentModel.SPRING)
 public interface UserMapper {
@@ -45,14 +43,6 @@ public interface UserMapper {
         @Mapping(target = "isAdhd", source = "user.isAdhd")
     })
     UserProfileDetailsResponse toUserProfileDetailsResponse(UserProfileDetailsData userProfileDetailsData);
-
-    @Named("mapToTermsApprovals")
-    @IterableMapping(qualifiedByName = "mapToTermsApproval")
-    List<UserProfileDetailsResponse.TermsApprovalResponse> mapToTermsApprovals(List<UserTermsApproval> userTermsApprovals);
-
-    @Named("mapToTermsApproval")
-    @Mapping(target = "termsId", source = "id.terms.id")
-    UserProfileDetailsResponse.TermsApprovalResponse mapToTermsApproval(UserTermsApproval userTermsApprovals);
 
     default SignUpData toSignUpData(SignUpRequest request) {
         User user = User.builder()
@@ -99,27 +89,50 @@ public interface UserMapper {
             .build();
     }
 
+    default UserPushNotificationApproval mapToUserPushNotificationApproval(String userId, Long pushNotificationApprovalId, Boolean approved) {
+        return UserPushNotificationApproval.builder()
+            .id(mapToUserPushNotificationApprovalId(userId, pushNotificationApprovalId))
+            .approved(approved)
+            .build();
+    }
+
     default UserPushNotificationApprovalId mapToUserPushNotificationApprovalId(User user, Long pushNotificationApprovalId) {
         PushNotificationApproval pushNotificationApproval = PushNotificationApproval.builder()
             .id(pushNotificationApprovalId).build();
         return new UserPushNotificationApprovalId(user, pushNotificationApproval);
     }
 
-    @Mappings({
-        @Mapping(target = "user.nickname", source = "request.nickname"),
-        @Mapping(target = "user.profileImage", source = "request.profileImage"),
-        @Mapping(target = "user.isAdhd", source = "request.isAdhd"),
-        @Mapping(target = "user.pushNotificationAgree", source = "request.pushNotificationAgree"),
-        @Mapping(target = "userTermsApprovals", source = "request", qualifiedByName = "mapToUserTermsApprovals")
-    })
-    SnsSignUpData toSnsSignUpData(@Context String userId, SnsSignUpRequest request);
+    default UserPushNotificationApprovalId mapToUserPushNotificationApprovalId(String userId, Long pushNotificationApprovalId) {
+        User user = User.builder().id(userId).build();
+        PushNotificationApproval pushNotificationApproval = PushNotificationApproval.builder()
+            .id(pushNotificationApprovalId).build();
+        return new UserPushNotificationApprovalId(user, pushNotificationApproval);
+    }
 
-    @Named("mapToUserTermsApprovals")
-    default List<UserTermsApproval> mapToUserTermsApprovals(@Context String userId, SnsSignUpRequest request) {
-        return request.getTermsApprovals().stream()
+    default SnsSignUpData toSnsSignUpData(@Context String userId, SnsSignUpRequest request) {
+        User user = User.builder().id(userId).build();
+        UserProfile userProfile = UserProfile.builder()
+            .user(user)
+            .nickname(request.getNickname())
+            .profileImage(request.getProfileImage())
+            .isAdhd(request.getIsAdhd())
+            .build();
+        List<UserTermsApproval> userTermsApprovals = request.getTermsApprovals().stream()
             .map(termsApproval ->
-                mapToUserTermsApproval(userId, termsApproval.getTermsId(), termsApproval.getApproved()))
+                mapToUserTermsApproval(userId, termsApproval.getTermsId(),
+                    termsApproval.getApproved()))
             .toList();
+        List<UserPushNotificationApproval> userPushNotificationApprovals = request.getPushNotificationApprovals().stream()
+            .map(pushNotificationApproval ->
+                mapToUserPushNotificationApproval(userId,
+                    pushNotificationApproval.getPushNotificationApprovalId(),
+                    pushNotificationApproval.getApproved()))
+            .toList();
+        return SnsSignUpData.builder()
+            .userProfile(userProfile)
+            .userTermsApprovals(userTermsApprovals)
+            .userPushNotificationApprovals(userPushNotificationApprovals)
+            .build();
     }
 
     default UserTermsApprovalId mapToUserTermsApprovalId(User user, Long termsId) {
