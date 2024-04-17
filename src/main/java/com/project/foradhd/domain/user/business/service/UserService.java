@@ -94,10 +94,10 @@ public class UserService {
 
     @Transactional
     public void updateProfile(String userId, ProfileUpdateData profileUpdateData) {
-        User user = getUser(userId);
-        validateDuplicatedNickname(profileUpdateData.getNickname());
-        user.updateProfile(profileUpdateData.getNickname(), profileUpdateData.getProfileImage(),
-            profileUpdateData.getIsAdhd());
+        UserProfile newUserProfile = profileUpdateData.getUserProfile();
+        validateDuplicatedNickname(newUserProfile.getNickname());
+        UserProfile originUserProfile = getUserProfile(userId);
+        originUserProfile.updateProfile(newUserProfile);
     }
 
     @Transactional

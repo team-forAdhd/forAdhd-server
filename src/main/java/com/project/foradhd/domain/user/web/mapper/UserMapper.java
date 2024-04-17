@@ -160,6 +160,11 @@ public interface UserMapper {
             .build();
     }
 
+    @Mappings({
+        @Mapping(target = "userProfile.nickname", source = "nickname"),
+        @Mapping(target = "userProfile.profileImage", source = "profileImage"),
+        @Mapping(target = "userProfile.isAdhd", source = "isAdhd")
+    })
     ProfileUpdateData toProfileUpdateData(ProfileUpdateRequest request);
 
     PasswordUpdateData toPasswordUpdateData(PasswordUpdateRequest request);
