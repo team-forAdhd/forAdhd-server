@@ -32,6 +32,15 @@ spring:
               - birthyear
               - age
               - gender
+          facebook:
+            client-id: ENC(N+8OKapW80anlr3JUxC5Hnsj79AsiOYJXU1LKYWHOkc=)
+            client-secret: ENC(ICCDO1J0O8sx31C2YYmuXzfV5Zhw2M+GVwjVNI9YGKi/mcu3AbHLdwN0ORrXoigN)
+            scope:
+              - email
+              - public_profile
+              - user_birthday
+              - user_age_range
+              - user_gender
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize

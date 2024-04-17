@@ -94,8 +94,22 @@ public class User extends BaseTimeEntity {
         return this.role.getName();
     }
 
+    public void updateProfile(String nickname, String profileImage, Boolean isAdhd) {
+        this.nickname = nickname;
+        this.profileImage = profileImage;
+        this.isAdhd = isAdhd;
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
     public void updateEncodedPassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    public void updatePushNotificationAgree(Boolean pushNotificationAgree) {
+        this.pushNotificationAgree = pushNotificationAgree;
     }
 
     public User loginBySns(User snsUser) {
@@ -105,5 +119,13 @@ public class User extends BaseTimeEntity {
         this.ageRange = snsUser.ageRange;
         this.birth = snsUser.birth;
         return this;
+    }
+
+    public void snsSignUp(User user) {
+        this.role = Role.USER;
+        this.nickname = user.getNickname();
+        this.profileImage = user.getProfileImage();
+        this.isAdhd = user.getIsAdhd();
+        this.pushNotificationAgree = user.getPushNotificationAgree();
     }
 }

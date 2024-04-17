@@ -12,6 +12,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Collection;
@@ -71,16 +72,19 @@ public class JwtServiceImpl implements JwtService {
         try {
             parseToken(token);
         } catch (UnsupportedJwtException e) {
-            log.error("The claimsJwt argument does not represent an unsigned Claims JWT");
+            log.error("The claimsJws argument does not represent an Claims JWS");
             throw e;
         } catch (MalformedJwtException e) {
-            log.error("The claimsJwt string is not a valid JWT");
+            log.error("The claimsJws string is not a valid JWS");
+            throw e;
+        } catch (SignatureException e) {
+            log.error("The claimsJws JWS signature validation fails");
             throw e;
         } catch (ExpiredJwtException e) {
             log.error("The specified JWT is a Claims JWT and the Claims has an expiration time before the time this method is invoked.");
             throw e;
         } catch (IllegalArgumentException e) {
-            log.error("The claimsJwt string is null or empty or only whitespace");
+            log.error("The claimsJws string is null or empty or only whitespace");
             throw new JwtException(e.getMessage(), e);
         }
     }
@@ -89,16 +93,19 @@ public class JwtServiceImpl implements JwtService {
     public void validateTokenForm(String token) {
         try {
             parseToken(token);
-        } catch (UnsupportedJwtException e) {
-            log.error("The claimsJwt argument does not represent an unsigned Claims JWT");
+        }  catch (UnsupportedJwtException e) {
+            log.error("The claimsJws argument does not represent an Claims JWS");
             throw e;
         } catch (MalformedJwtException e) {
-            log.error("The claimsJwt string is not a valid JWT");
+            log.error("The claimsJws string is not a valid JWS");
+            throw e;
+        } catch (SignatureException e) {
+            log.error("The claimsJws JWS signature validation fails");
             throw e;
         } catch (IllegalArgumentException e) {
-            log.error("The claimsJwt string is null or empty or only whitespace");
+            log.error("The claimsJws string is null or empty or only whitespace");
             throw new JwtException(e.getMessage(), e);
-        }
+        } catch (ExpiredJwtException e) { }
     }
 
     @Override
@@ -123,13 +130,13 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String getSubject(String token) {
-        Claims claims = parseToken(token);
+        Claims claims = parseExpiredToken(token);
         return claims.getSubject();
     }
 
     @Override
     public Collection<GrantedAuthority> getAuthorities(String token) {
-        Claims claims = parseToken(token);
+        Claims claims = parseExpiredToken(token);
         String authorityString = claims.get(AUTHORITIES_CLAIM_NAME, String.class);
         return AuthorityUtils.commaSeparatedStringToAuthorityList(authorityString);
     }
@@ -146,5 +153,13 @@ public class JwtServiceImpl implements JwtService {
             .build()
             .parseClaimsJws(token)
             .getBody();
+    }
+
+    private Claims parseExpiredToken(String token) {
+        try {
+            return parseToken(token);
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
     }
 }
