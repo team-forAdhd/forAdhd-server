@@ -3,7 +3,7 @@ package com.project.foradhd.domain.user.business.service;
 import com.project.foradhd.domain.user.business.dto.in.EmailUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.PasswordUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.PushNotificationAgreeUpdateData;
+import com.project.foradhd.domain.user.business.dto.in.PushNotificationApprovalUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
@@ -115,10 +115,10 @@ public class UserService {
     }
 
     @Transactional
-    public void updatePushNotificationAgree(String userId,
-        PushNotificationAgreeUpdateData pushNotificationAgreeUpdateData) {
-        User user = getUser(userId);
-        user.updatePushNotificationAgree(pushNotificationAgreeUpdateData.getPushNotificationAgree());
+    public void updatePushNotificationApproval(PushNotificationApprovalUpdateData pushNotificationApprovalUpdateData) {
+        List<UserPushNotificationApproval> userPushNotificationApprovals = pushNotificationApprovalUpdateData.getUserPushNotificationApprovals();
+        validatePushNotificationApprovals(userPushNotificationApprovals);
+        userPushNotificationApprovalRepository.saveAll(userPushNotificationApprovals);
     }
 
     @Transactional

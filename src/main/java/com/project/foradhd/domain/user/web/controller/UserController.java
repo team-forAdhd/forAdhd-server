@@ -3,7 +3,7 @@ package com.project.foradhd.domain.user.web.controller;
 import com.project.foradhd.domain.user.business.dto.in.EmailUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.PasswordUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.PushNotificationAgreeUpdateData;
+import com.project.foradhd.domain.user.business.dto.in.PushNotificationApprovalUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
@@ -13,7 +13,7 @@ import com.project.foradhd.domain.user.web.dto.request.EmailUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.request.NicknameCheckRequest;
 import com.project.foradhd.domain.user.web.dto.request.PasswordUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.request.ProfileUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.request.PushNotificationAgreeUpdateRequest;
+import com.project.foradhd.domain.user.web.dto.request.PushNotificationApprovalUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.TermsApprovalsUpdateRequest;
@@ -103,11 +103,12 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/push-notification-agree")
-    public ResponseEntity<Void> updatePushNotificationAgree(@AuthUserId String userId,
-        @RequestBody @Valid PushNotificationAgreeUpdateRequest request) {
-        PushNotificationAgreeUpdateData pushNotificationAgreeUpdateData = userMapper.toPushNotificationAgreeUpdateData(request);
-        userService.updatePushNotificationAgree(userId, pushNotificationAgreeUpdateData);
+    @PutMapping("/push-notification-approvals")
+    public ResponseEntity<Void> updatePushNotificationApprovals(@AuthUserId String userId,
+        @RequestBody @Valid PushNotificationApprovalUpdateRequest request) {
+        PushNotificationApprovalUpdateData pushNotificationApprovalUpdateData = userMapper
+            .toPushNotificationApprovalUpdateData(userId, request);
+        userService.updatePushNotificationApproval(pushNotificationApprovalUpdateData);
         return ResponseEntity.ok().build();
     }
 

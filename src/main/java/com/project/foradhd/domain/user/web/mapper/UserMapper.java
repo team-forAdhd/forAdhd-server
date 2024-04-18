@@ -3,7 +3,7 @@ package com.project.foradhd.domain.user.web.mapper;
 import com.project.foradhd.domain.user.business.dto.in.EmailUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.PasswordUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.PushNotificationAgreeUpdateData;
+import com.project.foradhd.domain.user.business.dto.in.PushNotificationApprovalUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
@@ -21,7 +21,7 @@ import com.project.foradhd.domain.user.persistence.enums.Role;
 import com.project.foradhd.domain.user.web.dto.request.EmailUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.request.PasswordUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.request.ProfileUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.request.PushNotificationAgreeUpdateRequest;
+import com.project.foradhd.domain.user.web.dto.request.PushNotificationApprovalUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.TermsApprovalsUpdateRequest;
@@ -37,10 +37,10 @@ import org.mapstruct.Mappings;
 public interface UserMapper {
 
     @Mappings({
-        @Mapping(target = "email", source = "user.email"),
-        @Mapping(target = "nickname", source = "user.nickname"),
-        @Mapping(target = "profileImage", source = "user.profileImage"),
-        @Mapping(target = "isAdhd", source = "user.isAdhd")
+        @Mapping(target = "email", source = "userProfile.user.email"),
+        @Mapping(target = "nickname", source = "userProfile.nickname"),
+        @Mapping(target = "profileImage", source = "userProfile.profileImage"),
+        @Mapping(target = "isAdhd", source = "userProfile.isAdhd")
     })
     UserProfileDetailsResponse toUserProfileDetailsResponse(UserProfileDetailsData userProfileDetailsData);
 
@@ -171,8 +171,17 @@ public interface UserMapper {
 
     EmailUpdateData toEmailUpdateData(EmailUpdateRequest request);
 
-    PushNotificationAgreeUpdateData toPushNotificationAgreeUpdateData(
-        PushNotificationAgreeUpdateRequest request);
+    default PushNotificationApprovalUpdateData toPushNotificationApprovalUpdateData(String userId,
+        PushNotificationApprovalUpdateRequest request) {
+        List<UserPushNotificationApproval> userPushNotificationApprovals = request.getPushNotificationApprovals()
+            .stream()
+            .map(pushNotificationApproval ->
+                mapToUserPushNotificationApproval(userId,
+                    pushNotificationApproval.getPushNotificationApprovalId(),
+                    pushNotificationApproval.getApproved()))
+            .toList();
+        return new PushNotificationApprovalUpdateData(userPushNotificationApprovals);
+    }
 
     default TermsApprovalsUpdateData toTermsApprovalsUpdateData(String userId, TermsApprovalsUpdateRequest request) {
         List<UserTermsApproval> userTermsApprovals = request.getTermsApprovals().stream()
