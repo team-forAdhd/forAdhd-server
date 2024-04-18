@@ -27,4 +27,25 @@ public class UserAuthInfoServiceImpl implements UserAuthInfoService {
             .build();
         authPasswordRepository.save(authPassword);
     }
+
+    @Override
+    public void validatePasswordMatches(String userId, String password) {
+        AuthPassword authPassword = getAuthPassword(userId);
+        if (!passwordEncoder.matches(password, authPassword.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    @Transactional
+    @Override
+    public void updatePassword(String userId, String newPassword) {
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+        AuthPassword authPassword = getAuthPassword(userId);
+        authPassword.updateEncodedPassword(encodedNewPassword);
+    }
+
+    private AuthPassword getAuthPassword(String userId) {
+        return authPasswordRepository.findByUserId(userId)
+            .orElseThrow(() -> new RuntimeException("일반 회원가입 유저가 아닙니다."));
+    }
 }

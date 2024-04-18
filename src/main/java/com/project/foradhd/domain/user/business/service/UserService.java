@@ -102,10 +102,10 @@ public class UserService {
 
     @Transactional
     public void updatePassword(String userId, PasswordUpdateData passwordUpdateData) {
-        User user = getUser(userId);
-        validatePasswordMatches(passwordUpdateData.getPrevPassword(), user.getPassword());
-        String encodedNewPassword = passwordEncoder.encode(passwordUpdateData.getPassword());
-        user.updateEncodedPassword(encodedNewPassword);
+        String prevPassword = passwordUpdateData.getPrevPassword();
+        String newPassword = passwordUpdateData.getPassword();
+        userAuthInfoService.validatePasswordMatches(userId, prevPassword);
+        userAuthInfoService.updatePassword(userId, newPassword);
     }
 
     @Transactional
