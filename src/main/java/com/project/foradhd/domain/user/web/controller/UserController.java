@@ -25,6 +25,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -68,6 +69,16 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PostMapping("/email-auth")
+    public ResponseEntity<Void> authenticateEmail() {
+        return ResponseEntity.created(null).build();
+    }
+
+    @GetMapping("/email-auth")
+    public ResponseEntity<Void> validateEmailAuth() {
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/profile")
     public ResponseEntity<Void> updateProfile(@AuthUserId String userId,
         @RequestBody @Valid ProfileUpdateRequest request) {
@@ -105,6 +116,11 @@ public class UserController {
         @RequestBody @Valid TermsApprovalsUpdateRequest request) {
         TermsApprovalsUpdateData termsApprovalsUpdateData = userMapper.toTermsApprovalsUpdateData(userId, request);
         userService.updateTermsApprovals(termsApprovalsUpdateData);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<Void> withdraw(@AuthUserId String userId) {
         return ResponseEntity.ok().build();
     }
 }

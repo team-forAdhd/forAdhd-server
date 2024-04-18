@@ -15,7 +15,6 @@ import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
-import com.project.foradhd.domain.user.persistence.enums.Provider;
 import com.project.foradhd.domain.user.persistence.repository.PushNotificationApprovalRepository;
 import com.project.foradhd.domain.user.persistence.repository.TermsRepository;
 import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
@@ -110,7 +109,7 @@ public class UserService {
 
     @Transactional
     public void updateEmail(String userId, EmailUpdateData emailUpdateData) {
-        validateDuplicatedEmail(Provider.FOR_A, emailUpdateData.getEmail());
+        validateDuplicatedEmail(emailUpdateData.getEmail());
         User user = getUser(userId);
         user.updateEmail(emailUpdateData.getEmail());
     }
