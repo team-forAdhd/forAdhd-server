@@ -155,6 +155,10 @@ public class UserService {
         return userRepository.findByEmailOrProviderAndExternalUserId(email, provider, externalUserId);
     }
 
+    public Boolean hasVerifiedEmail(String userId) {
+        return getUser(userId).getIsVerifiedEmail();
+    }
+
     public boolean hasUserProfile(String userId) {
         return userRepository.findByIdWithProfile(userId)
             .isPresent();

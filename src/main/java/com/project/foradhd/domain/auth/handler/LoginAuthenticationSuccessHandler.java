@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import com.project.foradhd.domain.auth.business.service.JwtService;
 import com.project.foradhd.domain.auth.business.userdetails.impl.UserDetailsImpl;
 import com.project.foradhd.domain.auth.web.dto.response.LoginResponse;
+import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.global.util.JsonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
+    private final UserService userService;
     private final JwtService jwtService;
 
     @Override
@@ -29,7 +31,8 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         String refreshToken = jwtService.generateRefreshToken(userDetails.getUserId());
 
         //TODO: RT 저장소에 저장
-        LoginResponse loginResponse = new LoginResponse(accessToken, refreshToken);
+        Boolean hasVerifiedEmail = userService.hasVerifiedEmail(userDetails.getUserId());
+        LoginResponse loginResponse = new LoginResponse(accessToken, refreshToken, hasVerifiedEmail);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.getWriter().write(JsonUtil.writeValueAsString(loginResponse));
     }
