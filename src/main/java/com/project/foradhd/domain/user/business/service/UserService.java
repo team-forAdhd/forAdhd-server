@@ -15,6 +15,7 @@ import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
+import com.project.foradhd.domain.user.persistence.enums.Provider;
 import com.project.foradhd.domain.user.persistence.repository.PushNotificationApprovalRepository;
 import com.project.foradhd.domain.user.persistence.repository.TermsRepository;
 import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
@@ -24,6 +25,7 @@ import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.domain.user.persistence.repository.UserTermsApprovalRepository;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,8 +85,8 @@ public class UserService {
         validatePushNotificationApprovals(userPushNotificationApprovals);
 
         User user = getUser(userId);
-        boolean isDoneSnsSignUp = true;
-        user.updateAsUserRole(isDoneSnsSignUp);
+        boolean hasProfile = true;
+        user.updateAsUserRole(hasProfile);
 
         userProfileRepository.save(userProfile);
         userTermsApprovalRepository.saveAll(userTermsApprovals);
@@ -128,6 +130,12 @@ public class UserService {
         userTermsApprovalRepository.saveAll(userTermsApprovals); //update or insert
     }
 
+    @Transactional
+    public void saveUserInfo(User user, UserPrivacy userPrivacy) {
+        userRepository.save(user);
+        userPrivacyRepository.save(userPrivacy);
+    }
+
     public User getUser(String userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
@@ -141,6 +149,15 @@ public class UserService {
     private UserProfile getUserProfileFetch(String userId) {
         return userProfileRepository.findByUserIdFetch(userId)
             .orElseThrow(() -> new RuntimeException("해당 유저 프로필이 존재하지 않습니다."));
+    }
+
+    public Optional<User> getSignedUpUser(String email, Provider provider, String externalUserId) {
+        return userRepository.findByEmailOrProviderAndExternalUserId(email, provider, externalUserId);
+    }
+
+    public boolean hasUserProfile(String userId) {
+        return userRepository.findByIdWithProfile(userId)
+            .isPresent();
     }
 
     private void validateDuplicatedEmail(String email) {

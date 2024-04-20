@@ -50,8 +50,15 @@ public class User extends BaseTimeEntity {
         this.email = email;
     }
 
-    public void updateAsUserRole(boolean isDoneSnsSignUp) {
-        if (isDoneSnsSignUp && isVerifiedEmail) {
+    public void updateAsUserRole(boolean hasProfile) {
+        if (hasProfile && isVerifiedEmail) {
+            this.role = Role.USER;
+        }
+    }
+
+    public void updateAsUserRole(boolean isVerifiedEmail, boolean hasProfile) {
+        this.isVerifiedEmail = isVerifiedEmail;
+        if (hasProfile && isVerifiedEmail) {
             this.role = Role.USER;
         }
     }

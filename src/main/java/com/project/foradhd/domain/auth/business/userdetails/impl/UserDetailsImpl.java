@@ -11,7 +11,7 @@ public class UserDetailsImpl extends org.springframework.security.core.userdetai
     private final String userId;
 
     public UserDetailsImpl(User user) {
-        super(user.getEmail(), user.getPassword(), createAuthorityList(user.getAuthority()));
+        super(user.getEmail(), null, createAuthorityList(user.getAuthority()));
         this.userId = user.getId();
     }
 }
