@@ -7,8 +7,11 @@ import com.project.foradhd.domain.user.business.dto.in.PushNotificationApprovalU
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
+import com.project.foradhd.domain.user.business.dto.out.SignUpTokenData;
 import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
 import com.project.foradhd.domain.user.business.service.UserService;
+import com.project.foradhd.domain.user.business.service.UserSignUpTokenService;
+import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.web.dto.request.EmailUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.request.NicknameCheckRequest;
 import com.project.foradhd.domain.user.web.dto.request.PasswordUpdateRequest;
@@ -18,6 +21,8 @@ import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.TermsApprovalsUpdateRequest;
 import com.project.foradhd.domain.user.web.dto.response.NicknameCheckResponse;
+import com.project.foradhd.domain.user.web.dto.response.SignUpResponse;
+import com.project.foradhd.domain.user.web.dto.response.SnsSignUpResponse;
 import com.project.foradhd.domain.user.web.dto.response.UserProfileDetailsResponse;
 import com.project.foradhd.domain.user.web.mapper.UserMapper;
 import com.project.foradhd.global.AuthUserId;
@@ -39,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+    private final UserSignUpTokenService userSignUpTokenService;
     private final UserMapper userMapper;
 
     @GetMapping("/nickname-check")
@@ -55,18 +61,20 @@ public class UserController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<Void> signUp(@RequestBody @Valid SignUpRequest request) {
+    public ResponseEntity<SignUpResponse> signUp(@RequestBody @Valid SignUpRequest request) {
         SignUpData signUpData = userMapper.toSignUpData(request);
-        userService.signUp(signUpData);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        User user = userService.signUp(signUpData);
+        SignUpTokenData signUpTokenData = userSignUpTokenService.generateSignUpToken(user);
+        return new ResponseEntity<>(userMapper.toSignUpResponse(signUpTokenData, user), HttpStatus.CREATED);
     }
 
     @PostMapping("/sns-sign-up")
-    public ResponseEntity<Void> snsSignUp(@AuthUserId String userId,
+    public ResponseEntity<SnsSignUpResponse> snsSignUp(@AuthUserId String userId,
         @RequestBody @Valid SnsSignUpRequest request) {
         SnsSignUpData snsSignUpData = userMapper.toSnsSignUpData(userId, request);
-        userService.snsSignUp(userId, snsSignUpData);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        User user = userService.snsSignUp(userId, snsSignUpData);
+        SignUpTokenData signUpTokenData = userSignUpTokenService.generateSignUpToken(user);
+        return new ResponseEntity<>(userMapper.toSnsSignUpResponse(signUpTokenData, user), HttpStatus.CREATED);
     }
 
     @PostMapping("/email-auth")

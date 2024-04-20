@@ -7,6 +7,7 @@ import com.project.foradhd.domain.user.business.dto.in.PushNotificationApprovalU
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
+import com.project.foradhd.domain.user.business.dto.out.SignUpTokenData;
 import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
 import com.project.foradhd.domain.user.persistence.entity.PushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.Terms;
@@ -25,6 +26,8 @@ import com.project.foradhd.domain.user.web.dto.request.PushNotificationApprovalU
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.TermsApprovalsUpdateRequest;
+import com.project.foradhd.domain.user.web.dto.response.SignUpResponse;
+import com.project.foradhd.domain.user.web.dto.response.SnsSignUpResponse;
 import com.project.foradhd.domain.user.web.dto.response.UserProfileDetailsResponse;
 import java.util.List;
 import org.mapstruct.Context;
@@ -190,4 +193,11 @@ public interface UserMapper {
             .toList();
         return new TermsApprovalsUpdateData(userTermsApprovals);
     }
+
+    @Mapping(target = "hasVerifiedEmail", source = "user.isVerifiedEmail")
+    SignUpResponse toSignUpResponse(SignUpTokenData signUpTokenData, User user);
+
+    @Mapping(target = "hasVerifiedEmail", source = "user.isVerifiedEmail")
+    @Mapping(target = "hasProfile", constant = "true")
+    SnsSignUpResponse toSnsSignUpResponse(SignUpTokenData signUpTokenData, User user);
 }

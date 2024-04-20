@@ -56,7 +56,7 @@ public class UserService {
     }
 
     @Transactional
-    public void signUp(SignUpData signUpData) {
+    public User signUp(SignUpData signUpData) {
         User user = signUpData.getUser();
         UserPrivacy userPrivacy = signUpData.getUserPrivacy();
         UserProfile userProfile = signUpData.getUserProfile();
@@ -73,10 +73,11 @@ public class UserService {
         userTermsApprovalRepository.saveAll(userTermsApprovals);
         userPushNotificationApprovalRepository.saveAll(userPushNotificationApprovals);
         userAuthInfoService.signUpByPassword(user, signUpData.getPassword());
+        return user;
     }
 
     @Transactional
-    public void snsSignUp(String userId, SnsSignUpData snsSignUpData) {
+    public User snsSignUp(String userId, SnsSignUpData snsSignUpData) {
         UserProfile userProfile = snsSignUpData.getUserProfile();
         List<UserTermsApproval> userTermsApprovals = snsSignUpData.getUserTermsApprovals();
         List<UserPushNotificationApproval> userPushNotificationApprovals = snsSignUpData.getUserPushNotificationApprovals();
@@ -91,6 +92,7 @@ public class UserService {
         userProfileRepository.save(userProfile);
         userTermsApprovalRepository.saveAll(userTermsApprovals);
         userPushNotificationApprovalRepository.saveAll(userPushNotificationApprovals);
+        return user;
     }
 
     @Transactional
