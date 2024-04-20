@@ -5,9 +5,13 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
+import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
+import com.project.foradhd.domain.user.web.dto.request.SignUpRequest.PushNotificationApprovalRequest;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest.TermsApprovalRequest;
 import com.project.foradhd.domain.user.web.mapper.UserMapperTest.UserMapperTestConfig;
 import java.time.LocalDate;
@@ -40,6 +44,10 @@ class UserMapperTest {
             .termsId(2L).approved(true).build();
         TermsApprovalRequest termsApprovalRequest3 = TermsApprovalRequest.builder()
             .termsId(3L).approved(false).build();
+        PushNotificationApprovalRequest pushNotificationApprovalRequest1 = PushNotificationApprovalRequest.builder()
+            .pushNotificationApprovalId(1L).approved(true).build();
+        PushNotificationApprovalRequest pushNotificationApprovalRequest2 = PushNotificationApprovalRequest.builder()
+            .pushNotificationApprovalId(1L).approved(false).build();
         SignUpRequest signUpRequest = SignUpRequest.builder()
             .name("김다은")
             .birth(LocalDate.of(1999, 2, 1))
@@ -50,31 +58,39 @@ class UserMapperTest {
             .nickname("단이")
             .profileImage("http://")
             .isAdhd(false)
-            .pushNotificationAgree(true)
             .termsApprovals(List.of(termsApprovalRequest1, termsApprovalRequest2, termsApprovalRequest3))
+            .pushNotificationApprovals(List.of(pushNotificationApprovalRequest1, pushNotificationApprovalRequest2))
             .build();
 
         //when
         SignUpData signUpData = userMapper.toSignUpData(signUpRequest);
         User user = signUpData.getUser();
+        UserPrivacy userPrivacy = signUpData.getUserPrivacy();
+        UserProfile userProfile = signUpData.getUserProfile();
+        String password = signUpData.getPassword();
         List<UserTermsApproval> userTermsApprovals = signUpData.getUserTermsApprovals();
+        List<UserPushNotificationApproval> userPushNotificationApprovals = signUpData.getUserPushNotificationApprovals();
 
         //then
-        assertThat(user.getName()).isEqualTo(signUpRequest.getName());
-        assertThat(user.getBirth()).isEqualTo(signUpRequest.getBirth());
-        assertThat(user.getGender()).isEqualTo(signUpRequest.getGender());
         assertThat(user.getEmail()).isEqualTo(signUpRequest.getEmail());
-        assertThat(user.getPassword()).isNull();
-        assertThat(user.getNickname()).isEqualTo(signUpRequest.getNickname());
-        assertThat(user.getProfileImage()).isEqualTo(signUpRequest.getProfileImage());
-        assertThat(user.getIsAdhd()).isEqualTo(signUpRequest.getIsAdhd());
-        assertThat(user.getPushNotificationAgree()).isEqualTo(signUpRequest.getPushNotificationAgree());
-
+        assertThat(userPrivacy.getName()).isEqualTo(signUpRequest.getName());
+        assertThat(userPrivacy.getBirth()).isEqualTo(signUpRequest.getBirth());
+        assertThat(userPrivacy.getGender()).isEqualTo(signUpRequest.getGender());
+        assertThat(password).isEqualTo(signUpRequest.getPassword());
+        assertThat(userProfile.getNickname()).isEqualTo(signUpRequest.getNickname());
+        assertThat(userProfile.getProfileImage()).isEqualTo(signUpRequest.getProfileImage());
+        assertThat(userProfile.getIsAdhd()).isEqualTo(signUpRequest.getIsAdhd());
         assertThat(userTermsApprovals).extracting("id.user", "id.terms.id", "approved")
             .containsExactlyInAnyOrder(
                 tuple(user, termsApprovalRequest1.getTermsId(), termsApprovalRequest1.getApproved()),
                 tuple(user, termsApprovalRequest2.getTermsId(), termsApprovalRequest2.getApproved()),
                 tuple(user, termsApprovalRequest3.getTermsId(), termsApprovalRequest3.getApproved()));
+        assertThat(userPushNotificationApprovals).extracting("id.user", "id.pushNotificationApproval.id", "approved")
+            .containsExactlyInAnyOrder(
+                tuple(user, pushNotificationApprovalRequest1.getPushNotificationApprovalId(),
+                    pushNotificationApprovalRequest1.getApproved()),
+                tuple(user, pushNotificationApprovalRequest2.getPushNotificationApprovalId(),
+                    pushNotificationApprovalRequest2.getApproved()));
     }
 
     @TestConfiguration
