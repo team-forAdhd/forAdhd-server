@@ -98,7 +98,7 @@ public class UserService {
     @Transactional
     public void updateProfile(String userId, ProfileUpdateData profileUpdateData) {
         UserProfile newUserProfile = profileUpdateData.getUserProfile();
-        validateDuplicatedNickname(newUserProfile.getNickname());
+        validateDuplicatedNickname(newUserProfile.getNickname(), userId);
         UserProfile originUserProfile = getUserProfile(userId);
         originUserProfile.updateProfile(newUserProfile);
     }
@@ -113,13 +113,13 @@ public class UserService {
 
     @Transactional
     public void updateEmail(String userId, EmailUpdateData emailUpdateData) {
-        validateDuplicatedEmail(emailUpdateData.getEmail());
+        validateDuplicatedEmail(emailUpdateData.getEmail(), userId);
         User user = getUser(userId);
         user.updateEmail(emailUpdateData.getEmail());
     }
 
     @Transactional
-    public void updatePushNotificationApproval(PushNotificationApprovalUpdateData pushNotificationApprovalUpdateData) {
+    public void updatePushNotificationApprovals(PushNotificationApprovalUpdateData pushNotificationApprovalUpdateData) {
         List<UserPushNotificationApproval> userPushNotificationApprovals = pushNotificationApprovalUpdateData.getUserPushNotificationApprovals();
         validatePushNotificationApprovals(userPushNotificationApprovals);
         userPushNotificationApprovalRepository.saveAll(userPushNotificationApprovals);
@@ -173,8 +173,23 @@ public class UserService {
         }
     }
 
+    private void validateDuplicatedEmail(String email, String userId) {
+        boolean isExistingUser = userRepository.findByEmailAndUserIdNot(email, userId).isPresent();
+        if (isExistingUser) {
+            throw new RuntimeException("이미 가입한 이메일입니다.");
+        }
+    }
+
     private void validateDuplicatedNickname(String nickname) {
         boolean isDuplicatedNickname = userProfileRepository.findByNickname(nickname).isPresent();
+        if (isDuplicatedNickname) {
+            throw new RuntimeException("이미 존재하는 닉네임입니다.");
+        }
+    }
+
+    private void validateDuplicatedNickname(String nickname, String userId) {
+        boolean isDuplicatedNickname = userProfileRepository.findByNicknameAndUserIdNot(nickname, userId)
+            .isPresent();
         if (isDuplicatedNickname) {
             throw new RuntimeException("이미 존재하는 닉네임입니다.");
         }
@@ -192,7 +207,7 @@ public class UserService {
         for (Terms terms : termsList) {
             if (!Objects.equals(terms.getId(), termsId)) continue;
             if (!terms.getRequired() || approved) return;
-            throw new RuntimeException("필수 이용 약관에 동의해야 합니다."); //TODO: 예외 처리
+            throw new RuntimeException("필수 이용 약관에 동의해야 합니다.");
         }
         throw new RuntimeException("존재하지 않는 이용 약관입니다.");
     }

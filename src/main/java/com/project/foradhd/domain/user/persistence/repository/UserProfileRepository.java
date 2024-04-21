@@ -20,4 +20,12 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, String
     Optional<UserProfile> findByUserId(@Param("userId") String userId);
 
     Optional<UserProfile> findByNickname(String nickname);
+
+    @Query("""
+        select up
+        from UserProfile up
+        where up.nickname = :nickname and up.user.id <> :userId
+        """)
+    Optional<UserProfile> findByNicknameAndUserIdNot(@Param("nickname") String nickname,
+        @Param("userId") String userId);
 }

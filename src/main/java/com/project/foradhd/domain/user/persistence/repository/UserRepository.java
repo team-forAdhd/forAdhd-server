@@ -12,6 +12,12 @@ public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
 
     @Query("""
+        select u from User u
+        where u.email = :email and u.id <> :userId
+        """)
+    Optional<User> findByEmailAndUserIdNot(@Param("email") String email, @Param("userId") String userId);
+
+    @Query("""
         select u from User u 
         left join AuthSocialLogin asl on asl.user.id = u.id 
         where u.email = :email or (asl.provider = :provider and asl.externalUserId = :externalUserId)

@@ -232,7 +232,8 @@ class UserServiceTest {
         ProfileUpdateData profileUpdateData = ProfileUpdateData.builder()
             .userProfile(newUserProfile)
             .build();
-        given(userProfileRepository.findByNickname(newUserProfile.getNickname())).willReturn(Optional.empty());
+        given(userProfileRepository.findByNicknameAndUserIdNot(newUserProfile.getNickname(), userId))
+            .willReturn(Optional.empty());
         given(userProfileRepository.findByUserId(userId)).willReturn(Optional.of(originUserProfile));
 
         //when
@@ -242,7 +243,8 @@ class UserServiceTest {
         assertThat(originUserProfile.getNickname()).isEqualTo(newUserProfile.getNickname());
         assertThat(originUserProfile.getProfileImage()).isEqualTo(newUserProfile.getProfileImage());
         assertThat(originUserProfile.getIsAdhd()).isEqualTo(newUserProfile.getIsAdhd());
-        then(userProfileRepository).should(times(1)).findByNickname(newUserProfile.getNickname());
+        then(userProfileRepository).should(times(1))
+            .findByNicknameAndUserIdNot(newUserProfile.getNickname(), userId);
         then(userProfileRepository).should(times(1)).findByUserId(userId);
     }
 
@@ -256,21 +258,28 @@ class UserServiceTest {
             .profileImage("https://image.png")
             .isAdhd(false)
             .build();
+        UserProfile anotherUser = UserProfile.builder()
+            .nickname("김다")
+            .profileImage("https://image.jpeg")
+            .isAdhd(true)
+            .build();
         UserProfile newUserProfile = UserProfile.builder()
-            .nickname("단이")
+            .nickname("김다")
             .profileImage("https://image.jpg")
             .isAdhd(true)
             .build();
         ProfileUpdateData profileUpdateData = ProfileUpdateData.builder()
             .userProfile(newUserProfile)
             .build();
-        given(userProfileRepository.findByNickname(newUserProfile.getNickname())).willReturn(Optional.of(originUserProfile));
+        given(userProfileRepository.findByNicknameAndUserIdNot(newUserProfile.getNickname(), userId))
+            .willReturn(Optional.of(anotherUser));
 
         //when, then
         assertThatThrownBy(() -> userService.updateProfile(userId, profileUpdateData))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("이미 존재하는 닉네임입니다.");
-        then(userProfileRepository).should(times(1)).findByNickname(newUserProfile.getNickname());
+        then(userProfileRepository).should(times(1))
+            .findByNicknameAndUserIdNot(newUserProfile.getNickname(), userId);
         then(userProfileRepository).should(never()).findByUserId(userId);
     }
 
@@ -310,7 +319,7 @@ class UserServiceTest {
         EmailUpdateData emailUpdateData = EmailUpdateData.builder()
             .email(newEmail)
             .build();
-        given(userRepository.findByEmail(newEmail)).willReturn(Optional.empty());
+        given(userRepository.findByEmailAndUserIdNot(newEmail, userId)).willReturn(Optional.empty());
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
 
         //when
@@ -320,7 +329,7 @@ class UserServiceTest {
         assertThat(user.getIsVerifiedEmail()).isTrue();
         assertThat(user.getRole()).isEqualTo(Role.USER);
         assertThat(user.getEmail()).isEqualTo(newEmail);
-        then(userRepository).should(times(1)).findByEmail(newEmail);
+        then(userRepository).should(times(1)).findByEmailAndUserIdNot(newEmail, userId);
         then(userRepository).should(times(1)).findById(userId);
     }
 
@@ -329,29 +338,30 @@ class UserServiceTest {
     void update_email_test_fail_duplicated_email() {
         //given
         String userId = "userId";
-        User user = toUser()
-            .id(userId)
-            .email("email")
-            .isVerifiedEmail(true)
-            .role(Role.USER)
+        String anotherUserId = "anotherUserId";
+        User anotherUser = toUser()
+            .id(anotherUserId)
+            .email("anotherEmail")
+            .isVerifiedEmail(false)
+            .role(Role.GUEST)
             .build();
-        String newEmail = "email";
+        String newEmail = "anotherEmail";
         EmailUpdateData emailUpdateData = EmailUpdateData.builder()
             .email(newEmail)
             .build();
-        given(userRepository.findByEmail(newEmail)).willReturn(Optional.of(user));
+        given(userRepository.findByEmailAndUserIdNot(newEmail, userId)).willReturn(Optional.of(anotherUser));
 
         //when, then
         assertThatThrownBy(() -> userService.updateEmail(userId, emailUpdateData))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("이미 가입한 이메일입니다.");
-        then(userRepository).should(times(1)).findByEmail(newEmail);
+        then(userRepository).should(times(1)).findByEmailAndUserIdNot(newEmail, userId);
         then(userRepository).should(never()).findById(userId);
     }
 
     @DisplayName("푸시 알림 동의 여부 수정 테스트")
     @Test
-    void update_push_notification_approval_test() {
+    void update_push_notification_approvals_test() {
         //given
         User user = toUser().build();
         PushNotificationApproval allPushNotificationApproval = toAllPushNotificationApproval().build();
@@ -365,7 +375,7 @@ class UserServiceTest {
         given(pushNotificationApprovalRepository.findAll()).willReturn(List.of(allPushNotificationApproval));
 
         //when
-        userService.updatePushNotificationApproval(pushNotificationApprovalUpdateData);
+        userService.updatePushNotificationApprovals(pushNotificationApprovalUpdateData);
 
         //then
         then(pushNotificationApprovalRepository).should(times(1)).findAll();
@@ -374,7 +384,7 @@ class UserServiceTest {
 
     @DisplayName("푸시 알림 동의 여부 수정 테스트 - 실패: 존재하지 않는 푸시 알림 동의 항목")
     @Test
-    void update_push_notification_approval_test_fail_not_existed_push_notification_approval() {
+    void update_push_notification_approvals_test_fail_not_existed_push_notification_approval() {
         //given
         User user = toUser().build();
         PushNotificationApproval allPushNotificationApproval = toAllPushNotificationApproval().build();
@@ -388,7 +398,7 @@ class UserServiceTest {
         given(pushNotificationApprovalRepository.findAll()).willReturn(List.of());
 
         //when, then
-        assertThatThrownBy(() -> userService.updatePushNotificationApproval(pushNotificationApprovalUpdateData))
+        assertThatThrownBy(() -> userService.updatePushNotificationApprovals(pushNotificationApprovalUpdateData))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("존재하지 않는 푸시 알림 동의 항목입니다.");
         then(pushNotificationApprovalRepository).should(times(1)).findAll();

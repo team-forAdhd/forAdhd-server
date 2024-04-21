@@ -116,7 +116,7 @@ public class UserController {
         @RequestBody @Valid PushNotificationApprovalUpdateRequest request) {
         PushNotificationApprovalUpdateData pushNotificationApprovalUpdateData = userMapper
             .toPushNotificationApprovalUpdateData(userId, request);
-        userService.updatePushNotificationApproval(pushNotificationApprovalUpdateData);
+        userService.updatePushNotificationApprovals(pushNotificationApprovalUpdateData);
         return ResponseEntity.ok().build();
     }
 
