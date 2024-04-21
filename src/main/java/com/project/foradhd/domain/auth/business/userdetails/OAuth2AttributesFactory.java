@@ -11,7 +11,8 @@ public abstract class OAuth2AttributesFactory {
 
     public static OAuth2Attributes valueOf(String registrationId, String nameAttributesKey,
         Map<String, Object> attributes) {
-        Provider provider = Provider.from(registrationId);
+        Provider provider = Provider.from(registrationId)
+            .orElseThrow(() -> new RuntimeException("유효하지 않은 SNS 입니다."));
         switch (provider) {
             case NAVER -> {
                 return NaverOAuth2Attributes.of(nameAttributesKey, attributes);
