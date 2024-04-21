@@ -44,7 +44,8 @@ public class UserAuthInfoServiceImpl implements UserAuthInfoService {
         authPassword.updateEncodedPassword(encodedNewPassword);
     }
 
-    private AuthPassword getAuthPassword(String userId) {
+    @Override
+    public AuthPassword getAuthPassword(String userId) {
         return authPasswordRepository.findByUserId(userId)
             .orElseThrow(() -> new RuntimeException("일반 회원가입 유저가 아닙니다."));
     }
