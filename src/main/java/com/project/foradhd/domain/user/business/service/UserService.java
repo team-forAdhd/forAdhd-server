@@ -143,12 +143,12 @@ public class UserService {
             .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
     }
 
-    private UserProfile getUserProfile(String userId) {
+    public UserProfile getUserProfile(String userId) {
         return userProfileRepository.findByUserId(userId)
             .orElseThrow(() -> new RuntimeException("해당 유저 프로필이 존재하지 않습니다."));
     }
 
-    private UserProfile getUserProfileFetch(String userId) {
+    public UserProfile getUserProfileFetch(String userId) {
         return userProfileRepository.findByUserIdFetch(userId)
             .orElseThrow(() -> new RuntimeException("해당 유저 프로필이 존재하지 않습니다."));
     }
