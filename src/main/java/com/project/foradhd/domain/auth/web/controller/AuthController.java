@@ -24,9 +24,8 @@ public class AuthController {
     private final AuthMapper authMapper;
 
     @PutMapping("/reissue")
-    public ResponseEntity<TokenReissueResponse> reissue(@AuthUserId String userId,
-        @RequestBody @Valid TokenReissueRequest request) {
-        AuthTokenData authTokenData = authService.reissue(userId, request.getAccessToken(), request.getRefreshToken());
+    public ResponseEntity<TokenReissueResponse> reissue(@RequestBody @Valid TokenReissueRequest request) {
+        AuthTokenData authTokenData = authService.reissue(request.getAccessToken(), request.getRefreshToken());
         TokenReissueResponse response = authMapper.toTokenReissueResponse(authTokenData);
         return ResponseEntity.ok(response);
     }

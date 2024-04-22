@@ -5,6 +5,7 @@ import static org.springframework.security.core.authority.AuthorityUtils.createA
 import com.project.foradhd.domain.auth.business.dto.out.AuthTokenData;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +18,10 @@ public class AuthService {
     private final JwtService jwtService;
     private final UserService userService;
 
-    public AuthTokenData reissue(String userId, String accessToken, String refreshToken) {
-        validateAuthToken(userId, accessToken, refreshToken);
+    public AuthTokenData reissue(String accessToken, String refreshToken) {
+        validateAccessToken(accessToken);
+        String userId = jwtService.getSubject(accessToken);
+        validateRefreshToken(userId, refreshToken);
 
         User user = userService.getUser(userId);
         String reissuedAccessToken = jwtService.generateAccessToken(userId, user.getEmail(),
@@ -28,21 +31,18 @@ public class AuthService {
         return new AuthTokenData(reissuedAccessToken, reissuedRefreshToken);
     }
 
-    private void validateAuthToken(String userId, String accessToken, String refreshToken) {
-        if (!isValidAccessToken(userId, accessToken) ||
-            !isValidRefreshToken(userId, refreshToken)) {
+    private void validateAccessToken(String accessToken) {
+        if (!jwtService.isValidTokenForm(accessToken)) {
             throw new RuntimeException("유효하지 않은 토큰입니다.");
         }
     }
 
-    private boolean isValidAccessToken(String userId, String accessToken) {
-        String parsedUserId = jwtService.getSubject(accessToken);
-        return jwtService.isValidTokenForm(accessToken) && userId.equals(parsedUserId);
-    }
-
-    private boolean isValidRefreshToken(String userId, String refreshToken) {
+    private void validateRefreshToken(String userId, String refreshToken) {
+        boolean isValidExpiry = jwtService.isValidTokenExpiry(refreshToken);
         String parsedUserId = jwtService.getSubject(refreshToken);
         //TODO: RT 저장 여부 확인
-        return jwtService.isValidTokenExpiry(refreshToken) && userId.equals(parsedUserId);
+        if (!isValidExpiry || !Objects.equals(parsedUserId, userId)) {
+            throw new RuntimeException("유효하지 않은 토큰입니다.");
+        }
     }
 }
