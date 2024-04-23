@@ -9,5 +9,6 @@ public class OAuth2LoginResponse {
 
     private String accessToken;
     private String refreshToken;
-    private Boolean isSignedUpUser;
+    private Boolean hasVerifiedEmail;
+    private Boolean hasProfile;
 }

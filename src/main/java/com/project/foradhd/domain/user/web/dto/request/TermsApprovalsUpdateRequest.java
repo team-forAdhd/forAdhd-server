@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class TermsApprovalsUpdateRequest {
 
-    private List<SignUpRequest.TermsApprovalRequest> termsApprovals;
+    private List<TermsApprovalRequest> termsApprovals;
 
     @Getter
     public static class TermsApprovalRequest {

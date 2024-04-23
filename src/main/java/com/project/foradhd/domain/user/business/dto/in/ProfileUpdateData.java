@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.user.business.dto.in;
 
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -7,9 +8,5 @@ import lombok.Getter;
 @Builder
 public class ProfileUpdateData {
 
-    private String nickname;
-
-    private String profileImage;
-
-    private Boolean isAdhd;
+    private UserProfile userProfile;
 }

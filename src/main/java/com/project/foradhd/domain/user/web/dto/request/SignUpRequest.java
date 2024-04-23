@@ -38,9 +38,9 @@ public class SignUpRequest {
 
     private Boolean isAdhd;
 
-    private Boolean pushNotificationAgree;
-
     private List<TermsApprovalRequest> termsApprovals;
+
+    private List<PushNotificationApprovalRequest> pushNotificationApprovals;
 
     @Getter
     @Builder
@@ -49,6 +49,17 @@ public class SignUpRequest {
     public static class TermsApprovalRequest {
 
         private Long termsId;
+
+        private Boolean approved;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PushNotificationApprovalRequest {
+
+        private Long pushNotificationApprovalId;
 
         private Boolean approved;
     }

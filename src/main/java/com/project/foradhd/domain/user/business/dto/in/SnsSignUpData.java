@@ -1,15 +1,17 @@
 package com.project.foradhd.domain.user.business.dto.in;
 
-import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
+import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
+@Builder
 public class SnsSignUpData {
 
-    private User user;
+    private UserProfile userProfile;
     private List<UserTermsApproval> userTermsApprovals;
+    private List<UserPushNotificationApproval> userPushNotificationApprovals;
 }
