@@ -41,7 +41,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         return new OAuth2UserImpl(attributes, nameAttributeKey, user);
     }
 
-    private User getSocialLoginedUser(OAuth2Attributes oAuth2Attributes) {
+    public User getSocialLoginedUser(OAuth2Attributes oAuth2Attributes) {
         String email = oAuth2Attributes.getEmail();
         Provider provider = oAuth2Attributes.getProvider();
         String externalUserId = oAuth2Attributes.getId();
@@ -55,7 +55,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         }
     }
 
-    private User loginSocialUser(User user, OAuth2Attributes oAuth2Attributes) {
+    public User loginSocialUser(User user, OAuth2Attributes oAuth2Attributes) {
         boolean isVerifiedEmail = user.getIsVerifiedEmail() || oAuth2Attributes.getIsVerifiedEmail();
         boolean hasProfile = userService.hasUserProfile(user.getId());
         user.updateAsUserRole(isVerifiedEmail, hasProfile);
@@ -71,7 +71,7 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
         return user;
     }
 
-    private User signUpSocialUser(OAuth2Attributes oAuth2Attributes) {
+    public User signUpSocialUser(OAuth2Attributes oAuth2Attributes) {
         User user = oAuth2Attributes.toUserEntity();
         UserPrivacy userPrivacy = oAuth2Attributes.toUserPrivacyEntity(user);
         AuthSocialLogin authSocialLogin = oAuth2Attributes.toAuthSocialLoginEntity(user);
