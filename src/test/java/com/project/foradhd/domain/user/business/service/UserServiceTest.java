@@ -7,6 +7,7 @@ import static com.project.foradhd.domain.user.fixtures.UserFixtures.toThirdParty
 import static com.project.foradhd.domain.user.fixtures.UserFixtures.toUser;
 import static com.project.foradhd.domain.user.fixtures.UserFixtures.toUserPrivacy;
 import static com.project.foradhd.domain.user.fixtures.UserFixtures.toUserProfile;
+import static com.project.foradhd.global.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -41,6 +42,8 @@ import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.domain.user.persistence.repository.UserTermsApprovalRepository;
 import java.util.List;
 import java.util.Optional;
+
+import com.project.foradhd.global.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -276,8 +279,9 @@ class UserServiceTest {
 
         //when, then
         assertThatThrownBy(() -> userService.updateProfile(userId, profileUpdateData))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("이미 존재하는 닉네임입니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ALREADY_EXISTS_NICKNAME);
         then(userProfileRepository).should(times(1))
             .findByNicknameAndUserIdNot(newUserProfile.getNickname(), userId);
         then(userProfileRepository).should(never()).findByUserId(userId);
@@ -353,8 +357,9 @@ class UserServiceTest {
 
         //when, then
         assertThatThrownBy(() -> userService.updateEmail(userId, emailUpdateData))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("이미 가입한 이메일입니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ALREADY_EXISTS_EMAIL);
         then(userRepository).should(times(1)).findByEmailAndUserIdNot(newEmail, userId);
         then(userRepository).should(never()).findById(userId);
     }
@@ -399,8 +404,9 @@ class UserServiceTest {
 
         //when, then
         assertThatThrownBy(() -> userService.updatePushNotificationApprovals(pushNotificationApprovalUpdateData))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("존재하지 않는 푸시 알림 동의 항목입니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(NOT_FOUND_PUSH_NOTIFICATION_APPROVAL);
         then(pushNotificationApprovalRepository).should(times(1)).findAll();
         then(userPushNotificationApprovalRepository).should(never()).saveAll(userPushNotificationApprovals);
     }
@@ -471,8 +477,9 @@ class UserServiceTest {
 
         //when, then
         assertThatThrownBy(() -> userService.updateTermsApprovals(termsApprovalsUpdateData))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("존재하지 않는 이용 약관입니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(NOT_FOUND_TERMS);
         then(termsRepository).should(times(1)).findAll();
         then(userTermsApprovalRepository).should(never()).saveAll(userTermsApprovals);
     }
@@ -486,8 +493,9 @@ class UserServiceTest {
 
         //when, then
         assertThatThrownBy(() -> userService.getUser(userId))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("해당 유저가 존재하지 않습니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(NOT_FOUND_USER);
     }
 
     @DisplayName("ID로 UserProfile 조회 테스트 - 실패")
@@ -499,8 +507,9 @@ class UserServiceTest {
 
         //when, then
         assertThatThrownBy(() -> userService.getUserProfile(userId))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("해당 유저 프로필이 존재하지 않습니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(NOT_FOUND_USER_PROFILE);
     }
 
     @DisplayName("ID로 조회된 User의 이메일 인증 여부 테스트")
