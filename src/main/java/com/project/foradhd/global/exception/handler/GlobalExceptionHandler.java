@@ -2,7 +2,7 @@ package com.project.foradhd.global.exception.handler;
 
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
-import com.project.foradhd.global.exception.SystemException;
+import com.project.foradhd.global.exception.InternalSystemException;
 import com.project.foradhd.global.exception.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +26,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, errorCode.getStatus());
     }
 
-    @ExceptionHandler(SystemException.class)
-    public ResponseEntity<ErrorResponse> handleSystemException(SystemException e) {
+    @ExceptionHandler(InternalSystemException.class)
+    public ResponseEntity<ErrorResponse> handleSystemException(InternalSystemException e) {
         Throwable cause = e.getCause();
         log.error("Exception occurred while processing request", cause);
 

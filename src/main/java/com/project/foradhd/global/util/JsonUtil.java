@@ -1,6 +1,6 @@
 package com.project.foradhd.global.util;
 
-import com.project.foradhd.global.exception.SystemException;
+import com.project.foradhd.global.exception.InternalSystemException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +18,7 @@ public abstract class JsonUtil {
         try {
             return objectMapper.readValue(content, clazz);
         } catch (JsonProcessingException e) {
-            throw new SystemException(e);
+            throw new InternalSystemException(e);
         }
     }
 
@@ -27,7 +27,7 @@ public abstract class JsonUtil {
             return objectMapper.readValue(content, typeReference);
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
-            throw new SystemException(e);
+            throw new InternalSystemException(e);
         }
     }
 
@@ -35,7 +35,7 @@ public abstract class JsonUtil {
         try {
             return objectMapper.readValue(stream, clazz);
         } catch (IOException e) {
-            throw new SystemException(e);
+            throw new InternalSystemException(e);
         }
     }
 
@@ -43,7 +43,7 @@ public abstract class JsonUtil {
         try {
             return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
-            throw new SystemException(e);
+            throw new InternalSystemException(e);
         }
     }
 }
