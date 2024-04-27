@@ -26,9 +26,13 @@ import com.project.foradhd.domain.user.persistence.repository.UserTermsApprovalR
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import com.project.foradhd.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.project.foradhd.global.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -140,17 +144,17 @@ public class UserService {
 
     public User getUser(String userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("해당 유저가 존재하지 않습니다."));
+            .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
     }
 
     public UserProfile getUserProfile(String userId) {
         return userProfileRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("해당 유저 프로필이 존재하지 않습니다."));
+            .orElseThrow(() -> new BusinessException(NOT_FOUND_USER_PROFILE));
     }
 
     public UserProfile getUserProfileFetch(String userId) {
         return userProfileRepository.findByUserIdFetch(userId)
-            .orElseThrow(() -> new RuntimeException("해당 유저 프로필이 존재하지 않습니다."));
+            .orElseThrow(() -> new BusinessException(NOT_FOUND_USER_PROFILE));
     }
 
     public Optional<User> getSignedUpUser(String email, Provider provider, String externalUserId) {
@@ -169,21 +173,21 @@ public class UserService {
     private void validateDuplicatedEmail(String email) {
         boolean isExistingUser = userRepository.findByEmail(email).isPresent();
         if (isExistingUser) {
-            throw new RuntimeException("이미 가입한 이메일입니다.");
+            throw new BusinessException(ALREADY_EXISTS_EMAIL);
         }
     }
 
     private void validateDuplicatedEmail(String email, String userId) {
         boolean isExistingUser = userRepository.findByEmailAndUserIdNot(email, userId).isPresent();
         if (isExistingUser) {
-            throw new RuntimeException("이미 가입한 이메일입니다.");
+            throw new BusinessException(ALREADY_EXISTS_EMAIL);
         }
     }
 
     private void validateDuplicatedNickname(String nickname) {
         boolean isDuplicatedNickname = userProfileRepository.findByNickname(nickname).isPresent();
         if (isDuplicatedNickname) {
-            throw new RuntimeException("이미 존재하는 닉네임입니다.");
+            throw new BusinessException(ALREADY_EXISTS_NICKNAME);
         }
     }
 
@@ -191,7 +195,7 @@ public class UserService {
         boolean isDuplicatedNickname = userProfileRepository.findByNicknameAndUserIdNot(nickname, userId)
             .isPresent();
         if (isDuplicatedNickname) {
-            throw new RuntimeException("이미 존재하는 닉네임입니다.");
+            throw new BusinessException(ALREADY_EXISTS_NICKNAME);
         }
     }
 
@@ -207,9 +211,9 @@ public class UserService {
         for (Terms terms : termsList) {
             if (!Objects.equals(terms.getId(), termsId)) continue;
             if (!terms.getRequired() || approved) return;
-            throw new RuntimeException("필수 이용 약관에 동의해야 합니다.");
+            throw new BusinessException(REQUIRED_TERMS_APPROVAL);
         }
-        throw new RuntimeException("존재하지 않는 이용 약관입니다.");
+        throw new BusinessException(NOT_FOUND_TERMS);
     }
 
     private void validatePushNotificationApprovals(
@@ -227,7 +231,7 @@ public class UserService {
             .anyMatch(pushNotificationApproval ->
                 pushNotificationApproval.getId().equals(pushNotificationApprovalId));
         if (!isValidPushNotificationApproval) {
-            throw new RuntimeException("존재하지 않는 푸시 알림 동의 항목입니다.");
+            throw new BusinessException(NOT_FOUND_PUSH_NOTIFICATION_APPROVAL);
         }
     }
 }

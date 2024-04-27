@@ -1,11 +1,14 @@
 package com.project.foradhd.domain.auth.business.service;
 
+import static com.project.foradhd.global.exception.ErrorCode.INVALID_AUTH_TOKEN;
 import static org.springframework.security.core.authority.AuthorityUtils.createAuthorityList;
 
 import com.project.foradhd.domain.auth.business.dto.out.AuthTokenData;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import java.util.Objects;
+
+import com.project.foradhd.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +36,7 @@ public class AuthService {
 
     private void validateAccessToken(String accessToken) {
         if (!jwtService.isValidTokenForm(accessToken)) {
-            throw new RuntimeException("유효하지 않은 토큰입니다.");
+            throw new BusinessException(INVALID_AUTH_TOKEN);
         }
     }
 
@@ -42,7 +45,7 @@ public class AuthService {
         String parsedUserId = jwtService.getSubject(refreshToken);
         //TODO: RT 저장 여부 확인
         if (!isValidExpiry || !Objects.equals(parsedUserId, userId)) {
-            throw new RuntimeException("유효하지 않은 토큰입니다.");
+            throw new BusinessException(INVALID_AUTH_TOKEN);
         }
     }
 }
