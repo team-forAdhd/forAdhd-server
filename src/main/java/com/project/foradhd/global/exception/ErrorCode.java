@@ -24,6 +24,9 @@ public enum ErrorCode {
     NOT_FOUND_PUSH_NOTIFICATION_APPROVAL(NOT_FOUND, "존재하지 않는 푸시 알림 동의 항목입니다."),
     REQUIRED_TERMS_APPROVAL(BAD_REQUEST, "필수 이용 약관에 동의해야 합니다."),
 
+    //validation
+    INVALID_REQUEST(BAD_REQUEST, "잘못된 요청입니다."),
+
     //system
     SYSTEM_ERROR(INTERNAL_SERVER_ERROR, "시스템 에러입니다.");
 
