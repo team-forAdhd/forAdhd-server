@@ -1,13 +1,11 @@
 package com.project.foradhd.domain.user.web.dto.request;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import com.project.foradhd.global.validation.annotation.ValidEmail;
 import lombok.Getter;
 
 @Getter
 public class EmailUpdateRequest {
 
-    @NotBlank(message = "{email.notBlank}")
-    @Email(message = "{email.email}")
+    @ValidEmail
     private String email;
 }

@@ -3,8 +3,8 @@ package com.project.foradhd.domain.user.web.dto.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
+import com.project.foradhd.global.validation.annotation.ValidEmail;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,8 +32,7 @@ public class SignUpRequest {
     @NotNull(message = "{gender.notNull}")
     private Gender gender;
 
-    @NotBlank(message = "{email.notBlank}")
-    @Email(message = "{email.email}")
+    @ValidEmail
     private String email;
 
     private String password;
