@@ -10,6 +10,7 @@ import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
+import com.project.foradhd.domain.user.web.dto.request.PasswordRequest;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest.PushNotificationApprovalRequest;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest.TermsApprovalRequest;
@@ -53,8 +54,7 @@ class UserMapperTest {
             .birth(LocalDate.of(1999, 2, 1))
             .gender(Gender.FEMALE)
             .email("jkde7721@naver.com")
-            .password("abc123!")
-            .passwordConfirm("abc123!")
+            .password(new PasswordRequest("abc123!", "abc123!"))
             .nickname("단이")
             .profileImage("http://")
             .isAdhd(false)
@@ -76,7 +76,7 @@ class UserMapperTest {
         assertThat(userPrivacy.getName()).isEqualTo(signUpRequest.getName());
         assertThat(userPrivacy.getBirth()).isEqualTo(signUpRequest.getBirth());
         assertThat(userPrivacy.getGender()).isEqualTo(signUpRequest.getGender());
-        assertThat(password).isEqualTo(signUpRequest.getPassword());
+        assertThat(password).isEqualTo(signUpRequest.getPassword().getPassword());
         assertThat(userProfile.getNickname()).isEqualTo(signUpRequest.getNickname());
         assertThat(userProfile.getProfileImage()).isEqualTo(signUpRequest.getProfileImage());
         assertThat(userProfile.getIsAdhd()).isEqualTo(signUpRequest.getIsAdhd());

@@ -35,9 +35,8 @@ public class SignUpRequest {
     @ValidEmail
     private String email;
 
-    private String password;
-
-    private String passwordConfirm;
+    @Valid
+    private PasswordRequest password;
 
     @NotBlank(message = "{nickname.notBlank}")
     private String nickname;
