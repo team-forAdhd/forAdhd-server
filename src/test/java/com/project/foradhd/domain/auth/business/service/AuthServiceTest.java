@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.auth.business.service;
 
 import static com.project.foradhd.domain.user.fixtures.UserFixtures.toUser;
+import static com.project.foradhd.global.exception.ErrorCode.INVALID_AUTH_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -13,6 +14,7 @@ import com.project.foradhd.domain.auth.business.dto.out.AuthTokenData;
 import com.project.foradhd.domain.auth.business.service.impl.JwtServiceImpl;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.global.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -77,8 +79,9 @@ class AuthServiceTest {
 
         //when, then
         assertThatThrownBy(() -> authService.reissue(accessToken, refreshToken))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("유효하지 않은 토큰입니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(INVALID_AUTH_TOKEN);
         then(userService).should(never()).getUser(userId);
     }
 
@@ -94,8 +97,9 @@ class AuthServiceTest {
 
         //when, then
         assertThatThrownBy(() -> authService.reissue(accessToken, refreshToken))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("유효하지 않은 토큰입니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(INVALID_AUTH_TOKEN);
         then(userService).should(never()).getUser(userId);
     }
 }

@@ -1,34 +1,47 @@
 package com.project.foradhd.domain.user.web.dto.request;
 
 import java.util.List;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
 public class SnsSignUpRequest {
 
+    @NotBlank(message = "{nickname.notBlank}")
     private String nickname;
 
     private String profileImage;
 
+    @NotNull(message = "{isAdhd.notNull}")
     private Boolean isAdhd;
 
-    private List<TermsApprovalRequest> termsApprovals;
+    @NotEmpty(message = "{termsApprovals.notEmpty}")
+    private List<@Valid TermsApprovalRequest> termsApprovals;
 
-    private List<PushNotificationApprovalRequest> pushNotificationApprovals;
+    @NotEmpty(message = "{pushNotificationApprovals.notEmpty}")
+    private List<@Valid PushNotificationApprovalRequest> pushNotificationApprovals;
 
     @Getter
     public static class TermsApprovalRequest {
 
+        @NotNull(message = "{termsId.notNull}")
         private Long termsId;
 
+        @NotNull(message = "{terms.approved.notNull}")
         private Boolean approved;
     }
 
     @Getter
     public static class PushNotificationApprovalRequest {
 
+        @NotNull(message = "{pushNotificationApprovalId.notNull}")
         private Long pushNotificationApprovalId;
 
+        @NotNull(message = "{pushNotificationApproval.approved.notNull}")
         private Boolean approved;
     }
 }

@@ -1,8 +1,11 @@
 package com.project.foradhd.domain.auth.business.userdetails;
 
+import static com.project.foradhd.global.exception.ErrorCode.NOT_SUPPORTED_SNS_TYPE;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Map;
+
+import com.project.foradhd.global.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +22,8 @@ class OAuth2AttributesFactoryTest {
 
         //when, then
         assertThatThrownBy(() -> OAuth2AttributesFactory.valueOf(registrationId, nameAttributesKey, attributes))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("유효하지 않은 SNS 입니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(NOT_SUPPORTED_SNS_TYPE);
     }
 }

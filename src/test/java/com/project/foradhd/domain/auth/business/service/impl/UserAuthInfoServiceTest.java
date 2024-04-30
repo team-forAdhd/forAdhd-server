@@ -2,6 +2,8 @@ package com.project.foradhd.domain.auth.business.service.impl;
 
 import static com.project.foradhd.domain.auth.fixtures.AuthFixtures.toAuthPassword;
 import static com.project.foradhd.domain.user.fixtures.UserFixtures.toUser;
+import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_USER;
+import static com.project.foradhd.global.exception.ErrorCode.NOT_MATCH_USERNAME_PASSWORD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -15,6 +17,8 @@ import com.project.foradhd.domain.user.business.service.UserAuthInfoService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.config.PasswordEncoderConfig;
 import java.util.Optional;
+
+import com.project.foradhd.global.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -101,8 +105,9 @@ class UserAuthInfoServiceTest {
 
         //when, then
         assertThatThrownBy(() -> userAuthInfoService.validatePasswordMatches(userId, password))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("비밀번호가 일치하지 않습니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(NOT_MATCH_USERNAME_PASSWORD);
         then(authPasswordRepository).should(times(1)).findByUserId(userId);
     }
 
@@ -136,7 +141,8 @@ class UserAuthInfoServiceTest {
 
         //when, then
         assertThatThrownBy(() -> userAuthInfoService.getAuthPassword(userId))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("일반 회원가입 유저가 아닙니다.");
+            .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(NOT_FOUND_USER);
     }
 }

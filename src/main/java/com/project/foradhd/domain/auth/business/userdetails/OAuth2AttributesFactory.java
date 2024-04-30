@@ -5,14 +5,18 @@ import com.project.foradhd.domain.auth.business.userdetails.impl.FacebookOAuth2A
 import com.project.foradhd.domain.auth.business.userdetails.impl.KakaoOAuth2Attributes;
 import com.project.foradhd.domain.auth.business.userdetails.impl.NaverOAuth2Attributes;
 import com.project.foradhd.domain.user.persistence.enums.Provider;
+import com.project.foradhd.global.exception.BusinessException;
+
 import java.util.Map;
+
+import static com.project.foradhd.global.exception.ErrorCode.NOT_SUPPORTED_SNS_TYPE;
 
 public abstract class OAuth2AttributesFactory {
 
     public static OAuth2Attributes valueOf(String registrationId, String nameAttributesKey,
         Map<String, Object> attributes) {
         Provider provider = Provider.from(registrationId)
-            .orElseThrow(() -> new RuntimeException("유효하지 않은 SNS 입니다."));
+            .orElseThrow(() -> new BusinessException(NOT_SUPPORTED_SNS_TYPE));
         switch (provider) {
             case NAVER -> {
                 return NaverOAuth2Attributes.of(nameAttributesKey, attributes);
@@ -26,7 +30,7 @@ public abstract class OAuth2AttributesFactory {
             case APPLE -> {
                 return AppleOAuth2Attributes.of(nameAttributesKey, attributes);
             }
-            default -> throw new RuntimeException("유효하지 않은 SNS 입니다.");
+            default -> throw new BusinessException(NOT_SUPPORTED_SNS_TYPE);
         }
     }
 }

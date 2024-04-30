@@ -79,7 +79,7 @@ public interface UserMapper {
             .user(user)
             .userPrivacy(userPrivacy)
             .userProfile(userProfile)
-            .password(request.getPassword())
+            .password(request.getPassword().getPassword())
             .userTermsApprovals(userTermsApprovals)
             .userPushNotificationApprovals(userPushNotificationApprovals)
             .build();
@@ -170,6 +170,10 @@ public interface UserMapper {
     })
     ProfileUpdateData toProfileUpdateData(ProfileUpdateRequest request);
 
+    @Mappings({
+            @Mapping(target = "password", source = "password.password"),
+            @Mapping(target = "passwordConfirm", source = "password.passwordConfirm"),
+    })
     PasswordUpdateData toPasswordUpdateData(PasswordUpdateRequest request);
 
     EmailUpdateData toEmailUpdateData(EmailUpdateRequest request);
