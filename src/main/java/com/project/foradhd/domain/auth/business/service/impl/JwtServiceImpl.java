@@ -3,6 +3,7 @@ package com.project.foradhd.domain.auth.business.service.impl;
 import static org.springframework.util.StringUtils.collectionToCommaDelimitedString;
 
 import com.project.foradhd.domain.auth.business.service.JwtService;
+import com.project.foradhd.global.service.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -18,6 +19,9 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,13 +34,16 @@ public class JwtServiceImpl implements JwtService {
 
     private static final String EMAIL_CLAIM_NAME = "email";
     private static final String AUTHORITIES_CLAIM_NAME = "authorities";
+    private final RedisService redisService;
     private final Long accessTokenExpiry;
     private final Long refreshTokenExpiry;
     private final Key key;
 
-    public JwtServiceImpl(@Value("${jwt.expiry.access-token}") Long accessTokenExpiry,
+    public JwtServiceImpl(RedisService redisService,
+        @Value("${jwt.expiry.access-token}") Long accessTokenExpiry,
         @Value("${jwt.expiry.refresh-token}") Long refreshTokenExpiry,
         @Value("${jwt.secret-key}") String secretKey) {
+        this.redisService = redisService;
         this.accessTokenExpiry = accessTokenExpiry;
         this.refreshTokenExpiry = refreshTokenExpiry;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
@@ -139,6 +146,23 @@ public class JwtServiceImpl implements JwtService {
         Claims claims = parseExpiredToken(token);
         String authorityString = claims.get(AUTHORITIES_CLAIM_NAME, String.class);
         return AuthorityUtils.commaSeparatedStringToAuthorityList(authorityString);
+    }
+
+    @Override
+    public void saveRefreshToken(String userId, String refreshToken) {
+        redisService.setValue(userId, refreshToken, refreshTokenExpiry, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public void deleteRefreshToken(String userId) {
+        redisService.deleteValue(userId);
+    }
+
+    @Override
+    public boolean existsSavedRefreshToken(String userId, String refreshToken) {
+        Optional<Object> value = redisService.getValue(userId);
+        return value.filter(savedRefreshToken -> savedRefreshToken.equals(refreshToken))
+                .isPresent();
     }
 
     private Date calculateExpiration(Date now, Long expiry) {

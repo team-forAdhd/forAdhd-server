@@ -21,7 +21,7 @@ public class UserSignUpTokenServiceImpl implements UserSignUpTokenService {
         String accessToken = jwtService.generateAccessToken(user.getId(), user.getEmail(),
             AuthorityUtils.createAuthorityList(user.getAuthority()));
         String refreshToken = jwtService.generateRefreshToken(user.getId());
-        //TODO: RT 저장소에 저장
+        jwtService.saveRefreshToken(user.getId(), refreshToken);
         return new SignUpTokenData(accessToken, refreshToken);
     }
 }

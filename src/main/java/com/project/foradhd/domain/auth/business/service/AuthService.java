@@ -30,7 +30,7 @@ public class AuthService {
         String reissuedAccessToken = jwtService.generateAccessToken(userId, user.getEmail(),
             createAuthorityList(user.getAuthority()));
         String reissuedRefreshToken = jwtService.generateRefreshToken(userId);
-        //TODO: RT 저장 로직 구현
+        jwtService.saveRefreshToken(userId, reissuedRefreshToken);
         return new AuthTokenData(reissuedAccessToken, reissuedRefreshToken);
     }
 
@@ -43,8 +43,8 @@ public class AuthService {
     private void validateRefreshToken(String userId, String refreshToken) {
         boolean isValidExpiry = jwtService.isValidTokenExpiry(refreshToken);
         String parsedUserId = jwtService.getSubject(refreshToken);
-        //TODO: RT 저장 여부 확인
-        if (!isValidExpiry || !Objects.equals(parsedUserId, userId)) {
+        boolean existsSavedRefreshToken = jwtService.existsSavedRefreshToken(userId, refreshToken);
+        if (!isValidExpiry || !Objects.equals(parsedUserId, userId) || !existsSavedRefreshToken) {
             throw new BusinessException(INVALID_AUTH_TOKEN);
         }
     }
