@@ -60,6 +60,9 @@ dependencies {
 
 	//Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//AWS SES
+	implementation 'com.amazonaws:aws-java-sdk-ses'
 }
 
 tasks.named('test') {
