@@ -13,4 +13,7 @@ public interface JwtService {
     boolean isValidTokenForm(String token);
     String getSubject(String token);
     Collection<GrantedAuthority> getAuthorities(String token);
+    void saveRefreshToken(String userId, String refreshToken);
+    void deleteRefreshToken(String userId);
+    boolean existsSavedRefreshToken(String userId, String refreshToken);
 }

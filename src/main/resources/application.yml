@@ -9,6 +9,10 @@ spring:
   config:
     import:
       - application-oauth2.yml
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
 
 jwt:
   expiry:

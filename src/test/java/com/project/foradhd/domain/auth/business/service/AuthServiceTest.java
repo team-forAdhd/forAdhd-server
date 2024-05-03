@@ -15,6 +15,7 @@ import com.project.foradhd.domain.auth.business.service.impl.JwtServiceImpl;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.service.RedisService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,22 +23,33 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Optional;
 
 @DisplayName("AuthService 테스트")
 @TestPropertySource(properties = {"jwt.expiry.access-token=100", "jwt.expiry.refresh-token=3600000",
     "jwt.secret-key=ThisIsSimplyAJwtSecretKeyForTestingPurposesThereAreNoSecurityIssuesAtAll"})
-@Import(JwtServiceImpl.class)
 @ExtendWith({MockitoExtension.class, SpringExtension.class})
 class AuthServiceTest {
 
     AuthService authService;
 
-    @Autowired
     JwtService jwtService;
+
+    @Mock
+    RedisService redisService;
+
+    @Value("${jwt.expiry.access-token}")
+    Long accessTokenExpiry;
+
+    @Value("${jwt.expiry.refresh-token}")
+    Long refreshTokenExpiry;
+
+    @Value("${jwt.secret-key}")
+    String secretKey;
 
     @Mock
     UserService userService;
@@ -45,6 +57,7 @@ class AuthServiceTest {
     @BeforeEach
     void init() {
         MockitoAnnotations.openMocks(this);
+        this.jwtService = new JwtServiceImpl(redisService, accessTokenExpiry, refreshTokenExpiry, secretKey);
         this.authService = new AuthService(jwtService, userService);
     }
 
@@ -57,6 +70,7 @@ class AuthServiceTest {
         String accessToken = jwtService.generateAccessToken(userId, email, createAuthorityList("ROLE_USER"));
         String refreshToken = jwtService.generateRefreshToken(userId);
         User user = toUser().build();
+        given(redisService.getValue(userId)).willReturn(Optional.of(refreshToken));
         given(userService.getUser(userId)).willReturn(user);
 
         //when
@@ -66,6 +80,7 @@ class AuthServiceTest {
         //then
         assertThat(authTokenData.getAccessToken()).isNotEqualTo(accessToken);
         assertThat(authTokenData.getRefreshToken()).isNotEqualTo(refreshToken);
+        then(redisService).should(times(1)).getValue(userId);
         then(userService).should(times(1)).getUser(userId);
     }
 
@@ -100,6 +115,26 @@ class AuthServiceTest {
             .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(INVALID_AUTH_TOKEN);
+        then(userService).should(never()).getUser(userId);
+    }
+
+    @DisplayName("AT 만료 시 토큰 재발급 테스트 - 실패: 저장된 토큰과 다름")
+    @Test
+    void reissue_test_fail_not_matches_with_saved_refresh_token() {
+        //given
+        String userId = "userId";
+        String email = "jkde7721@naver.com";
+        String accessToken = jwtService.generateAccessToken(userId, email, createAuthorityList("ROLE_USER"));
+        String refreshToken = jwtService.generateRefreshToken(userId);
+        String savedRefreshToken = "savedRefreshToken";
+        given(redisService.getValue(userId)).willReturn(Optional.of(savedRefreshToken));
+
+        //when, then
+        assertThatThrownBy(() -> authService.reissue(accessToken, refreshToken))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(INVALID_AUTH_TOKEN);
+        then(redisService).should(times(1)).getValue(userId);
         then(userService).should(never()).getUser(userId);
     }
 }

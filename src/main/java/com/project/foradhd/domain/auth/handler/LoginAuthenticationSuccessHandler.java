@@ -29,8 +29,8 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
         String accessToken = jwtService.generateAccessToken(userDetails.getUserId(), userDetails.getUsername(),
             userDetails.getAuthorities());
         String refreshToken = jwtService.generateRefreshToken(userDetails.getUserId());
+        jwtService.saveRefreshToken(userDetails.getUserId(), refreshToken);
 
-        //TODO: RT 저장소에 저장
         Boolean hasVerifiedEmail = userService.hasVerifiedEmail(userDetails.getUserId());
         LoginResponse loginResponse = new LoginResponse(accessToken, refreshToken, hasVerifiedEmail);
         response.setContentType(APPLICATION_JSON_VALUE);
