@@ -2,12 +2,11 @@ package com.project.foradhd.global.exception.handler;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.project.foradhd.global.exception.BusinessException;
-import com.project.foradhd.global.exception.ErrorCode;
-import com.project.foradhd.global.exception.InternalSystemException;
+import com.project.foradhd.global.exception.*;
 import com.project.foradhd.global.exception.dto.response.ErrorResponse;
 import com.project.foradhd.global.exception.dto.response.ErrorResponse.ValidationErrorResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -89,4 +88,23 @@ public class GlobalExceptionHandler {
         }
         return defaultMessage;
     }
+
+    @ExceptionHandler(BoardNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleBoardNotFoundException(BoardNotFoundException ex) {
+        log.error("Board not found: ", ex);
+        return ErrorResponse.toResponseEntity(ErrorCode.BOARD_NOT_FOUND);
+    }
+
+    @ExceptionHandler(BoardAccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleBoardAccessDeniedException(BoardAccessDeniedException ex) {
+        log.error("Access denied: ", ex);
+        return ErrorResponse.toResponseEntity(ErrorCode.ACCESS_DENIED);
+    }
+
+    @ExceptionHandler(InvalidBoardOperationException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidBoardOperationException(InvalidBoardOperationException ex) {
+        log.error("Invalid operation on board: ", ex);
+        return ErrorResponse.toResponseEntity(ErrorCode.INVALID_REQUEST);
+    }
+
 }
