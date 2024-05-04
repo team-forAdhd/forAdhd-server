@@ -25,8 +25,8 @@ public class GeneralCommentServiceImpl implements GeneralCommentService {
     }
 
     @Override
-    public GeneralCommentDto getComment(String commentId) {
-        GeneralComment comment = repository.findById(Long.valueOf(commentId))
+    public GeneralCommentDto getComment(String Id) {
+        GeneralComment comment = repository.findById(Id)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
         return mapper.toDto(comment);
     }
@@ -39,13 +39,13 @@ public class GeneralCommentServiceImpl implements GeneralCommentService {
     }
 
     @Override
-    public void deleteComment(String commentId) {
-        repository.deleteById(Long.valueOf(commentId));
+    public void deleteComment(String Id) {
+        repository.deleteById(Id);
     }
 
     @Override
     public GeneralCommentDto updateComment(GeneralCommentDto commentDto) {
-        GeneralComment existingComment = repository.findById(Long.valueOf(commentDto.getCommentId()))
+        GeneralComment existingComment = repository.findById(commentDto.getId())
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
         existingComment = mapper.toEntity(commentDto);
         repository.save(existingComment);
@@ -54,6 +54,17 @@ public class GeneralCommentServiceImpl implements GeneralCommentService {
 
     @Override
     public List<GeneralCommentDto> listComments() {
-        return repository.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
+        List<GeneralComment> comments = repository.findAll();
+        return comments.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GeneralCommentDto> listCommentsByPostId(String postId) {
+        List<GeneralComment> comments = repository.findByPostId(postId);
+        return comments.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 }

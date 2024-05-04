@@ -9,7 +9,7 @@ public class GeneralComment {
 
     @Id
     @Column(name = "comment_id", length = 32)
-    private String commentId;
+    private String Id;
 
     @Column(name = "writer_id", length = 32)
     private String writerId;
@@ -43,12 +43,12 @@ public class GeneralComment {
 
     // Getters and Setters
 
-    public String getCommentId() {
-        return commentId;
+    public String getId() {
+        return Id;
     }
 
-    public void setCommentId(String commentId) {
-        this.commentId = commentId;
+    public void setId(String Id) {
+        this.Id = Id;
     }
 
     public String getWriterId() {
@@ -130,4 +130,7 @@ public class GeneralComment {
     public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
         this.lastModifiedAt = lastModifiedAt;
     }
+
+    // Getters and Setters
+
 }

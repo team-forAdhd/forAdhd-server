@@ -16,9 +16,9 @@ public class GeneralCommentController {
         this.service = service;
     }
 
-    @GetMapping("/{commentId}")
-    public GeneralCommentDto getComment(@PathVariable String commentId) {
-        return service.getComment(commentId);
+    @GetMapping("/{Id}")
+    public GeneralCommentDto getComment(@PathVariable String Id) {
+        return service.getComment(Id);
     }
 
     @PostMapping
@@ -26,9 +26,9 @@ public class GeneralCommentController {
         return service.createComment(commentDto);
     }
 
-    @DeleteMapping("/{commentId}")
-    public void deleteComment(@PathVariable String commentId) {
-        service.deleteComment(commentId);
+    @DeleteMapping("/{Id}")
+    public void deleteComment(@PathVariable String Id) {
+        service.deleteComment(Id);
     }
 
     @PutMapping

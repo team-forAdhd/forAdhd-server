@@ -55,6 +55,8 @@ public class GeneralPost {
 
     @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime lastModifiedAt;
+    @jakarta.persistence.Id
+    private Long id;
 
     // Getters and Setters
 
@@ -176,5 +178,13 @@ public class GeneralPost {
 
     public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
         this.lastModifiedAt = lastModifiedAt;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
