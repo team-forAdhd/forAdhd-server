@@ -5,7 +5,7 @@ import com.project.foradhd.domain.user.business.dto.in.EmailAuthValidationData;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.service.AwsSesService;
 import com.project.foradhd.global.service.RedisService;
-import com.project.foradhd.global.util.EmailAuthNumberGenerator;
+import com.project.foradhd.global.util.EmailAuthCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class UserEmailAuthService {
         String email = emailAuthData.getEmail();
         userService.validateDuplicatedEmail(email, userId);
 
-        String authCode = EmailAuthNumberGenerator.generate();
+        String authCode = EmailAuthCodeGenerator.generate();
         redisService.setValue(email, authCode, AUTH_CODE_TIMEOUT_MIN, MINUTES);
         awsSesService.sendEmail("emailAuth.html", "ForA 이메일 인증을 완료해주세요.",
                 Map.of("authCode", authCode), email);

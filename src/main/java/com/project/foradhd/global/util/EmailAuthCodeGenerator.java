@@ -2,9 +2,9 @@ package com.project.foradhd.global.util;
 
 import java.util.Random;
 
-public class EmailAuthNumberGenerator {
+public class EmailAuthCodeGenerator {
 
-    private static final int AUTH_NUMBER_LENGTH = 6;
+    private static final int AUTH_CODE_LENGTH = 6;
     private static final int MIN_RANDOM_NUMBER_INCLUSIVE = 0;
     private static final int MAX_RANDOM_NUMBER_EXCLUSIVE = 10;
     private static final int ALLOWED_MAX_DUPLICATED_TIMES = 2;
@@ -16,7 +16,7 @@ public class EmailAuthNumberGenerator {
         do {
             int number = generateRandomNumber(random, numberCheckTable);
             builder.append(number);
-        } while (builder.length() < AUTH_NUMBER_LENGTH);
+        } while (builder.length() < AUTH_CODE_LENGTH);
         return builder.toString();
     }
 

@@ -6,19 +6,19 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@DisplayName("이메일 인증번호 Generator 테스트")
-class EmailAuthNumberGeneratorTest {
+@DisplayName("이메일 인증코드 Generator 테스트")
+class EmailAuthCodeGeneratorTest {
 
     static final int ALLOWED_MAX_DUPLICATED_TIMES = 2;
 
-    @DisplayName("생성된 인증번호 내 숫자는 최대 2번만 중복")
+    @DisplayName("생성된 인증코드 내 숫자는 최대 2번만 중복")
     @Test
-    void email_auth_number_generator_test() {
+    void email_auth_code_generator_test() {
         //when
-        String emailAuthNumber = EmailAuthNumberGenerator.generate();
+        String authCode = EmailAuthCodeGenerator.generate();
         int[] numberCheckTable = new int[10];
-        for (char numberChar : emailAuthNumber.toCharArray()) {
-            numberCheckTable[numberChar - '0']++;
+        for (char number : authCode.toCharArray()) {
+            numberCheckTable[number - '0']++;
         }
 
         //then
