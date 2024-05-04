@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static com.project.foradhd.global.enums.RedisKeyType.USER_EMAIL_AUTH_CODE;
 import static com.project.foradhd.global.exception.ErrorCode.EMAIL_AUTH_TIMEOUT;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -47,7 +48,7 @@ class UserEmailAuthServiceTest {
                 .email(email)
                 .authCode(authCode)
                 .build();
-        given(redisService.getValue(email)).willReturn(Optional.empty());
+        given(redisService.getValue(USER_EMAIL_AUTH_CODE, email)).willReturn(Optional.empty());
 
         //when, then
         assertThatThrownBy(() -> userEmailAuthService.validateEmailAuth(userId, emailAuthValidationData))
@@ -69,7 +70,7 @@ class UserEmailAuthServiceTest {
                 .email(email)
                 .authCode(authCode)
                 .build();
-        given(redisService.getValue(email)).willReturn(Optional.of(savedAuthCode));
+        given(redisService.getValue(USER_EMAIL_AUTH_CODE, email)).willReturn(Optional.of(savedAuthCode));
 
         //when, then
         assertThatThrownBy(() -> userEmailAuthService.validateEmailAuth(userId, emailAuthValidationData))
