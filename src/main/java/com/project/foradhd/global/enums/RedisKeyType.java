@@ -3,10 +3,10 @@ package com.project.foradhd.global.enums;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum RedisKey {
+public enum RedisKeyType {
 
-    USER_REFRESH_TOKEN_KEY("user", "refresh-token"),
-    USER_EMAIL_AUTH_CODE_KEY("user", "email-auth-code");
+    USER_REFRESH_TOKEN("user", "refresh-token"),
+    USER_EMAIL_AUTH_CODE("user", "email-auth-code");
 
     private final String domain;
     private final String dataType;

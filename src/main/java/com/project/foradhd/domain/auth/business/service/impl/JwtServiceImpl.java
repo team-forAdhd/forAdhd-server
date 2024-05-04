@@ -1,6 +1,6 @@
 package com.project.foradhd.domain.auth.business.service.impl;
 
-import static com.project.foradhd.global.enums.RedisKey.USER_REFRESH_TOKEN_KEY;
+import static com.project.foradhd.global.enums.RedisKeyType.USER_REFRESH_TOKEN;
 import static org.springframework.util.StringUtils.collectionToCommaDelimitedString;
 
 import com.project.foradhd.domain.auth.business.service.JwtService;
@@ -150,18 +150,17 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public void saveRefreshToken(String userId, String refreshToken) {
-        redisService.setValue(USER_REFRESH_TOKEN_KEY.getKey(userId), refreshToken,
-                refreshTokenExpiry, TimeUnit.MILLISECONDS);
+        redisService.setValue(USER_REFRESH_TOKEN, userId, refreshToken, refreshTokenExpiry, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void deleteRefreshToken(String userId) {
-        redisService.deleteValue(USER_REFRESH_TOKEN_KEY.getKey(userId));
+        redisService.deleteValue(USER_REFRESH_TOKEN, userId);
     }
 
     @Override
     public boolean existsSavedRefreshToken(String userId, String refreshToken) {
-        return redisService.getValue(USER_REFRESH_TOKEN_KEY.getKey(userId))
+        return redisService.getValue(USER_REFRESH_TOKEN, userId)
                 .filter(savedRefreshToken -> savedRefreshToken.equals(refreshToken))
                 .isPresent();
     }
