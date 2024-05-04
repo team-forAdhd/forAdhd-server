@@ -62,7 +62,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	//AWS SES
-	implementation 'com.amazonaws:aws-java-sdk-ses'
+	implementation 'com.amazonaws:aws-java-sdk-ses:1.12.713'
 
 	//Thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
