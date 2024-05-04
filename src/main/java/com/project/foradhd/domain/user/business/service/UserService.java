@@ -170,28 +170,28 @@ public class UserService {
             .isPresent();
     }
 
-    private void validateDuplicatedEmail(String email) {
+    public void validateDuplicatedEmail(String email) {
         boolean isExistingUser = userRepository.findByEmail(email).isPresent();
         if (isExistingUser) {
             throw new BusinessException(ALREADY_EXISTS_EMAIL);
         }
     }
 
-    private void validateDuplicatedEmail(String email, String userId) {
+    public void validateDuplicatedEmail(String email, String userId) {
         boolean isExistingUser = userRepository.findByEmailAndUserIdNot(email, userId).isPresent();
         if (isExistingUser) {
             throw new BusinessException(ALREADY_EXISTS_EMAIL);
         }
     }
 
-    private void validateDuplicatedNickname(String nickname) {
+    public void validateDuplicatedNickname(String nickname) {
         boolean isDuplicatedNickname = userProfileRepository.findByNickname(nickname).isPresent();
         if (isDuplicatedNickname) {
             throw new BusinessException(ALREADY_EXISTS_NICKNAME);
         }
     }
 
-    private void validateDuplicatedNickname(String nickname, String userId) {
+    public void validateDuplicatedNickname(String nickname, String userId) {
         boolean isDuplicatedNickname = userProfileRepository.findByNicknameAndUserIdNot(nickname, userId)
             .isPresent();
         if (isDuplicatedNickname) {
@@ -199,7 +199,7 @@ public class UserService {
         }
     }
 
-    private void validateTermsApprovals(List<UserTermsApproval> userTermsApprovals) {
+    public void validateTermsApprovals(List<UserTermsApproval> userTermsApprovals) {
         List<Terms> termsList = termsRepository.findAll();
         for (UserTermsApproval userTermsApproval : userTermsApprovals) {
             Long termsId = userTermsApproval.getId().getTerms().getId();
@@ -216,7 +216,7 @@ public class UserService {
         throw new BusinessException(NOT_FOUND_TERMS);
     }
 
-    private void validatePushNotificationApprovals(
+    public void validatePushNotificationApprovals(
         List<UserPushNotificationApproval> userPushNotificationApprovals) {
         List<PushNotificationApproval> pushNotificationApprovalList = pushNotificationApprovalRepository.findAll();
         for (UserPushNotificationApproval userPushNotificationApproval : userPushNotificationApprovals) {
