@@ -364,6 +364,48 @@ class UserServiceTest {
         then(userRepository).should(never()).findById(userId);
     }
 
+    @DisplayName("이메일 인증 후 유저 인증 정보 수정 테스트")
+    @Test
+    void update_email_auth_test() {
+        //given
+        User user = toUser()
+                .isVerifiedEmail(false)
+                .role(Role.GUEST)
+                .build();
+        given(userRepository.findById(anyString())).willReturn(Optional.of(user));
+        given(userRepository.findByIdWithProfile(anyString())).willReturn(Optional.of(user));
+
+        //when
+        userService.updateEmailAuth(user.getId());
+
+        //then
+        assertThat(user.getIsVerifiedEmail()).isTrue();
+        assertThat(user.getRole()).isEqualTo(Role.USER);
+        then(userRepository).should(times(1)).findById(user.getId());
+        then(userRepository).should(times(1)).findByIdWithProfile(user.getId());
+    }
+
+    @DisplayName("이메일 인증 후 유저 인증 정보 수정 테스트 - 유저 프로필 미등록 상태인 경우 USER Role 획득 불가")
+    @Test
+    void update_email_auth_without_profile_test() {
+        //given
+        User user = toUser()
+                .isVerifiedEmail(false)
+                .role(Role.GUEST)
+                .build();
+        given(userRepository.findById(anyString())).willReturn(Optional.of(user));
+        given(userRepository.findByIdWithProfile(anyString())).willReturn(Optional.empty());
+
+        //when
+        userService.updateEmailAuth(user.getId());
+
+        //then
+        assertThat(user.getIsVerifiedEmail()).isTrue();
+        assertThat(user.getRole()).isEqualTo(Role.GUEST);
+        then(userRepository).should(times(1)).findById(user.getId());
+        then(userRepository).should(times(1)).findByIdWithProfile(user.getId());
+    }
+
     @DisplayName("푸시 알림 동의 여부 수정 테스트")
     @Test
     void update_push_notification_approvals_test() {
