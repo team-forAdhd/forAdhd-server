@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+import static com.project.foradhd.global.enums.EmailTemplate.USER_EMAIL_AUTH_TEMPLATE;
 import static com.project.foradhd.global.exception.ErrorCode.EMAIL_AUTH_TIMEOUT;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -29,8 +30,7 @@ public class UserEmailAuthService {
 
         String authCode = EmailAuthCodeGenerator.generate();
         redisService.setValue(email, authCode, AUTH_CODE_TIMEOUT_MIN, MINUTES);
-        awsSesService.sendEmail("emailAuth.html", "ForA 이메일 인증을 완료해주세요.",
-                Map.of("authCode", authCode), email);
+        awsSesService.sendEmail(USER_EMAIL_AUTH_TEMPLATE, Map.of("authCode", authCode), email);
     }
 
     public void validateEmailAuth(String userId, EmailAuthValidationData emailAuthValidationData) {
