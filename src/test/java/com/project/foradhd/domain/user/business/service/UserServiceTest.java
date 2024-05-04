@@ -376,11 +376,11 @@ class UserServiceTest {
         given(userRepository.findByIdWithProfile(anyString())).willReturn(Optional.of(user));
 
         //when
-        userService.updateEmailAuth(user.getId());
+        User updatedUser = userService.updateEmailAuth(user.getId());
 
         //then
-        assertThat(user.getIsVerifiedEmail()).isTrue();
-        assertThat(user.getRole()).isEqualTo(Role.USER);
+        assertThat(updatedUser.getIsVerifiedEmail()).isTrue();
+        assertThat(updatedUser.getRole()).isEqualTo(Role.USER);
         then(userRepository).should(times(1)).findById(user.getId());
         then(userRepository).should(times(1)).findByIdWithProfile(user.getId());
     }
@@ -397,11 +397,11 @@ class UserServiceTest {
         given(userRepository.findByIdWithProfile(anyString())).willReturn(Optional.empty());
 
         //when
-        userService.updateEmailAuth(user.getId());
+        User updatedUser = userService.updateEmailAuth(user.getId());
 
         //then
-        assertThat(user.getIsVerifiedEmail()).isTrue();
-        assertThat(user.getRole()).isEqualTo(Role.GUEST);
+        assertThat(updatedUser.getIsVerifiedEmail()).isTrue();
+        assertThat(updatedUser.getRole()).isEqualTo(Role.GUEST);
         then(userRepository).should(times(1)).findById(user.getId());
         then(userRepository).should(times(1)).findByIdWithProfile(user.getId());
     }

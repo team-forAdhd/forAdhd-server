@@ -1,7 +1,7 @@
 package com.project.foradhd.domain.user.web.mapper;
 
 import com.project.foradhd.domain.user.business.dto.in.*;
-import com.project.foradhd.domain.user.business.dto.out.SignUpTokenData;
+import com.project.foradhd.domain.user.business.dto.out.UserTokenData;
 import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
 import com.project.foradhd.domain.user.persistence.entity.PushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.Terms;
@@ -14,6 +14,7 @@ import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval.UserTermsApprovalId;
 import com.project.foradhd.domain.user.persistence.enums.Role;
 import com.project.foradhd.domain.user.web.dto.request.*;
+import com.project.foradhd.domain.user.web.dto.response.EmailAuthValidationResponse;
 import com.project.foradhd.domain.user.web.dto.response.SignUpResponse;
 import com.project.foradhd.domain.user.web.dto.response.SnsSignUpResponse;
 import com.project.foradhd.domain.user.web.dto.response.UserProfileDetailsResponse;
@@ -187,13 +188,15 @@ public interface UserMapper {
     }
 
     @Mapping(target = "hasVerifiedEmail", source = "user.isVerifiedEmail")
-    SignUpResponse toSignUpResponse(SignUpTokenData signUpTokenData, User user);
+    SignUpResponse toSignUpResponse(UserTokenData userTokenData, User user);
 
     @Mapping(target = "hasVerifiedEmail", source = "user.isVerifiedEmail")
     @Mapping(target = "hasProfile", constant = "true")
-    SnsSignUpResponse toSnsSignUpResponse(SignUpTokenData signUpTokenData, User user);
+    SnsSignUpResponse toSnsSignUpResponse(UserTokenData userTokenData, User user);
 
     EmailAuthData toEmailAuthData(EmailAuthRequest request);
 
     EmailAuthValidationData toEmailAuthValidationData(EmailAuthValidationRequest request);
+
+    EmailAuthValidationResponse toEmailAuthValidationResponse(UserTokenData userTokenData);
 }

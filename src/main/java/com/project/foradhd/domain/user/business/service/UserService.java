@@ -123,11 +123,12 @@ public class UserService {
     }
 
     @Transactional
-    public void updateEmailAuth(String userId) {
+    public User updateEmailAuth(String userId) {
         User user = getUser(userId);
         boolean isVerifiedEmail = true;
         boolean hasProfile = hasUserProfile(user.getId());
         user.updateAsUserRole(isVerifiedEmail, hasProfile);
+        return user;
     }
 
     @Transactional

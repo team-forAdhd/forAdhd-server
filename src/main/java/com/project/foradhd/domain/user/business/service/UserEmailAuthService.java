@@ -2,6 +2,7 @@ package com.project.foradhd.domain.user.business.service;
 
 import com.project.foradhd.domain.user.business.dto.in.EmailAuthData;
 import com.project.foradhd.domain.user.business.dto.in.EmailAuthValidationData;
+import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.service.AwsSesService;
 import com.project.foradhd.global.service.RedisService;
@@ -34,11 +35,11 @@ public class UserEmailAuthService {
         awsSesService.sendEmail(USER_EMAIL_AUTH_TEMPLATE, Map.of("authCode", authCode), email);
     }
 
-    public void validateEmailAuth(String userId, EmailAuthValidationData emailAuthValidationData) {
+    public User validateEmailAuth(String userId, EmailAuthValidationData emailAuthValidationData) {
         String email = emailAuthValidationData.getEmail();
         String authCode = emailAuthValidationData.getAuthCode();
         validateEmailAuthCode(email, authCode);
-        userService.updateEmailAuth(userId);
+        return userService.updateEmailAuth(userId);
     }
 
     private void validateEmailAuthCode(String email, String authCode) {
