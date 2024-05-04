@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 import static com.project.foradhd.global.enums.EmailTemplate.USER_EMAIL_AUTH_TEMPLATE;
+import static com.project.foradhd.global.enums.RedisKey.USER_EMAIL_AUTH_CODE_KEY;
 import static com.project.foradhd.global.exception.ErrorCode.EMAIL_AUTH_TIMEOUT;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -29,7 +30,7 @@ public class UserEmailAuthService {
         userService.validateDuplicatedEmail(email, userId);
 
         String authCode = EmailAuthCodeGenerator.generate();
-        redisService.setValue(email, authCode, AUTH_CODE_TIMEOUT_MIN, MINUTES);
+        redisService.setValue(USER_EMAIL_AUTH_CODE_KEY.getKey(email), authCode, AUTH_CODE_TIMEOUT_MIN, MINUTES);
         awsSesService.sendEmail(USER_EMAIL_AUTH_TEMPLATE, Map.of("authCode", authCode), email);
     }
 
@@ -41,9 +42,9 @@ public class UserEmailAuthService {
     }
 
     private void validateEmailAuthCode(String email, String authCode) {
-        redisService.getValue(email)
+        redisService.getValue(USER_EMAIL_AUTH_CODE_KEY.getKey(email))
                 .filter(savedAuthCode -> savedAuthCode.equals(authCode))
                 .orElseThrow(() -> new BusinessException(EMAIL_AUTH_TIMEOUT));
-        redisService.deleteValue(email);
+        redisService.deleteValue(USER_EMAIL_AUTH_CODE_KEY.getKey(email));
     }
 }
