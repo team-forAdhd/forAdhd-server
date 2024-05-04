@@ -23,6 +23,7 @@ public enum ErrorCode {
     NOT_FOUND_TERMS(NOT_FOUND, "존재하지 않는 이용약관입니다."),
     NOT_FOUND_PUSH_NOTIFICATION_APPROVAL(NOT_FOUND, "존재하지 않는 푸시 알림 동의 항목입니다."),
     REQUIRED_TERMS_APPROVAL(BAD_REQUEST, "필수 이용 약관에 동의해야 합니다."),
+    EMAIL_AUTH_TIMEOUT(BAD_REQUEST, "이메일 인증 가능 시간을 초과했습니다."),
 
     //validation
     INVALID_REQUEST(BAD_REQUEST, "잘못된 요청입니다."),

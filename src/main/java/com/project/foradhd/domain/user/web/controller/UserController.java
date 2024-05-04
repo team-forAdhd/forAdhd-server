@@ -1,25 +1,13 @@
 package com.project.foradhd.domain.user.web.controller;
 
-import com.project.foradhd.domain.user.business.dto.in.EmailUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.PasswordUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.PushNotificationApprovalUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.SignUpData;
-import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
-import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
+import com.project.foradhd.domain.user.business.dto.in.*;
 import com.project.foradhd.domain.user.business.dto.out.SignUpTokenData;
 import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
+import com.project.foradhd.domain.user.business.service.UserEmailAuthService;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.business.service.UserSignUpTokenService;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.web.dto.request.EmailUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.request.NicknameCheckRequest;
-import com.project.foradhd.domain.user.web.dto.request.PasswordUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.request.ProfileUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.request.PushNotificationApprovalUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
-import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
-import com.project.foradhd.domain.user.web.dto.request.TermsApprovalsUpdateRequest;
+import com.project.foradhd.domain.user.web.dto.request.*;
 import com.project.foradhd.domain.user.web.dto.response.NicknameCheckResponse;
 import com.project.foradhd.domain.user.web.dto.response.SignUpResponse;
 import com.project.foradhd.domain.user.web.dto.response.SnsSignUpResponse;
@@ -45,6 +33,7 @@ public class UserController {
 
     private final UserService userService;
     private final UserSignUpTokenService userSignUpTokenService;
+    private final UserEmailAuthService userEmailAuthService;
     private final UserMapper userMapper;
 
     @GetMapping("/nickname-check")
@@ -78,12 +67,18 @@ public class UserController {
     }
 
     @PostMapping("/email-auth")
-    public ResponseEntity<Void> authenticateEmail() {
-        return ResponseEntity.created(null).build();
+    public ResponseEntity<Void> authenticateEmail(@AuthUserId String userId,
+                                                @RequestBody @Valid EmailAuthRequest request) {
+        EmailAuthData emailAuthData = userMapper.toEmailAuthData(request);
+        userEmailAuthService.authenticateEmail(userId, emailAuthData);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/email-auth")
-    public ResponseEntity<Void> validateEmailAuth() {
+    @PutMapping("/email-auth")
+    public ResponseEntity<Void> validateEmailAuth(@AuthUserId String userId,
+                                                @RequestBody @Valid EmailAuthValidationRequest request) {
+        EmailAuthValidationData emailAuthValidationData = userMapper.toEmailAuthValidationData(request);
+        userEmailAuthService.validateEmailAuth(userId, emailAuthValidationData);
         return ResponseEntity.ok().build();
     }
 

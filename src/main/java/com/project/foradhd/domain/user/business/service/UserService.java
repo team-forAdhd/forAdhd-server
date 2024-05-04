@@ -123,6 +123,14 @@ public class UserService {
     }
 
     @Transactional
+    public void updateEmailAuth(String userId) {
+        User user = getUser(userId);
+        boolean isVerifiedEmail = true;
+        boolean hasProfile = hasUserProfile(user.getId());
+        user.updateAsUserRole(isVerifiedEmail, hasProfile);
+    }
+
+    @Transactional
     public void updatePushNotificationApprovals(PushNotificationApprovalUpdateData pushNotificationApprovalUpdateData) {
         List<UserPushNotificationApproval> userPushNotificationApprovals = pushNotificationApprovalUpdateData.getUserPushNotificationApprovals();
         validatePushNotificationApprovals(userPushNotificationApprovals);
