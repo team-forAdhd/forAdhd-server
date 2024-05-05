@@ -16,7 +16,6 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
-import com.project.foradhd.domain.user.business.dto.in.EmailUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.PasswordUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.PushNotificationApprovalUpdateData;
@@ -308,67 +307,14 @@ class UserServiceTest {
         then(userAuthInfoService).should(times(1)).updatePassword(userId, newPassword);
     }
 
-    @DisplayName("이메일 수정 테스트(기존의 role, 이메일 인증 여부 값 변경X, only email 변경O)")
-    @Test
-    void update_email_test() {
-        //given
-        String userId = "userId";
-        User user = toUser()
-            .id(userId)
-            .email("email")
-            .isVerifiedEmail(true)
-            .role(Role.USER)
-            .build();
-        String newEmail = "newEmail";
-        EmailUpdateData emailUpdateData = EmailUpdateData.builder()
-            .email(newEmail)
-            .build();
-        given(userRepository.findByEmailAndUserIdNot(newEmail, userId)).willReturn(Optional.empty());
-        given(userRepository.findById(userId)).willReturn(Optional.of(user));
-
-        //when
-        userService.updateEmail(userId, emailUpdateData);
-
-        //then
-        assertThat(user.getIsVerifiedEmail()).isTrue();
-        assertThat(user.getRole()).isEqualTo(Role.USER);
-        assertThat(user.getEmail()).isEqualTo(newEmail);
-        then(userRepository).should(times(1)).findByEmailAndUserIdNot(newEmail, userId);
-        then(userRepository).should(times(1)).findById(userId);
-    }
-
-    @DisplayName("이메일 수정 테스트 - 실패: 이메일 중복")
-    @Test
-    void update_email_test_fail_duplicated_email() {
-        //given
-        String userId = "userId";
-        String anotherUserId = "anotherUserId";
-        User anotherUser = toUser()
-            .id(anotherUserId)
-            .email("anotherEmail")
-            .isVerifiedEmail(false)
-            .role(Role.GUEST)
-            .build();
-        String newEmail = "anotherEmail";
-        EmailUpdateData emailUpdateData = EmailUpdateData.builder()
-            .email(newEmail)
-            .build();
-        given(userRepository.findByEmailAndUserIdNot(newEmail, userId)).willReturn(Optional.of(anotherUser));
-
-        //when, then
-        assertThatThrownBy(() -> userService.updateEmail(userId, emailUpdateData))
-            .isInstanceOf(BusinessException.class)
-                .extracting("errorCode")
-                .isEqualTo(ALREADY_EXISTS_EMAIL);
-        then(userRepository).should(times(1)).findByEmailAndUserIdNot(newEmail, userId);
-        then(userRepository).should(never()).findById(userId);
-    }
-
     @DisplayName("이메일 인증 후 유저 인증 정보 수정 테스트")
     @Test
     void update_email_auth_test() {
         //given
+        String prevEmail = "prevEmail@naver.com";
+        String newEmail = "newEmail@naver.com";
         User user = toUser()
+                .email(prevEmail)
                 .isVerifiedEmail(false)
                 .role(Role.GUEST)
                 .build();
@@ -376,9 +322,10 @@ class UserServiceTest {
         given(userRepository.findByIdWithProfile(anyString())).willReturn(Optional.of(user));
 
         //when
-        User updatedUser = userService.updateEmailAuth(user.getId());
+        User updatedUser = userService.updateEmailAuth(user.getId(), newEmail);
 
         //then
+        assertThat(updatedUser.getEmail()).isEqualTo(newEmail);
         assertThat(updatedUser.getIsVerifiedEmail()).isTrue();
         assertThat(updatedUser.getRole()).isEqualTo(Role.USER);
         then(userRepository).should(times(1)).findById(user.getId());
@@ -389,7 +336,10 @@ class UserServiceTest {
     @Test
     void update_email_auth_without_profile_test() {
         //given
+        String prevEmail = "prevEmail@naver.com";
+        String newEmail = "newEmail@naver.com";
         User user = toUser()
+                .email(prevEmail)
                 .isVerifiedEmail(false)
                 .role(Role.GUEST)
                 .build();
@@ -397,9 +347,10 @@ class UserServiceTest {
         given(userRepository.findByIdWithProfile(anyString())).willReturn(Optional.empty());
 
         //when
-        User updatedUser = userService.updateEmailAuth(user.getId());
+        User updatedUser = userService.updateEmailAuth(user.getId(), newEmail);
 
         //then
+        assertThat(updatedUser.getEmail()).isEqualTo(newEmail);
         assertThat(updatedUser.getIsVerifiedEmail()).isTrue();
         assertThat(updatedUser.getRole()).isEqualTo(Role.GUEST);
         then(userRepository).should(times(1)).findById(user.getId());

@@ -39,7 +39,7 @@ public class UserEmailAuthService {
         String email = emailAuthValidationData.getEmail();
         String authCode = emailAuthValidationData.getAuthCode();
         validateEmailAuthCode(email, authCode);
-        return userService.updateEmailAuth(userId);
+        return userService.updateEmailAuth(userId, email);
     }
 
     private void validateEmailAuthCode(String email, String authCode) {

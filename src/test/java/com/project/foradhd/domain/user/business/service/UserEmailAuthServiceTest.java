@@ -55,7 +55,7 @@ class UserEmailAuthServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(EMAIL_AUTH_TIMEOUT);
-        then(userService).should(never()).updateEmailAuth(anyString());
+        then(userService).should(never()).updateEmailAuth(anyString(), anyString());
     }
 
     @DisplayName("유저 이메일 인증코드 검증 테스트 : 실패 - 인증코드 불일치")
@@ -77,6 +77,6 @@ class UserEmailAuthServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(EMAIL_AUTH_TIMEOUT);
-        then(userService).should(never()).updateEmailAuth(anyString());
+        then(userService).should(never()).updateEmailAuth(anyString(), anyString());
     }
 }

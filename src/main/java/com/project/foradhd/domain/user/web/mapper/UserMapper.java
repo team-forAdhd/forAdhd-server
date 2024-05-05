@@ -165,8 +165,6 @@ public interface UserMapper {
     })
     PasswordUpdateData toPasswordUpdateData(PasswordUpdateRequest request);
 
-    EmailUpdateData toEmailUpdateData(EmailUpdateRequest request);
-
     default PushNotificationApprovalUpdateData toPushNotificationApprovalUpdateData(String userId,
         PushNotificationApprovalUpdateRequest request) {
         List<UserPushNotificationApproval> userPushNotificationApprovals = request.getPushNotificationApprovals()

@@ -96,14 +96,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/email")
-    public ResponseEntity<Void> updateEmail(@AuthUserId String userId,
-        @RequestBody @Valid EmailUpdateRequest request) {
-        EmailUpdateData emailUpdateData = userMapper.toEmailUpdateData(request);
-        userService.updateEmail(userId, emailUpdateData);
-        return ResponseEntity.ok().build();
-    }
-
     @PutMapping("/push-notification-approvals")
     public ResponseEntity<Void> updatePushNotificationApprovals(@AuthUserId String userId,
         @RequestBody @Valid PushNotificationApprovalUpdateRequest request) {

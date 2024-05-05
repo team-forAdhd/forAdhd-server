@@ -1,6 +1,5 @@
 package com.project.foradhd.domain.user.business.service;
 
-import com.project.foradhd.domain.user.business.dto.in.EmailUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.PasswordUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
 import com.project.foradhd.domain.user.business.dto.in.PushNotificationApprovalUpdateData;
@@ -116,18 +115,12 @@ public class UserService {
     }
 
     @Transactional
-    public void updateEmail(String userId, EmailUpdateData emailUpdateData) {
-        validateDuplicatedEmail(emailUpdateData.getEmail(), userId);
-        User user = getUser(userId);
-        user.updateEmail(emailUpdateData.getEmail());
-    }
-
-    @Transactional
-    public User updateEmailAuth(String userId) {
+    public User updateEmailAuth(String userId, String email) {
         User user = getUser(userId);
         boolean isVerifiedEmail = true;
         boolean hasProfile = hasUserProfile(user.getId());
         user.updateAsUserRole(isVerifiedEmail, hasProfile);
+        user.updateEmail(email);
         return user;
     }
 
