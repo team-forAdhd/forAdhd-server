@@ -39,21 +39,10 @@ public class GeneralCommentServiceTest {
         comment = new GeneralComment();
         commentDto = new GeneralCommentDto();
 
-        comment.setId("testId");
+        comment.setId("1");
         comment.setContent("Sample comment");
     }
 
-    @Test
-    void getComment_shouldReturnComment_whenCommentExists() {
-        GeneralCommentDto result = service.getComment("testId");
-
-        when(repository.findById(anyString())).thenReturn(Optional.of(comment));
-        when(mapper.toDto(any(GeneralComment.class))).thenReturn(commentDto);
-
-        assertNotNull(result);
-        verify(repository).findById("testId");
-        verify(mapper).toDto(comment);
-    }
 
     @Test
     void createComment_shouldSaveComment() {
@@ -64,6 +53,18 @@ public class GeneralCommentServiceTest {
         GeneralCommentDto result = service.createComment(commentDto);
         assertNotNull(result);
         verify(repository).save(comment);
+        verify(mapper).toDto(comment);
+    }
+
+    @Test
+    void getComment_shouldReturnComment_whenCommentExists() {
+        when(repository.findById("testId")).thenReturn(Optional.of(comment));
+        when(mapper.toDto(any(GeneralComment.class))).thenReturn(commentDto);
+
+        GeneralCommentDto result = service.getComment("testId");
+
+        assertNotNull(result);
+        verify(repository).findById("testId");
         verify(mapper).toDto(comment);
     }
 

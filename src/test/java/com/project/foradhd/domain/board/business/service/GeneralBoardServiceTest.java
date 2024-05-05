@@ -34,18 +34,22 @@ public class GeneralBoardServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        post = new GeneralPost(); // configure with test data
-        postDto = new GeneralPostDto(); // configure with test data
+        post = new GeneralPost();
+        postDto = new GeneralPostDto();
+
+        post.setPostId("testId");
+        post.setTitle("Sample post");
     }
 
     @Test
     void getPost_shouldReturnPost_whenPostExists() {
-        when(repository.findById(Long.valueOf(anyString()))).thenReturn(Optional.of(post));
+        when(repository.findById(anyString())).thenReturn(Optional.of(post));
         when(mapper.toDto(any(GeneralPost.class))).thenReturn(postDto);
 
         GeneralPostDto result = service.getPost("testId");
+
         assertNotNull(result);
-        verify(repository).findById(Long.valueOf("testId"));
+        verify(repository).findById("testId");
         verify(mapper).toDto(post);
     }
 
@@ -56,6 +60,7 @@ public class GeneralBoardServiceTest {
         when(mapper.toDto(any(GeneralPost.class))).thenReturn(postDto);
 
         GeneralPostDto result = service.createPost(postDto);
+
         assertNotNull(result);
         verify(repository).save(post);
         verify(mapper).toDto(post);
@@ -63,7 +68,7 @@ public class GeneralBoardServiceTest {
 
     @Test
     void updatePost_shouldUpdateAndReturnPost_whenPostExists() {
-        when(repository.findById(Long.valueOf(anyString()))).thenReturn(Optional.of(post));
+        when(repository.findById(anyString())).thenReturn(Optional.of(post));
         when(repository.save(any(GeneralPost.class))).thenReturn(post);
         when(mapper.toEntity(any(GeneralPostDto.class))).thenReturn(post);
         when(mapper.toDto(any(GeneralPost.class))).thenReturn(postDto);
@@ -76,8 +81,8 @@ public class GeneralBoardServiceTest {
 
     @Test
     void deletePost_shouldCallDeleteById() {
-        doNothing().when(repository).deleteById(Long.valueOf(anyString()));
+        doNothing().when(repository).deleteById(anyString());
         service.deletePost("testId");
-        verify(repository).deleteById(Long.valueOf("testId"));
+        verify(repository).deleteById("testId");
     }
 }
