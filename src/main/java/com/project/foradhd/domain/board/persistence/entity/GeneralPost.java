@@ -12,23 +12,23 @@ import java.time.LocalDateTime;
 @Table(name = "general_post")
 public class GeneralPost {
 
-    @Id
-    @Column(name = "post_id", length = 32)
+    @jakarta.persistence.Id
+    @Column(name = "post_id")
     private String postId;
 
-    @Column(name = "writer_id", length = 32)
+    @Column(name = "writer_id")
     private String writerId;
 
     @Column(name = "category_id")
     private String categoryId;
 
-    @Column(name = "writer_name", length = 50)
+    @Column(name = "writer_name")
     private String writerName;
 
-    @Column(name = "category_name", length = 100)
+    @Column(name = "category_name")
     private String categoryName;
 
-    @Column(name = "title", length = 255)
+    @Column(name = "title")
     private String title;
 
     @Column(name = "content", columnDefinition = "LONGTEXT")
@@ -57,8 +57,9 @@ public class GeneralPost {
 
     @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime lastModifiedAt;
-    @jakarta.persistence.Id
-    private Long id;
+
+    @Column(name = "view_count")
+    private long viewCount;
 
     // Getters and Setters
 
@@ -120,10 +121,6 @@ public class GeneralPost {
 
     public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
         this.lastModifiedAt = lastModifiedAt;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
 }

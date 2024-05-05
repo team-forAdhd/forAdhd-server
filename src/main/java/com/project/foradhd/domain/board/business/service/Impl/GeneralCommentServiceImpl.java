@@ -2,8 +2,10 @@ package com.project.foradhd.domain.board.business.service.Impl;
 
 import com.project.foradhd.domain.board.business.service.GeneralCommentService;
 import com.project.foradhd.domain.board.persistence.entity.GeneralComment;
+import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
 import com.project.foradhd.domain.board.persistence.repository.GeneralCommentRepository;
 import com.project.foradhd.domain.board.web.dto.GeneralCommentDto;
+import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
 import com.project.foradhd.domain.board.web.mapper.GeneralCommentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -63,6 +65,14 @@ public class GeneralCommentServiceImpl implements GeneralCommentService {
     @Override
     public List<GeneralCommentDto> listCommentsByPostId(String postId) {
         List<GeneralComment> comments = repository.findByPostId(postId);
+        return comments.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GeneralCommentDto> getUserComments(String userId) {
+        List<GeneralComment> comments = repository.findByWriterId(userId);
         return comments.stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());

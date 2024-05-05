@@ -15,4 +15,6 @@ public interface GeneralCommentRepository extends JpaRepository<GeneralComment, 
 
     // 부모 댓글 ID를 기준으로 모든 대댓글 조회
     List<GeneralComment> findByParentCommentId(String parentCommentId);
+
+    List<GeneralComment> findByWriterId(String writerId);
 }

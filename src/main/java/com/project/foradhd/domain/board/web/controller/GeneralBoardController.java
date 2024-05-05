@@ -8,9 +8,8 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/posts")
+@RequestMapping("/api/v1/posts")
 public class GeneralBoardController {
-
     private final GeneralBoardService service;
 
     public GeneralBoardController(GeneralBoardService service) {
