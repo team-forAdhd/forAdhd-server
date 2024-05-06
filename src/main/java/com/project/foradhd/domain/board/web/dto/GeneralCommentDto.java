@@ -3,7 +3,7 @@ package com.project.foradhd.domain.board.web.dto;
 import java.time.LocalDateTime;
 
 public class GeneralCommentDto {
-    private String Id;
+    private String commentId;
     private String writerId;
     private String writerName;
     private String postId;
@@ -17,12 +17,12 @@ public class GeneralCommentDto {
 
     // Getters and Setters
 
-    public String getId() {
-        return Id;
+    public String getCommentId() {
+        return commentId;
     }
 
-    public void setId(String Id) {
-        this.Id = Id;
+    public void setCommentId(String commentId) {
+        this.commentId = commentId;
     }
 
     public String getWriterId() {

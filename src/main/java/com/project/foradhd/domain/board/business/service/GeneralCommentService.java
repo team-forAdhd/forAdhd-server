@@ -11,7 +11,6 @@ public interface GeneralCommentService {
     GeneralCommentDto updateComment(GeneralCommentDto commentDTO);
     List<GeneralCommentDto> listCommentsByPostId(String postId);
     List<GeneralCommentDto> listComments();
-
-    List<GeneralCommentDto> getUserComments(String userId);
+    List<GeneralCommentDto> getUserComments(String userId, String sortDirection);
 }
 

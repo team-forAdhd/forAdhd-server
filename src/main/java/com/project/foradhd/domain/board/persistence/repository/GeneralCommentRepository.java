@@ -1,9 +1,11 @@
 package com.project.foradhd.domain.board.persistence.repository;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.project.foradhd.domain.board.persistence.entity.GeneralComment;
 
+import javax.xml.stream.events.Comment;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,5 +18,5 @@ public interface GeneralCommentRepository extends JpaRepository<GeneralComment, 
     // 부모 댓글 ID를 기준으로 모든 대댓글 조회
     List<GeneralComment> findByParentCommentId(String parentCommentId);
 
-    List<GeneralComment> findByWriterId(String writerId);
+    List<GeneralComment> findByUserId(String userId, Sort sort);
 }
