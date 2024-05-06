@@ -10,6 +10,5 @@ public interface GeneralBoardService {
     void deletePost(String postId);
     GeneralPostDto updatePost(GeneralPostDto postDTO);
     List<GeneralPostDto> listPosts();
-    List<GeneralPostDto> getScrapedPosts(String userId);
     List<GeneralPostDto> getUserPosts(String userId, PostSortOption sortOption);
 }

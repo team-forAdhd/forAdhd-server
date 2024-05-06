@@ -44,24 +44,15 @@ public class GeneralBoardServiceImpl implements GeneralBoardService {
 
     @Override
     public GeneralPostDto createPost(GeneralPostDto postDTO) {
-        try {
-            GeneralPost post = postMapper.toEntity(postDTO);
-            post = boardRepository.save(post);
-            return postMapper.toDto(post);
-        } catch (Exception e) {
-            throw new InternalSystemException(e);
-        }
+        GeneralPost post = postMapper.toEntity(postDTO);
+        post = boardRepository.save(post);
+        return postMapper.toDto(post);
     }
-
 
     @Override
     public GeneralPostDto updatePost(GeneralPostDto postDTO) {
         GeneralPost existingPost = boardRepository.findById(postDTO.getPostId())
                 .orElseThrow(() -> new BoardNotFoundException("Post with ID " + postDTO.getPostId() + " not found"));
-
-        if (postDTO.getTitle() == null || postDTO.getContent() == null) {
-            throw new InvalidBoardOperationException("Title or content cannot be null");
-        }
 
         existingPost.setTitle(postDTO.getTitle());
         existingPost.setContent(postDTO.getContent());
@@ -74,11 +65,6 @@ public class GeneralBoardServiceImpl implements GeneralBoardService {
     public void deletePost(String postId) {
         GeneralPost post = boardRepository.findById(postId)
                 .orElseThrow(() -> new BoardNotFoundException("Post with ID " + postId + " not found"));
-
-        if (!userHasAccess(post)) {
-            throw new BoardAccessDeniedException("Access denied to delete post with ID " + postId);
-        }
-
         boardRepository.deleteById(postId);
     }
 
@@ -86,31 +72,6 @@ public class GeneralBoardServiceImpl implements GeneralBoardService {
     public List<GeneralPostDto> listPosts() {
         List<GeneralPost> posts = boardRepository.findAll();
         return posts.stream().map(postMapper::toDto).collect(Collectors.toList());
-    }
-
-    private boolean userHasAccess(GeneralPost post) {
-        // 현재 인증된 사용자의 역할 확인
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUserRole = authentication.getAuthorities().iterator().next().getAuthority();
-
-        // 관리자인 경우 항상 true 반환
-        if (currentUserRole.equals("ROLE_ADMIN")) {
-            return true;
-        }
-
-        // 게시글의 소유자인 경우 true 반환
-        String ownerId = post.getWriterId(); // 게시글을 작성한 사람의 정보 반환
-        String currentUserId = authentication.getName(); // 현재 로그인한 사용자의 ID
-
-        return currentUserId.equals(ownerId);
-    }
-
-    @Override
-    public List<GeneralPostDto> getScrapedPosts(String userId) {
-        List<GeneralPost> scrapedPosts = boardRepository.findScrapedByUserId(userId);
-        return scrapedPosts.stream()
-                .map(postMapper::toDto)
-                .collect(Collectors.toList());
     }
 
     @Override

@@ -107,4 +107,15 @@ public class GlobalExceptionHandler {
         return ErrorResponse.toResponseEntity(ErrorCode.INVALID_REQUEST);
     }
 
+    // 스크랩
+    @ExceptionHandler(ScrapNotFoundException.class)
+    public ResponseEntity<String> handleScrapNotFound(ScrapNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ScrapAccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDenied(ScrapAccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
+
 }

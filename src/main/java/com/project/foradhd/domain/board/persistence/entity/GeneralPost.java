@@ -5,6 +5,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Getter
@@ -13,22 +14,26 @@ import java.time.LocalDateTime;
 public class GeneralPost {
 
     @jakarta.persistence.Id
-    @Column(name = "post_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id", length = 32, columnDefinition = "VARCHAR(32)")
     private String postId;
 
-    @Column(name = "writer_id")
+    @Column(name = "user_id")
+    private String userId;
+
+    @Column(name = "writer_id", length = 32, columnDefinition = "VARCHAR(32)")
     private String writerId;
 
-    @Column(name = "category_id")
+    @Column(name = "category_id", length = 16, columnDefinition = "BINARY(16)")
     private String categoryId;
 
-    @Column(name = "writer_name")
+    @Column(name = "writer_name", length = 50, columnDefinition = "VARCHAR(50)")
     private String writerName;
 
-    @Column(name = "category_name")
+    @Column(name = "category_name", length = 100, columnDefinition = "VARCHAR(100)")
     private String categoryName;
 
-    @Column(name = "title")
+    @Column(name = "title", columnDefinition = "LONGTEXT")
     private String title;
 
     @Column(name = "content", columnDefinition = "LONGTEXT")
@@ -49,6 +54,9 @@ public class GeneralPost {
     @Column(name = "scrap_count")
     private long scrapCount;
 
+    @Column(name = "view_count")
+    private long viewCount;
+
     @Column(name = "tags", columnDefinition = "TEXT")
     private String tags;
 
@@ -57,11 +65,6 @@ public class GeneralPost {
 
     @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime lastModifiedAt;
-
-    @Column(name = "view_count")
-    private long viewCount;
-
-    // Getters and Setters
 
     public void setPostId(String postId) {
         this.postId = postId;
