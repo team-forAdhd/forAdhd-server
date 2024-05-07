@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.board.business.service.Impl;
 
 import com.project.foradhd.domain.board.business.service.GeneralBoardService;
+import com.project.foradhd.domain.board.business.service.PostLikeService;
 import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
 import com.project.foradhd.domain.board.persistence.enums.PostSortOption;
 import com.project.foradhd.domain.board.persistence.repository.GeneralBoardRepository;
@@ -8,8 +9,12 @@ import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
 import com.project.foradhd.domain.board.web.mapper.GeneralPostMapper;
 import com.project.foradhd.global.exception.BoardNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Comparator;
 import java.util.List;
@@ -20,11 +25,13 @@ import java.util.stream.Collectors;
 public class GeneralBoardServiceImpl implements GeneralBoardService {
     private final GeneralBoardRepository boardRepository;
     private final GeneralPostMapper postMapper;
+    private final PostLikeService postLikeService;
 
     @Autowired
-    public GeneralBoardServiceImpl(GeneralBoardRepository boardRepository, GeneralPostMapper postMapper) {
+    public GeneralBoardServiceImpl(GeneralBoardRepository boardRepository, GeneralPostMapper postMapper, PostLikeService postLikeService) {
         this.boardRepository = boardRepository;
         this.postMapper = postMapper;
+        this.postLikeService = postLikeService;
     }
 
     @Override
@@ -79,6 +86,8 @@ public class GeneralBoardServiceImpl implements GeneralBoardService {
                 .map(postMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    // 게시글 좋아요 기능
 
     private Comparator<GeneralPost> getComparator(PostSortOption sortOption) {
         switch (sortOption) {

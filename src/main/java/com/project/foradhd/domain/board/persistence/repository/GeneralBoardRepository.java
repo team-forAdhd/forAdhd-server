@@ -2,6 +2,7 @@ package com.project.foradhd.domain.board.persistence.repository;
 
 import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -21,4 +22,13 @@ public interface GeneralBoardRepository extends JpaRepository<GeneralPost, Strin
     List<GeneralPost> findAllOrderByPostIdAsc();
 
     List<GeneralPost> findByCategoryId(String categoryId);
+
+    // 게시글 좋아요 기능
+    @Modifying
+    @Query("UPDATE GeneralPost p SET p.likeCount = p.likeCount + 1 WHERE p.postId = :postId")
+    void incrementLikeCount(String postId);
+
+    @Modifying
+    @Query("UPDATE GeneralPost p SET p.likeCount = p.likeCount - 1 WHERE p.postId = :postId")
+    void decrementLikeCount(String postId);
 }

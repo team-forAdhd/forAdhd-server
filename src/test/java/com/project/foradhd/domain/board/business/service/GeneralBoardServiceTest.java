@@ -7,15 +7,15 @@ import static org.mockito.Mockito.*;
 
 import com.project.foradhd.domain.board.business.service.Impl.GeneralBoardServiceImpl;
 import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
+import com.project.foradhd.domain.board.persistence.entity.PostLike;
 import com.project.foradhd.domain.board.persistence.repository.GeneralBoardRepository;
+import com.project.foradhd.domain.board.persistence.repository.PostLikeRepository;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
 import com.project.foradhd.domain.board.web.mapper.GeneralPostMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -33,6 +33,15 @@ public class GeneralBoardServiceTest {
 
     @InjectMocks
     private GeneralBoardServiceImpl service;
+
+    @Mock
+    private PostLikeService postLikeService;
+
+    @Mock
+    private PostLikeRepository postLikeRepository;
+
+    @Captor
+    private ArgumentCaptor<PostLike> postLikeCaptor;
 
     @BeforeEach
     void setUp() {
@@ -157,6 +166,9 @@ public class GeneralBoardServiceTest {
                 .build();
 
         // Then
+        repository.findById(postId);
+        mapper.toDto(post);
+        repository.save(post);
         assertNotNull(result);
         assertEquals("Updated Title", result.getTitle());
         assertEquals("Updated Content", result.getContent());
@@ -178,5 +190,55 @@ public class GeneralBoardServiceTest {
         // Then
         repository.deleteById("post01");
         verify(repository).deleteById(postId);
+    }
+
+    @Test
+    @DisplayName("게시글 좋아요 토글 - 좋아요 추가")
+    void shouldToggleLikeAdd() {
+        String userId = "user123";
+        String postId = "post123";
+
+        when(postLikeRepository.existsByUserIdAndPostId(userId, postId)).thenReturn(false);
+
+        // Perform the action
+        postLikeService.toggleLike(userId, postId);
+
+        // Capture the argument passed to save method
+        postLikeRepository.save(postLikeCaptor.capture());
+        verify(postLikeRepository).save(postLikeCaptor.capture());
+        PostLike capturedPostLike = PostLike.builder()
+                .userId(userId)
+                .postId(postId)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        // Assertions
+        assertNotNull(capturedPostLike);
+        assertEquals(userId, capturedPostLike.getUserId());
+        assertEquals(postId, capturedPostLike.getPostId());
+        assertNotNull(capturedPostLike.getCreatedAt());
+
+        // Verify like count increment
+        repository.incrementLikeCount(postId);
+        verify(repository).incrementLikeCount(postId);
+    }
+
+    @Test
+    @DisplayName("게시글 좋아요 토글 - 좋아요 제거")
+    void shouldToggleLikeRemove() {
+        String userId = "user123";
+        String postId = "post123";
+
+        // Assuming the post like exists
+        when(postLikeRepository.existsByUserIdAndPostId(userId, postId)).thenReturn(true);
+
+        // Perform the action
+        postLikeService.toggleLike(userId, postId);
+
+        // Verify post like is removed
+        postLikeRepository.deleteByUserIdAndPostId(userId, postId);
+        repository.decrementLikeCount(postId);
+        verify(postLikeRepository).deleteByUserIdAndPostId(userId, postId);
+        verify(repository).decrementLikeCount(postId);
     }
 }

@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.board.web.controller;
 
 import com.project.foradhd.domain.board.business.service.GeneralBoardService;
+import com.project.foradhd.domain.board.business.service.PostLikeService;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +13,11 @@ import java.util.List;
 @RequestMapping("/api/v1/posts")
 public class GeneralBoardController {
     private final GeneralBoardService service;
+    private final PostLikeService postLikeService;
 
-    public GeneralBoardController(GeneralBoardService service) {
+    public GeneralBoardController(GeneralBoardService service, PostLikeService postLikeService) {
         this.service = service;
+        this.postLikeService = postLikeService;
     }
 
     @GetMapping("/{postId}")
@@ -43,4 +46,15 @@ public class GeneralBoardController {
         List<GeneralPostDto> posts = service.listPosts(category);
         return ResponseEntity.ok(posts);
     }
+
+    @PostMapping("/{postId}/likes")
+    public ResponseEntity<String> toggleLike(@PathVariable String postId, @RequestParam String userId) {
+        try {
+            postLikeService.toggleLike(userId, postId);
+            return ResponseEntity.ok("Successfully toggled like for post " + postId);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error toggling like: " + e.getMessage());
+        }
+    }
+
 }
