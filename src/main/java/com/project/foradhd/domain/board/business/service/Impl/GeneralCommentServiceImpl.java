@@ -74,7 +74,7 @@ public class GeneralCommentServiceImpl implements GeneralCommentService {
     @Override
     public List<GeneralCommentDto> getUserComments(String userId, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
-        List<GeneralComment> comments = repository.findByUserId(userId, sort);
+        List<GeneralComment> comments = repository.findByWriterId(userId, sort);
         return comments.stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());

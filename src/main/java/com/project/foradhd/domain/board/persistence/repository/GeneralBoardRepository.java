@@ -20,4 +20,5 @@ public interface GeneralBoardRepository extends JpaRepository<GeneralPost, Strin
     @Query("SELECT p FROM GeneralPost p ORDER BY p.postId ASC")
     List<GeneralPost> findAllOrderByPostIdAsc();
 
+    List<GeneralPost> findByCategoryId(String categoryId);
 }

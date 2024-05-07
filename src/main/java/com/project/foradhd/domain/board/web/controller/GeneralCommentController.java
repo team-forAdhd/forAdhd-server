@@ -2,12 +2,13 @@ package com.project.foradhd.domain.board.web.controller;
 
 import com.project.foradhd.domain.board.business.service.GeneralCommentService;
 import com.project.foradhd.domain.board.web.dto.GeneralCommentDto;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/comments")
+@RequestMapping("/api/v1/comments")
 public class GeneralCommentController {
 
     private final GeneralCommentService service;
@@ -35,9 +36,16 @@ public class GeneralCommentController {
     public GeneralCommentDto updateComment(@RequestBody GeneralCommentDto commentDto) {
         return service.updateComment(commentDto);
     }
-
     @GetMapping
     public List<GeneralCommentDto> listComments() {
         return service.listComments();
+    }
+
+    // 사용자 댓글 조회
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<GeneralCommentDto>> getUserComments(@PathVariable String userId,
+                                                                   @RequestParam(defaultValue = "DESC") String sortDirection) {
+        List<GeneralCommentDto> comments = service.getUserComments(userId, sortDirection);
+        return ResponseEntity.ok(comments);
     }
 }

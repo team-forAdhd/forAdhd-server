@@ -6,13 +6,8 @@ import com.project.foradhd.domain.board.persistence.enums.PostSortOption;
 import com.project.foradhd.domain.board.persistence.repository.GeneralBoardRepository;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
 import com.project.foradhd.domain.board.web.mapper.GeneralPostMapper;
-import com.project.foradhd.global.exception.BoardAccessDeniedException;
 import com.project.foradhd.global.exception.BoardNotFoundException;
-import com.project.foradhd.global.exception.InternalSystemException;
-import com.project.foradhd.global.exception.InvalidBoardOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +15,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.project.foradhd.domain.board.persistence.enums.PostSortOption.*;
-
 @Service
 @Transactional
 public class GeneralBoardServiceImpl implements GeneralBoardService {
-
     private final GeneralBoardRepository boardRepository;
     private final GeneralPostMapper postMapper;
 
@@ -63,15 +55,20 @@ public class GeneralBoardServiceImpl implements GeneralBoardService {
 
     @Override
     public void deletePost(String postId) {
-        GeneralPost post = boardRepository.findById(postId)
-                .orElseThrow(() -> new BoardNotFoundException("Post with ID " + postId + " not found"));
         boardRepository.deleteById(postId);
     }
 
     @Override
-    public List<GeneralPostDto> listPosts() {
-        List<GeneralPost> posts = boardRepository.findAll();
-        return posts.stream().map(postMapper::toDto).collect(Collectors.toList());
+    public List<GeneralPostDto> listPosts(String categoryId) {
+        // 전체 게시글을 불러온 후 카테고리 ID로 필터링
+        List<GeneralPost> posts = boardRepository.findAll()
+                .stream()
+                .filter(post -> post.getCategoryId().equals(categoryId))
+                .collect(Collectors.toList());
+        // 필터링된 게시글 리스트를 DTO로 변환하여 반환
+        return posts.stream()
+                .map(postMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override

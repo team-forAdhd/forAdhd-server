@@ -9,6 +9,6 @@ public interface GeneralBoardService {
     GeneralPostDto createPost(GeneralPostDto postDTO);
     void deletePost(String postId);
     GeneralPostDto updatePost(GeneralPostDto postDTO);
-    List<GeneralPostDto> listPosts();
+    List<GeneralPostDto> listPosts(String category);
     List<GeneralPostDto> getUserPosts(String userId, PostSortOption sortOption);
 }

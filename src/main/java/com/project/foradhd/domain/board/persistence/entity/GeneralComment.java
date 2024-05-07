@@ -3,6 +3,16 @@ package com.project.foradhd.domain.board.persistence.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "comment")
 public class GeneralComment {
@@ -40,97 +50,5 @@ public class GeneralComment {
 
     @Column(name = "last_modified_at")
     private LocalDateTime lastModifiedAt;
-
-    // Getters and Setters
-
-    public String getCommentId() {
-        return commentId;
-    }
-
-    public void setCommentId(String commentId) {
-        this.commentId = commentId;
-    }
-
-    public String getWriterId() {
-        return writerId;
-    }
-
-    public void setWriterId(String writerId) {
-        this.writerId = writerId;
-    }
-
-    public String getWriterName() {
-        return writerName;
-    }
-
-    public void setWriterName(String writerName) {
-        this.writerName = writerName;
-    }
-
-    public String getPostId() {
-        return postId;
-    }
-
-    public void setPostId(String postId) {
-        this.postId = postId;
-    }
-
-    public int getPostType() {
-        return postType;
-    }
-
-    public void setPostType(int postType) {
-        this.postType = postType;
-    }
-
-    public String getParentCommentId() {
-        return parentCommentId;
-    }
-
-    public void setParentCommentId(String parentCommentId) {
-        this.parentCommentId = parentCommentId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public boolean isAnonymous() {
-        return anonymous;
-    }
-
-    public void setAnonymous(boolean anonymous) {
-        this.anonymous = anonymous;
-    }
-
-    public long getLikeCount() {
-        return likeCount;
-    }
-
-    public void setLikeCount(long likeCount) {
-        this.likeCount = likeCount;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getLastModifiedAt() {
-        return lastModifiedAt;
-    }
-
-    public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
-        this.lastModifiedAt = lastModifiedAt;
-    }
-
-    // Getters and Setters
-
 }
+

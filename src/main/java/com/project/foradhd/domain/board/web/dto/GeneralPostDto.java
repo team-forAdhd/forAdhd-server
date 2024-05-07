@@ -1,9 +1,15 @@
 package com.project.foradhd.domain.board.web.dto;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@Builder
 public class GeneralPostDto {
-
     private String postId;
     private String writerId;
     private String categoryId;
@@ -16,11 +22,10 @@ public class GeneralPostDto {
     private long likeCount;
     private long commentCount;
     private long scrapCount;
+    private long viewCount;
     private String tags;
     private LocalDateTime createdAt;
     private LocalDateTime lastModifiedAt;
-
-    // Getters and Setters
 
     public String getPostId() {
         return postId;
@@ -140,5 +145,13 @@ public class GeneralPostDto {
 
     public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
         this.lastModifiedAt = lastModifiedAt;
+    }
+
+    public long getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(long viewCount) {
+        this.viewCount = viewCount;
     }
 }

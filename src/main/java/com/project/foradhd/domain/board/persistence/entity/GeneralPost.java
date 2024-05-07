@@ -3,12 +3,18 @@ package com.project.foradhd.domain.board.persistence.entity;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import org.springframework.data.annotation.Id;
-
-import java.math.BigInteger;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "general_post")
 public class GeneralPost {
@@ -65,65 +71,5 @@ public class GeneralPost {
 
     @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime lastModifiedAt;
-
-    public void setPostId(String postId) {
-        this.postId = postId;
-    }
-
-    public void setWriterId(String writerId) {
-        this.writerId = writerId;
-    }
-
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public void setWriterName(String writerName) {
-        this.writerName = writerName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setAnonymous(boolean anonymous) {
-        this.anonymous = anonymous;
-    }
-
-    public void setImages(String images) {
-        this.images = images;
-    }
-
-    public void setLikeCount(long likeCount) {
-        this.likeCount = likeCount;
-    }
-
-    public void setCommentCount(long commentCount) {
-        this.commentCount = commentCount;
-    }
-
-    public void setScrapCount(long scrapCount) {
-        this.scrapCount = scrapCount;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setLastModifiedAt(LocalDateTime lastModifiedAt) {
-        this.lastModifiedAt = lastModifiedAt;
-    }
-
 }
+

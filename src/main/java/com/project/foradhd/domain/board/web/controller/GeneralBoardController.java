@@ -2,6 +2,7 @@ package com.project.foradhd.domain.board.web.controller;
 
 import com.project.foradhd.domain.board.business.service.GeneralBoardService;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,8 +37,10 @@ public class GeneralBoardController {
         return service.updatePost(postDTO);
     }
 
+    // 게시글 목록 조회, 카테고리별 필터링
     @GetMapping
-    public List<GeneralPostDto> listPosts() {
-        return service.listPosts();
+    public ResponseEntity<List<GeneralPostDto>> listPosts(@RequestParam(required = false) String category) {
+        List<GeneralPostDto> posts = service.listPosts(category);
+        return ResponseEntity.ok(posts);
     }
 }
