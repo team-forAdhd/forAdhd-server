@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/comments")
+@RequestMapping("/api/v1/comment")
 public class GeneralCommentController {
 
     private final GeneralCommentService service;
@@ -17,9 +17,9 @@ public class GeneralCommentController {
         this.service = service;
     }
 
-    @GetMapping("/{Id}")
-    public GeneralCommentDto getComment(@PathVariable String Id) {
-        return service.getComment(Id);
+    @GetMapping("/{commentId}")
+    public GeneralCommentDto getComment(@PathVariable String commentId) {
+        return service.getComment(commentId);
     }
 
     @PostMapping
@@ -27,18 +27,14 @@ public class GeneralCommentController {
         return service.createComment(commentDto);
     }
 
-    @DeleteMapping("/{Id}")
-    public void deleteComment(@PathVariable String Id) {
-        service.deleteComment(Id);
+    @DeleteMapping("/{commentId}")
+    public void deleteComment(@PathVariable String commentId) {
+        service.deleteComment(commentId);
     }
 
     @PutMapping
     public GeneralCommentDto updateComment(@RequestBody GeneralCommentDto commentDto) {
         return service.updateComment(commentDto);
-    }
-    @GetMapping
-    public List<GeneralCommentDto> listComments() {
-        return service.listComments();
     }
 
     // 사용자 댓글 조회

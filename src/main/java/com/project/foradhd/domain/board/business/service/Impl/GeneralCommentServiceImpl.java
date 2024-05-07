@@ -56,22 +56,6 @@ public class GeneralCommentServiceImpl implements GeneralCommentService {
     }
 
     @Override
-    public List<GeneralCommentDto> listComments() {
-        List<GeneralComment> comments = repository.findAll();
-        return comments.stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<GeneralCommentDto> listCommentsByPostId(String postId) {
-        List<GeneralComment> comments = repository.findByPostId(postId);
-        return comments.stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<GeneralCommentDto> getUserComments(String userId, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
         List<GeneralComment> comments = repository.findByWriterId(userId, sort);

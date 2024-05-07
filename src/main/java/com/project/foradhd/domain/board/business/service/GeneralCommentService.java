@@ -4,13 +4,11 @@ import com.project.foradhd.domain.board.web.dto.GeneralCommentDto;
 import java.util.List;
 
 public interface GeneralCommentService {
-    GeneralCommentDto getComment(String Id);
+    GeneralCommentDto getComment(String commentId);
     GeneralCommentDto createComment(GeneralCommentDto commentDTO);
-    void deleteComment(String Id);
+    void deleteComment(String commentId);
 
     GeneralCommentDto updateComment(GeneralCommentDto commentDTO);
-    List<GeneralCommentDto> listCommentsByPostId(String postId);
-    List<GeneralCommentDto> listComments();
     List<GeneralCommentDto> getUserComments(String userId, String sortDirection);
 }
 
