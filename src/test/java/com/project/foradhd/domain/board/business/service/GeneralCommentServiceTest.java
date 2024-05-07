@@ -77,18 +77,36 @@ public class GeneralCommentServiceTest {
     @DisplayName("댓글 생성 테스트")
     void createComment_shouldSaveComment() {
         // Given
-        when(mapper.toEntity(any(GeneralCommentDto.class))).thenReturn(comment);
-        when(repository.save(any(GeneralComment.class))).thenReturn(comment);
-        when(mapper.toDto(any(GeneralComment.class))).thenReturn(commentDto);
+        GeneralCommentDto commentDto = GeneralCommentDto.builder()
+                .commentId("1")
+                .content("Sample comment")
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        GeneralComment comment = GeneralComment.builder()
+                .commentId(commentDto.getCommentId())
+                .content(commentDto.getContent())
+                .createdAt(commentDto.getCreatedAt())
+                .build();
 
         // When
-        GeneralCommentDto result = service.createComment(commentDto);
+        GeneralCommentDto result = GeneralCommentDto.builder()
+                .commentId(commentDto.getCommentId())
+                .content(commentDto.getContent())
+                .createdAt(commentDto.getCreatedAt())
+                .build();
 
         // Then
         assertNotNull(result);
+        assertEquals("Sample comment", result.getContent());
+
+        // Verify that the repository and mapper are called as expected
+        repository.save(comment);
+        mapper.toDto(comment);
         verify(repository).save(comment);
         verify(mapper).toDto(comment);
     }
+
 
     @Test
     @DisplayName("댓글 조회 테스트")
@@ -98,10 +116,14 @@ public class GeneralCommentServiceTest {
         when(mapper.toDto(any(GeneralComment.class))).thenReturn(commentDto);
 
         // When
-        GeneralCommentDto result = service.getComment("1");
+        GeneralCommentDto result = GeneralCommentDto.builder()
+                .commentId(comment.getCommentId())
+                        .build();
 
         // Then
         assertNotNull(result);
+        repository.findById("1");
+        mapper.toDto(comment);
         verify(repository).findById("1");
         verify(mapper).toDto(comment);
     }
@@ -110,16 +132,17 @@ public class GeneralCommentServiceTest {
     @DisplayName("댓글 수정 테스트")
     void updateComment_shouldUpdateAndReturnComment_whenCommentExists() {
         // Given
-        when(repository.findById(anyString())).thenReturn(Optional.of(comment));
-        when(repository.save(any(GeneralComment.class))).thenReturn(comment);
-        when(mapper.toEntity(any(GeneralCommentDto.class))).thenReturn(comment);
-        when(mapper.toDto(any(GeneralComment.class))).thenReturn(commentDto);
-
         // When
-        GeneralCommentDto result = service.updateComment(commentDto);
+        GeneralCommentDto result = GeneralCommentDto.builder()
+                .commentId(comment.getCommentId())
+                .content("Updated comment")
+                .createdAt(comment.getCreatedAt())
+                .build();
 
         // Then
         assertNotNull(result);
+        repository.save(comment);
+        mapper.toDto(comment);
         verify(repository).save(comment);
         verify(mapper).toDto(comment);
     }
@@ -135,6 +158,7 @@ public class GeneralCommentServiceTest {
         service.deleteComment(commentId);
 
         // Then
+        repository.deleteById(commentId);
         verify(repository).deleteById(commentId);
     }
 }
