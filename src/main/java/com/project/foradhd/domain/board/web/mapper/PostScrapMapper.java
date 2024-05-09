@@ -8,7 +8,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface PostScrapMapper {
-
     PostScrapDto toDto(PostScrap postScrap);
     PostScrap toEntity(PostScrapDto postScrapDto);
 }

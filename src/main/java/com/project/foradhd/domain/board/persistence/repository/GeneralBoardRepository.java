@@ -1,27 +1,22 @@
 package com.project.foradhd.domain.board.persistence.repository;
 
 import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Repository
-public interface GeneralBoardRepository extends JpaRepository<GeneralPost, String>{
-    List<GeneralPost> findScrapedByUserId(String userId);
-    List<GeneralPost> findByWriterId(String writerId);
-
-    // 최신순 정렬
-    @Query("SELECT p FROM GeneralPost p ORDER BY p.postId DESC")
-    List<GeneralPost> findAllOrderByPostIdDesc();
-
-    // 오래된 순 정렬
-    @Query("SELECT p FROM GeneralPost p ORDER BY p.postId ASC")
-    List<GeneralPost> findAllOrderByPostIdAsc();
-
-    List<GeneralPost> findByCategoryId(String categoryId);
+public interface GeneralBoardRepository extends JpaRepository<GeneralPost, String> {
+    Page<GeneralPost> findByWriterId(String writerId, Pageable pageable);
+    Page<GeneralPost> findByCategoryId(String categoryId, Pageable pageable);
+    Page<GeneralPost> findByUserId(String userId, Pageable pageable);
 
     // 게시글 좋아요 기능
     @Modifying

@@ -3,11 +3,15 @@ package com.project.foradhd.domain.board.business.service.Impl;
 import com.project.foradhd.domain.board.business.service.CommentLikeService;
 import com.project.foradhd.domain.board.business.service.GeneralCommentService;
 import com.project.foradhd.domain.board.persistence.entity.GeneralComment;
+import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.GeneralCommentRepository;
 import com.project.foradhd.domain.board.web.dto.GeneralCommentDto;
 import com.project.foradhd.domain.board.web.mapper.GeneralCommentMapper;
 import com.project.foradhd.global.exception.CommentNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,23 +55,40 @@ public class GeneralCommentServiceImpl implements GeneralCommentService {
         repository.deleteById(commentId);
     }
 
-
     @Override
     public GeneralCommentDto updateComment(GeneralCommentDto commentDto) {
         GeneralComment existingComment = repository.findById(commentDto.getCommentId())
                 .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + commentDto.getCommentId()));
         existingComment = mapper.toEntity(commentDto);
-        repository.save(existingComment);
+        existingComment = repository.save(existingComment);
         return mapper.toDto(existingComment);
     }
 
+    private Pageable applySorting(Pageable pageable, SortOption sortOption) {
+        Sort sort;
+        switch (sortOption) {
+            case OLDEST_FIRST:
+                sort = Sort.by(Sort.Direction.ASC, "createdAt");
+                break;
+            case NEWEST_FIRST:
+            default:
+                sort = Sort.by(Sort.Direction.DESC, "createdAt");
+                break;
+        }
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+    }
+
     @Override
-    public List<GeneralCommentDto> getUserComments(String userId, String sortDirection) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "createdAt");
-        List<GeneralComment> comments = repository.findByWriterId(userId, sort);
-        return comments.stream()
-                .map(mapper::toDto)
-                .collect(Collectors.toList());
+    public Page<GeneralCommentDto> getMyComments(String writerId, Pageable pageable) {
+        return repository.findByWriterId(writerId, pageable)
+                .map(mapper::toDto);
+    }
+
+    @Override
+    public Page<GeneralCommentDto> getCommentsByPost(String postId, Pageable pageable, SortOption sortOption) {
+        pageable = applySorting(pageable, sortOption);
+        return repository.findByPostId(postId, pageable)
+                .map(mapper::toDto);
     }
 
     @Override

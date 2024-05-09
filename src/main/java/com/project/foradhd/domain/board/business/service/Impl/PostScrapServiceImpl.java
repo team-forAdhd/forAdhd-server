@@ -2,6 +2,7 @@ package com.project.foradhd.domain.board.business.service.Impl;
 
 import com.project.foradhd.domain.board.business.service.PostScrapService;
 import com.project.foradhd.domain.board.persistence.entity.PostScrap;
+import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.GeneralBoardRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostScrapRepository;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
@@ -10,60 +11,74 @@ import com.project.foradhd.domain.board.web.mapper.GeneralPostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapMapper;
 import com.project.foradhd.global.exception.ScrapNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class PostScrapServiceImpl implements PostScrapService {
 
-    private final PostScrapRepository postScrapRepository;
-    private final PostScrapMapper postScrapMapper;
-    private final GeneralBoardRepository generalBoardRepository;
-
-    private final GeneralPostMapper generalPostMapper;
+    private final PostScrapRepository scrapRepository;
+    private final GeneralBoardRepository boardRepository;
+    private final PostScrapMapper scrapMapper;
+    private final GeneralPostMapper postMapper;
 
     @Autowired
-    public PostScrapServiceImpl(PostScrapRepository postScrapRepository, PostScrapMapper postScrapMapper,
-                                GeneralBoardRepository generalBoardRepository, GeneralPostMapper generalPostMapper) {
-        this.postScrapRepository = postScrapRepository;
-        this.postScrapMapper = postScrapMapper;
-        this.generalBoardRepository = generalBoardRepository;
-        this.generalPostMapper = generalPostMapper;
+    public PostScrapServiceImpl(PostScrapRepository scrapRepository, GeneralBoardRepository boardRepository, PostScrapMapper scrapMapper, GeneralPostMapper postMapper) {
+        this.scrapRepository = scrapRepository;
+        this.boardRepository = boardRepository;
+        this.scrapMapper = scrapMapper;
+        this.postMapper = postMapper;
     }
+
 
     @Override
-    public List<GeneralPostDto> getScrapsByUser(String userId) {
-        return postScrapRepository.findByUserId(userId).stream()
-                .map(scrap -> generalBoardRepository.findById(scrap.getPostId())
-                        .map(generalPostMapper::toDto)
-                        .orElseThrow(() -> new RuntimeException("Post not found for ID: " + scrap.getPostId())))
-                .collect(Collectors.toList());
+    public Page<GeneralPostDto> getScrapsByUser(String userId, Pageable pageable, SortOption sortOption) {
+        pageable = applySorting(pageable, sortOption);
+        Page<PostScrap> scrapPage = scrapRepository.findByUserId(userId, pageable);
+        return scrapPage.map(scrap -> postMapper.toDto(scrap.getPost()));  // GeneralPostMapper 사용
     }
 
+    private Pageable applySorting(Pageable pageable, SortOption sortOption) {
+        Sort sort;
+        switch (sortOption) {
+            case OLDEST_FIRST:
+                sort = Sort.by(Sort.Direction.ASC, "createdAt");
+                break;
+            case MOST_VIEWED:
+                sort = Sort.by(Sort.Direction.DESC, "post.viewCount");
+                break;
+            case MOST_LIKED:
+                sort = Sort.by(Sort.Direction.DESC, "post.likeCount");
+                break;
+            case MOST_COMMENTED:
+                sort = Sort.by(Sort.Direction.DESC, "post.commentCount");
+                break;
+            case NEWEST_FIRST:
+            default:
+                sort = Sort.by(Sort.Direction.DESC, "createdAt");
+                break;
+        }
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+    }
 
     @Override
     public PostScrapDto createScrap(PostScrapDto postScrapDto) {
-        PostScrap postScrap = postScrapMapper.toEntity(postScrapDto);
-        postScrap = postScrapRepository.save(postScrap);
-        return postScrapMapper.toDto(postScrap);
+        PostScrap scrap = scrapMapper.toEntity(postScrapDto);
+        scrap = scrapRepository.save(scrap);
+        return scrapMapper.toDto(scrap);
     }
-
-    @Override
-    public PostScrapDto getScrapById(String scrapId) {
-        PostScrap postScrap = postScrapRepository.findById(scrapId)
-                .orElseThrow(() -> new RuntimeException("Scrap not found for ID: " + scrapId));
-        return postScrapMapper.toDto(postScrap);
-    }
-
     @Override
     public void deleteScrap(String scrapId) {
-        PostScrap postScrap = postScrapRepository.findById(scrapId)
-                .orElseThrow(() -> new ScrapNotFoundException(scrapId));
-        postScrapRepository.delete(postScrap);
+        if (!scrapRepository.existsById(scrapId)) {
+            throw new ScrapNotFoundException("Scrap not found with ID: " + scrapId);
+        }
+        scrapRepository.deleteById(scrapId);
     }
-
 }

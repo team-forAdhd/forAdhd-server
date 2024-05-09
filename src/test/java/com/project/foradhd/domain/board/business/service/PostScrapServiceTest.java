@@ -69,19 +69,6 @@ public class PostScrapServiceTest {
     }
 
     @Test
-    void getScrapById_shouldReturnScrapDto() {
-        when(postScrapRepository.findById("scrapId")).thenReturn(Optional.of(postScrap));
-        when(postScrapMapper.toDto(any(PostScrap.class))).thenReturn(postScrapDto);
-
-        PostScrapDto result = postScrapService.getScrapById("scrapId");
-
-        assertNotNull(result);
-        assertEquals("postId", result.getPostId());
-        verify(postScrapRepository).findById("scrapId");
-        verify(postScrapMapper).toDto(postScrap);
-    }
-
-    @Test
     void deleteScrap_shouldRemoveScrap() {
         when(postScrapRepository.existsById("scrapId")).thenReturn(true);
         doNothing().when(postScrapRepository).deleteById("scrapId");

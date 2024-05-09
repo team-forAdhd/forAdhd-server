@@ -2,7 +2,10 @@ package com.project.foradhd.domain.board.web.controller;
 
 import com.project.foradhd.domain.board.business.service.CommentLikeService;
 import com.project.foradhd.domain.board.business.service.GeneralCommentService;
+import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.web.dto.GeneralCommentDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,11 +43,18 @@ public class GeneralCommentController {
         return service.updateComment(commentDto);
     }
 
-    // 사용자 댓글 조회
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<GeneralCommentDto>> getUserComments(@PathVariable String userId,
-                                                                   @RequestParam(defaultValue = "DESC") String sortDirection) {
-        List<GeneralCommentDto> comments = service.getUserComments(userId, sortDirection);
+
+    // 내 댓글 조회
+    @GetMapping("/user/{writerId}")
+    public ResponseEntity<Page<GeneralCommentDto>> getMyComments(@PathVariable String writerId, Pageable pageable) {
+        Page<GeneralCommentDto> comments = service.getMyComments(writerId, pageable);
+        return ResponseEntity.ok(comments);
+    }
+
+    // 특정 게시글의 댓글 조회
+    @GetMapping("/post/{postId}")
+    public ResponseEntity<Page<GeneralCommentDto>> getCommentsByPost(@PathVariable String postId, Pageable pageable, SortOption sortOption) {
+        Page<GeneralCommentDto> comments = service.getCommentsByPost(postId, pageable, sortOption);
         return ResponseEntity.ok(comments);
     }
 

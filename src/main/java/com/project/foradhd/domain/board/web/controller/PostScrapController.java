@@ -1,9 +1,12 @@
 package com.project.foradhd.domain.board.web.controller;
 
 import com.project.foradhd.domain.board.business.service.PostScrapService;
+import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
 import com.project.foradhd.domain.board.web.dto.PostScrapDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +26,12 @@ public class PostScrapController {
 
     // 내가 스크랩한 게시글 조회
     @GetMapping("/{userId}")
-    public ResponseEntity<List<GeneralPostDto>> getScrapsByUser(@PathVariable String userId) {
-        List<GeneralPostDto> scraps = postScrapService.getScrapsByUser(userId);
+    public ResponseEntity<Page<GeneralPostDto>> getScrapsByUser(
+            @PathVariable String userId,
+            @RequestParam(defaultValue = "NEWEST_FIRST") SortOption sortOption,
+            Pageable pageable) {
+
+        Page<GeneralPostDto> scraps = postScrapService.getScrapsByUser(userId, pageable, sortOption);
         return ResponseEntity.ok(scraps);
     }
 
@@ -35,12 +42,6 @@ public class PostScrapController {
         return new ResponseEntity<>(createdScrap, HttpStatus.CREATED);
     }
 
-    // 스크랩 조회
-    @GetMapping("/{scrapId}")
-    public ResponseEntity<PostScrapDto> getScrapById(@PathVariable String scrapId) {
-        PostScrapDto scrap = postScrapService.getScrapById(scrapId);
-        return ResponseEntity.ok(scrap);
-    }
 
     // 스크랩 삭제
     @DeleteMapping("/{scrapId}")

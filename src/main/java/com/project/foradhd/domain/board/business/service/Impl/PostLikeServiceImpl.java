@@ -41,7 +41,6 @@ public class PostLikeServiceImpl implements PostLikeService {
             postLikeRepository.save(newLike);
             post.incrementLikeCount();
         }
-
         generalBoardRepository.save(post);
     }
 }

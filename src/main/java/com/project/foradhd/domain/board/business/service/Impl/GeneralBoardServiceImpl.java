@@ -1,37 +1,37 @@
 package com.project.foradhd.domain.board.business.service.Impl;
 
 import com.project.foradhd.domain.board.business.service.GeneralBoardService;
-import com.project.foradhd.domain.board.business.service.PostLikeService;
 import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
-import com.project.foradhd.domain.board.persistence.enums.PostSortOption;
+import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.GeneralBoardRepository;
+import com.project.foradhd.domain.board.persistence.repository.GeneralCommentRepository;
+import com.project.foradhd.domain.board.persistence.repository.PostScrapRepository;
+import com.project.foradhd.domain.board.web.dto.GeneralCommentDto;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
 import com.project.foradhd.domain.board.web.mapper.GeneralPostMapper;
 import com.project.foradhd.global.exception.BoardNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class GeneralBoardServiceImpl implements GeneralBoardService {
     private final GeneralBoardRepository boardRepository;
     private final GeneralPostMapper postMapper;
-    private final PostLikeService postLikeService;
+    private final GeneralCommentRepository commentRepository;
+    private final PostScrapRepository scrapRepository;
 
     @Autowired
-    public GeneralBoardServiceImpl(GeneralBoardRepository boardRepository, GeneralPostMapper postMapper, PostLikeService postLikeService) {
+    public GeneralBoardServiceImpl(GeneralBoardRepository boardRepository, GeneralPostMapper postMapper, GeneralCommentRepository commentRepository, PostScrapRepository scrapRepository) {
         this.boardRepository = boardRepository;
         this.postMapper = postMapper;
-        this.postLikeService = postLikeService;
+        this.commentRepository = commentRepository;
+        this.scrapRepository = scrapRepository;
     }
 
     @Override
@@ -66,41 +66,68 @@ public class GeneralBoardServiceImpl implements GeneralBoardService {
     }
 
     @Override
-    public List<GeneralPostDto> listPosts(String categoryId) {
-        // 전체 게시글을 불러온 후 카테고리 ID로 필터링
-        List<GeneralPost> posts = boardRepository.findAll()
-                .stream()
-                .filter(post -> post.getCategoryId().equals(categoryId))
-                .collect(Collectors.toList());
-        // 필터링된 게시글 리스트를 DTO로 변환하여 반환
-        return posts.stream()
-                .map(postMapper::toDto)
-                .collect(Collectors.toList());
+    public Page<GeneralPostDto> getAllPosts(Pageable pageable) {
+        return boardRepository.findAll(pageable).map(postMapper::toDto);
     }
 
     @Override
-    public List<GeneralPostDto> getUserPosts(String userId, PostSortOption sortOption) {
-        List<GeneralPost> userPosts = boardRepository.findByWriterId(userId);
-        return userPosts.stream()
-                .sorted(getComparator(sortOption))
-                .map(postMapper::toDto)
-                .collect(Collectors.toList());
+    public Page<GeneralPostDto> getMyPosts(String writerId, Pageable pageable) {
+        return boardRepository.findByWriterId(writerId, pageable).map(postMapper::toDto);
     }
 
-    // 게시글 좋아요 기능
 
-    private Comparator<GeneralPost> getComparator(PostSortOption sortOption) {
+    @Override
+    public Page<GeneralPostDto> getMyScraps(String userId, Pageable pageable) {
+        return scrapRepository.findByUserId(userId, pageable)
+                .map(scrap -> postMapper.toDto(scrap.getPost()));
+    }
+
+    @Override
+    public Page<GeneralPostDto> getPostsByCategory(String categoryId, Pageable pageable) {
+        return boardRepository.findByCategoryId(categoryId, pageable)
+                .map(postMapper::toDto);
+    }
+
+    @Override
+    public Page<GeneralPostDto> getUserPosts(String userId, Pageable pageable, SortOption sortOption) {
+        pageable = applySorting(pageable, sortOption);
+        Page<GeneralPost> postsPage = boardRepository.findByUserId(userId, pageable);
+
+        if (postsPage.isEmpty()) {
+            throw new BoardNotFoundException("No posts found for user with ID: " + userId);
+        }
+        return postsPage.map(postMapper::toDto);
+    }
+
+    private Pageable applySorting(Pageable pageable, SortOption sortOption) {
+        Sort sort;
         switch (sortOption) {
             case NEWEST_FIRST:
-                return Comparator.comparing(GeneralPost::getCreatedAt).reversed();
+                sort = Sort.by(Sort.Direction.DESC, "createdAt");
+                break;
             case OLDEST_FIRST:
-                return Comparator.comparing(GeneralPost::getCreatedAt);
+                sort = Sort.by(Sort.Direction.ASC, "createdAt");
+                break;
             case MOST_VIEWED:
-                return Comparator.comparing(GeneralPost::getViewCount).reversed();
+                sort = Sort.by(Sort.Direction.DESC, "viewCount");
+                break;
             case MOST_LIKED:
-                return Comparator.comparing(GeneralPost::getLikeCount).reversed();
+                sort = Sort.by(Sort.Direction.DESC, "likeCount");
+                break;
             default:
-                return Comparator.comparing(GeneralPost::getCreatedAt).reversed();
+                sort = Sort.by(Sort.Direction.DESC, "createdAt");
         }
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+    }
+
+    @Override
+    public Page<GeneralPostDto> listPosts(String categoryId, Pageable pageable) {
+        // Category에 따른 게시물을 페이징 처리하여 조회
+        Page<GeneralPost> postsPage = boardRepository.findByCategoryId(categoryId, pageable);
+        if (postsPage.isEmpty()) {
+            throw new BoardNotFoundException("No posts found for category: " + categoryId);
+        }
+        return postsPage.map(postMapper::toDto);
     }
 }
