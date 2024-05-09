@@ -10,5 +10,6 @@ public interface GeneralCommentService {
 
     GeneralCommentDto updateComment(GeneralCommentDto commentDTO);
     List<GeneralCommentDto> getUserComments(String userId, String sortDirection);
+    void toggleCommentLike(String userId, String commentId);
 }
 

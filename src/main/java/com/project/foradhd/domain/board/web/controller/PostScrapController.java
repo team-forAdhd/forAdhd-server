@@ -21,7 +21,7 @@ public class PostScrapController {
         this.postScrapService = postScrapService;
     }
 
-    // 스크랩된 게시글 목록 조회
+    // 내가 스크랩한 게시글 조회
     @GetMapping("/{userId}")
     public ResponseEntity<List<GeneralPostDto>> getScrapsByUser(@PathVariable String userId) {
         List<GeneralPostDto> scraps = postScrapService.getScrapsByUser(userId);

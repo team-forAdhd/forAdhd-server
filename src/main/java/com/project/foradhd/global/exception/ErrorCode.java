@@ -30,9 +30,14 @@ public enum ErrorCode {
     //system
     SYSTEM_ERROR(INTERNAL_SERVER_ERROR, "시스템 에러입니다."),
 
-    // board
+    //board
     BOARD_NOT_FOUND(NOT_FOUND, "존재하지 않는 게시물입니다."),
-    ACCESS_DENIED(FORBIDDEN, "접근 권한이 없습니다."),;
+    ACCESS_DENIED(FORBIDDEN, "접근 권한이 없습니다."),
+
+    //comment
+    NOT_FOUND_COMMENT(NOT_FOUND, "존재하지 않는 댓글입니다."),
+    NOT_FOUND_COMMENT_LIKE(NOT_FOUND, "존재하지 않는 댓글 좋아요입니다."),
+    ALREADY_LIKED_COMMENT(CONFLICT, "이미 좋아요한 댓글입니다."),;
 
     private final HttpStatus status;
     private final String message;

@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.board.web.controller;
 
+import com.project.foradhd.domain.board.business.service.CommentLikeService;
 import com.project.foradhd.domain.board.business.service.GeneralCommentService;
 import com.project.foradhd.domain.board.web.dto.GeneralCommentDto;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +13,11 @@ import java.util.List;
 public class GeneralCommentController {
 
     private final GeneralCommentService service;
+    private final CommentLikeService commentLikeService;
 
-    public GeneralCommentController(GeneralCommentService service) {
+    public GeneralCommentController(GeneralCommentService service, CommentLikeService commentLikeService) {
         this.service = service;
+        this.commentLikeService = commentLikeService;
     }
 
     @GetMapping("/{commentId}")
@@ -43,5 +46,16 @@ public class GeneralCommentController {
                                                                    @RequestParam(defaultValue = "DESC") String sortDirection) {
         List<GeneralCommentDto> comments = service.getUserComments(userId, sortDirection);
         return ResponseEntity.ok(comments);
+    }
+
+    // 댓글 좋아요 기능
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<?> toggleCommentLike(@PathVariable String commentId, @RequestParam String userId) {
+        try {
+            commentLikeService.toggleLike(userId, commentId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error toggling like: " + e.getMessage());
+        }
     }
 }

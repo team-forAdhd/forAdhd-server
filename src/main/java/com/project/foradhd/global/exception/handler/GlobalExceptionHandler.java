@@ -40,6 +40,8 @@ public class GlobalExceptionHandler {
         return ErrorResponse.toResponseEntity(ErrorCode.SYSTEM_ERROR);
     }
 
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("Invalid request content", e);
@@ -91,31 +93,46 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BoardNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleBoardNotFoundException(BoardNotFoundException ex) {
-        log.error("Board not found: ", ex);
+        log.error("게시글을 찾을 수 없습니다 ", ex);
         return ErrorResponse.toResponseEntity(ErrorCode.BOARD_NOT_FOUND);
     }
 
     @ExceptionHandler(BoardAccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleBoardAccessDeniedException(BoardAccessDeniedException ex) {
-        log.error("Access denied: ", ex);
+        log.error("접근 권한이 없습니다. ", ex);
         return ErrorResponse.toResponseEntity(ErrorCode.ACCESS_DENIED);
     }
 
     @ExceptionHandler(InvalidBoardOperationException.class)
     public ResponseEntity<ErrorResponse> handleInvalidBoardOperationException(InvalidBoardOperationException ex) {
-        log.error("Invalid operation on board: ", ex);
+        log.error("유효하지 않은 접근입니다 ", ex);
         return ErrorResponse.toResponseEntity(ErrorCode.INVALID_REQUEST);
     }
 
     // 스크랩
     @ExceptionHandler(ScrapNotFoundException.class)
     public ResponseEntity<String> handleScrapNotFound(ScrapNotFoundException ex) {
+        log.error("스크랩을 찾을 수 없습니다", ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(ScrapAccessDeniedException.class)
     public ResponseEntity<String> handleAccessDenied(ScrapAccessDeniedException ex) {
+        log.error("접근 권한이 없습니다", ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
+
+    // 댓글
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCommentNotFoundException(CommentNotFoundException e) {
+        log.error("댓글을 찾을 수 없습니다. ", e);
+        return ErrorResponse.toResponseEntity(ErrorCode.NOT_FOUND_COMMENT);
+    }
+
+    @ExceptionHandler(CommentLikeException.class)
+    public ResponseEntity<ErrorResponse> handleCommentLikeException(CommentLikeException e) {
+        log.error("Comment like error", e);
+        return ErrorResponse.toResponseEntity(ErrorCode.NOT_FOUND_COMMENT_LIKE);
     }
 
 }

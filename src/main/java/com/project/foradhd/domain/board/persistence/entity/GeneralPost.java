@@ -71,5 +71,13 @@ public class GeneralPost {
 
     @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime lastModifiedAt;
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        if (this.likeCount > 0) this.likeCount--;
+    }
 }
 
