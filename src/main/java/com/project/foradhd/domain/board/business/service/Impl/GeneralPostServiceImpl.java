@@ -1,42 +1,42 @@
 package com.project.foradhd.domain.board.business.service.Impl;
 
-import com.project.foradhd.domain.board.business.service.GeneralBoardService;
-import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
+import com.project.foradhd.domain.board.business.service.GeneralPostService;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
-import com.project.foradhd.domain.board.persistence.repository.GeneralBoardRepository;
-import com.project.foradhd.domain.board.persistence.repository.GeneralCommentRepository;
-import com.project.foradhd.domain.board.persistence.repository.PostScrapRepository;
-import com.project.foradhd.domain.board.web.dto.GeneralCommentDto;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
+import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
+import com.project.foradhd.domain.board.persistence.repository.GeneralPostRepository;
+import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
+import com.project.foradhd.domain.board.persistence.repository.PostScrapFilterRepository;
 import com.project.foradhd.domain.board.web.mapper.GeneralPostMapper;
 import com.project.foradhd.global.exception.BoardNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class GeneralBoardServiceImpl implements GeneralBoardService {
-    private final GeneralBoardRepository boardRepository;
+public class GeneralPostServiceImpl implements GeneralPostService {
+    private final GeneralPostRepository postRepository;
     private final GeneralPostMapper postMapper;
-    private final GeneralCommentRepository commentRepository;
-    private final PostScrapRepository scrapRepository;
+    private final CommentRepository commentRepository;
+    private final PostScrapFilterRepository scrapFilterRepository;
 
     @Autowired
-    public GeneralBoardServiceImpl(GeneralBoardRepository boardRepository, GeneralPostMapper postMapper, GeneralCommentRepository commentRepository, PostScrapRepository scrapRepository) {
-        this.boardRepository = boardRepository;
+    public GeneralPostServiceImpl(GeneralPostRepository postRepository, GeneralPostMapper postMapper,
+                                  CommentRepository commentRepository, PostScrapFilterRepository scrapFilterRepository) {
+        this.postRepository = postRepository;
         this.postMapper = postMapper;
         this.commentRepository = commentRepository;
-        this.scrapRepository = scrapRepository;
+        this.scrapFilterRepository = scrapFilterRepository;
     }
 
     @Override
-    public GeneralPostDto getPost(String postId) {
-        GeneralPost post = boardRepository.findById(postId)
+    public GeneralPostDto getPost(Long postId) {
+        GeneralPost post = postRepository.findById(postId)
                 .orElseThrow(() -> new BoardNotFoundException("Post with ID " + postId + " not found"));
         return postMapper.toDto(post);
     }
@@ -44,63 +44,47 @@ public class GeneralBoardServiceImpl implements GeneralBoardService {
     @Override
     public GeneralPostDto createPost(GeneralPostDto postDTO) {
         GeneralPost post = postMapper.toEntity(postDTO);
-        post = boardRepository.save(post);
+        post = postRepository.save(post);
         return postMapper.toDto(post);
     }
 
     @Override
     public GeneralPostDto updatePost(GeneralPostDto postDTO) {
-        GeneralPost existingPost = boardRepository.findById(postDTO.getPostId())
+        GeneralPost existingPost = postRepository.findById(postDTO.getPostId())
                 .orElseThrow(() -> new BoardNotFoundException("Post with ID " + postDTO.getPostId() + " not found"));
 
         existingPost.setTitle(postDTO.getTitle());
         existingPost.setContent(postDTO.getContent());
         existingPost.setImages(postDTO.getImages());
-        existingPost = boardRepository.save(existingPost);
+        existingPost = postRepository.save(existingPost);
         return postMapper.toDto(existingPost);
     }
 
     @Override
-    public void deletePost(String postId) {
-        boardRepository.deleteById(postId);
+    public void deletePost(Long postId) {
+        postRepository.deleteById(postId);
     }
 
     @Override
     public Page<GeneralPostDto> getAllPosts(Pageable pageable) {
-        return boardRepository.findAll(pageable).map(postMapper::toDto);
+        return postRepository.findAll(pageable).map(postMapper::toDto);
     }
-
-    @Override
-    public Page<GeneralPostDto> getMyPosts(String writerId, Pageable pageable) {
-        return boardRepository.findByWriterId(writerId, pageable).map(postMapper::toDto);
-    }
-
 
     @Override
     public Page<GeneralPostDto> getMyScraps(String userId, Pageable pageable) {
-        return scrapRepository.findByUserId(userId, pageable)
+        return scrapFilterRepository.findByUserId(Long.valueOf(userId), pageable)
                 .map(scrap -> postMapper.toDto(scrap.getPost()));
-    }
-
-    @Override
-    public Page<GeneralPostDto> getPostsByCategory(String categoryId, Pageable pageable) {
-        return boardRepository.findByCategoryId(categoryId, pageable)
-                .map(postMapper::toDto);
     }
 
     @Override
     public Page<GeneralPostDto> getUserPosts(String userId, Pageable pageable, SortOption sortOption) {
         pageable = applySorting(pageable, sortOption);
-        Page<GeneralPost> postsPage = boardRepository.findByUserId(userId, pageable);
-
-        if (postsPage.isEmpty()) {
-            throw new BoardNotFoundException("No posts found for user with ID: " + userId);
-        }
-        return postsPage.map(postMapper::toDto);
+        return postRepository.findByUserId(Long.valueOf(userId), pageable)
+                .map(postMapper::toDto);
     }
 
     private Pageable applySorting(Pageable pageable, SortOption sortOption) {
-        Sort sort;
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         switch (sortOption) {
             case NEWEST_FIRST:
                 sort = Sort.by(Sort.Direction.DESC, "createdAt");
@@ -115,19 +99,14 @@ public class GeneralBoardServiceImpl implements GeneralBoardService {
                 sort = Sort.by(Sort.Direction.DESC, "likeCount");
                 break;
             default:
-                sort = Sort.by(Sort.Direction.DESC, "createdAt");
+                break;
         }
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-
     }
 
     @Override
     public Page<GeneralPostDto> listPosts(String categoryId, Pageable pageable) {
-        // Category에 따른 게시물을 페이징 처리하여 조회
-        Page<GeneralPost> postsPage = boardRepository.findByCategoryId(categoryId, pageable);
-        if (postsPage.isEmpty()) {
-            throw new BoardNotFoundException("No posts found for category: " + categoryId);
-        }
-        return postsPage.map(postMapper::toDto);
+        return postRepository.findByCategoryId(Long.valueOf(categoryId), pageable)
+                .map(postMapper::toDto);
     }
 }

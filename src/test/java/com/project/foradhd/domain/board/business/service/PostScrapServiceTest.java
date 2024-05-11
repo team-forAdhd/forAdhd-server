@@ -3,78 +3,98 @@ package com.project.foradhd.domain.board.business.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.project.foradhd.domain.board.business.service.Impl.PostScrapServiceImpl;
+import com.project.foradhd.domain.board.business.service.Impl.PostScrapFilterServiceImpl;
+import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
 import com.project.foradhd.domain.board.persistence.entity.PostScrap;
+import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.PostScrapRepository;
+import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
 import com.project.foradhd.domain.board.web.dto.PostScrapDto;
+import com.project.foradhd.domain.board.web.mapper.GeneralPostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
-@SpringBootTest
+import java.util.Collections;
+
 @ExtendWith(MockitoExtension.class)
 public class PostScrapServiceTest {
 
     @Mock
-    private PostScrapRepository postScrapRepository;
+    private PostScrapRepository scrapRepository;
 
     @Mock
-    private PostScrapMapper postScrapMapper;
+    private GeneralBoardRepository boardRepository;
+
+    @Mock
+    private PostScrapMapper scrapMapper;
 
     @InjectMocks
-    private PostScrapServiceImpl postScrapService;
+    private PostScrapFilterServiceImpl scrapService;
 
-    private PostScrap postScrap;
-    private PostScrapDto postScrapDto;
-
-    @BeforeEach
-    void setUp() {
-        postScrap = new PostScrap();
-        postScrap.setPostScrapFilterId("scrapId");
-        postScrap.setUserId("userId");
-        postScrap.setPostId("postId");
-        postScrap.setCreatedAt(LocalDateTime.now());
-
-        postScrapDto = new PostScrapDto("scrapId", "userId", "postId", LocalDateTime.now());
-    }
+    @Mock
+    private GeneralPostMapper postMapper;  // GeneralPostMapper를 모킹
 
     @Test
-    void createScrap_shouldReturnScrapDto() {
-        // Setup
-        when(postScrapRepository.save(any())).thenReturn(new PostScrap());
+    void testGetScrapsByUser() {
+        String userId = "user1";
+        GeneralPost post = new GeneralPost();
+        PostScrap scrap = new PostScrap();
+        scrap.setPost(post);
+        scrap.setUserId(userId);
 
-        // Convert the PostScrap to PostScrapDto (usually in the service layer, here simplified)
-        when(postScrapRepository.findById("scrapId1")).thenReturn(Optional.of(new PostScrap()));
+        Page<PostScrap> scrapPage = new PageImpl<>(Collections.singletonList(scrap), PageRequest.of(0, 10), 1);
 
-        // Action
-        PostScrapDto result = postScrapService.createScrap(postScrapDto);
+        when(scrapRepository.findByUserId(eq(userId), any())).thenReturn(scrapPage);
+        when(postMapper.toDto(any())).thenReturn(
+                GeneralPostDto.builder()
+                        .userId(userId)
+                        .postId("p1")
+                        .writerId("w1")
+                        .categoryId("c1")
+                        .writerName("이서현")
+                        .categoryName("10대")
+                        .title("Test Title")
+                        .content("Test Content")
+                        .anonymous(false)
+                        .images("image.jpg")
+                        .likeCount(100)
+                        .commentCount(50)
+                        .scrapCount(30)
+                        .viewCount(1000)
+                        .tags("tag1, tag2")
+                        .createdAt(LocalDateTime.now())
+                        .lastModifiedAt(LocalDateTime.now())
+                        .build()
+        );
 
-        // Verification
-        assertNotNull(result);
-        assertEquals(postScrapDto.getPostScrapId(), result.getPostScrapId());
-        assertEquals(postScrapDto.getUserId(), result.getUserId());
-        assertEquals(postScrapDto.getPostId(), result.getPostId());
-        assertNotNull(result.getCreatedAt());
+        Page<GeneralPostDto> results = scrapService.getScrapsByUser(userId, PageRequest.of(0, 10), SortOption.NEWEST_FIRST);
 
-        // Verify interactions
-        verify(postScrapRepository).save(any(PostScrap.class));
+        assertNotNull(results);
+        assertFalse(results.isEmpty());
+        assertEquals(1, results.getContent().size());
+        GeneralPostDto dto = results.getContent().get(0);
+        assertEquals("Test Title", dto.getTitle());
+        assertEquals("image.jpg", dto.getImages());
     }
-
     @Test
-    void deleteScrap_shouldRemoveScrap() {
-        when(postScrapRepository.existsById("scrapId")).thenReturn(true);
-        doNothing().when(postScrapRepository).deleteById("scrapId");
+    void testCreateScrap() {
+        PostScrapDto scrapDto = PostScrapDto.builder().build();
+        PostScrap scrap = PostScrap.builder().build();
+        when(scrapMapper.toEntity(scrapDto)).thenReturn(scrap);
+        when(scrapRepository.save(scrap)).thenReturn(scrap);
+        when(scrapMapper.toDto(scrap)).thenReturn(PostScrapDto.builder().build());
 
-        postScrapService.deleteScrap("scrapId");
-
-        verify(postScrapRepository).deleteById("scrapId");
+        PostScrapDto created = scrapService.createScrap(scrapDto);
+        assertNotNull(created);
     }
+
 }

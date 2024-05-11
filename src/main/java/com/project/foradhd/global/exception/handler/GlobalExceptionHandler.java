@@ -135,4 +135,11 @@ public class GlobalExceptionHandler {
         return ErrorResponse.toResponseEntity(ErrorCode.NOT_FOUND_COMMENT_LIKE);
     }
 
+    @ExceptionHandler(CategoryNotSelectedException.class)
+    public ResponseEntity<String> handleCategoryNotSelectedException(CategoryNotSelectedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
 }

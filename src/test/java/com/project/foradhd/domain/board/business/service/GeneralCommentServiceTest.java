@@ -7,37 +7,29 @@ import com.project.foradhd.domain.board.web.dto.GeneralCommentDto;
 import com.project.foradhd.domain.board.web.mapper.GeneralCommentMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doNothing;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -47,118 +39,112 @@ public class GeneralCommentServiceTest {
     private GeneralCommentRepository repository;
 
     @Mock
+    @Autowired
     private GeneralCommentMapper mapper;
 
     @InjectMocks
     private GeneralCommentServiceImpl service;
 
-    private GeneralComment comment;
-    private GeneralCommentDto commentDto;
+    GeneralComment comment;
+    GeneralCommentDto commentDto;
+
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        LocalDateTime now = LocalDateTime.now();
+        mapper = Mappers.getMapper(GeneralCommentMapper.class);
 
-        // 기본 테스트 데이터를 생성
-        comment = GeneralComment.builder()
-                .commentId("1")
-                .content("Sample comment")
-                .createdAt(LocalDateTime.now())
-                .build();
+        GeneralComment comment = new GeneralComment(
+                "1",
+                "user123",
+                "writer123",
+                "John Doe",
+                "post123",
+                1,
+                "parent1",
+                "Sample content",
+                false,
+                5,
+                now,
+                now
+        );
 
-        commentDto = GeneralCommentDto.builder()
-                .commentId("1")
-                .content("Sample comment")
-                .createdAt(LocalDateTime.now())
-                .build();
+        GeneralCommentDto commentDto = new GeneralCommentDto(comment.getCommentId(), comment.getUserId(), comment.getWriterId(), comment.getWriterName(), comment.getPostId(), comment.getPostType(), comment.getParentCommentId(), comment.getContent(), comment.isAnonymous(), comment.getLikeCount(), comment.getCreatedAt(), comment.getLastModifiedAt());
     }
 
+
     @Test
-    @DisplayName("댓글 생성 테스트")
-    void createComment_shouldSaveComment() {
-        // Given
-        GeneralCommentDto commentDto = GeneralCommentDto.builder()
-                .commentId("1")
-                .content("Sample comment")
-                .createdAt(LocalDateTime.now())
-                .build();
+    @DisplayName("댓글 작성 테스트")
+    void testCreateComment() {
+        LocalDateTime now = LocalDateTime.now();
+        GeneralComment comment = new GeneralComment(
+            "1",
+            "user123",
+            "writer123",
+            "John Doe",
+            "post123",
+            1,
+            "parent1",
+            "Sample content",
+            false,
+            5,
+            now,
+            now
+    );
+        GeneralCommentDto commentDto = new GeneralCommentDto(comment.getCommentId(), comment.getUserId(), comment.getWriterId(), comment.getWriterName(), comment.getPostId(), comment.getPostType(), comment.getParentCommentId(), comment.getContent(), comment.isAnonymous(), comment.getLikeCount(), comment.getCreatedAt(), comment.getLastModifiedAt());
 
-        GeneralComment comment = GeneralComment.builder()
-                .commentId(commentDto.getCommentId())
-                .content(commentDto.getContent())
-                .createdAt(commentDto.getCreatedAt())
-                .build();
-
-        // When
-        GeneralCommentDto result = GeneralCommentDto.builder()
-                .commentId(commentDto.getCommentId())
-                .content(commentDto.getContent())
-                .createdAt(commentDto.getCreatedAt())
-                .build();
-
-        // Then
-        assertNotNull(result);
-        assertEquals("Sample comment", result.getContent());
-
-        // Verify that the repository and mapper are called as expected
         repository.save(comment);
-        mapper.toDto(comment);
-        verify(repository).save(comment);
-        verify(mapper).toDto(comment);
+        GeneralCommentDto savedDto = service.createComment(commentDto);
+
+        // Assert
+        assertNotNull(savedDto, "The saved comment DTO should not be null.");
+        assertEquals(commentDto.getContent(), savedDto.getContent(), "The content of the saved comment should match the input.");
     }
 
 
     @Test
     @DisplayName("댓글 조회 테스트")
-    void getComment_shouldReturnComment_whenCommentExists() {
-        // Given
-        when(repository.findById("1")).thenReturn(Optional.of(comment));
-        when(mapper.toDto(any(GeneralComment.class))).thenReturn(commentDto);
+    void testGetComment() {
+        // Setup
+        String commentId = comment.getCommentId();
+        when(repository.findById(commentId)).thenReturn(Optional.of(comment));
 
-        // When
-        GeneralCommentDto result = GeneralCommentDto.builder()
-                .commentId(comment.getCommentId())
-                        .build();
+        // Act
+        GeneralCommentDto resultDto = service.getComment(commentId);
 
-        // Then
-        assertNotNull(result);
-        repository.findById("1");
-        mapper.toDto(comment);
-        verify(repository).findById("1");
-        verify(mapper).toDto(comment);
+        // Assert
+        assertNotNull(resultDto, "The result comment DTO should not be null.");
+        assertEquals(comment.getContent(), resultDto.getContent(), "The content of the comment should match the expected.");
     }
 
     @Test
     @DisplayName("댓글 수정 테스트")
-    void updateComment_shouldUpdateAndReturnComment_whenCommentExists() {
+    void testUpdateComment() {
         // Given
-        // When
-        GeneralCommentDto result = GeneralCommentDto.builder()
-                .commentId(comment.getCommentId())
-                .content("Updated comment")
-                .createdAt(comment.getCreatedAt())
+        GeneralCommentDto updatedDto = GeneralCommentDto.builder()
+                .commentId(commentDto.getCommentId())
+                .content("Updated content")
                 .build();
+        when(repository.findById(comment.getCommentId())).thenReturn(Optional.of(comment));
+        when(repository.save(comment)).thenReturn(comment);
 
-        // Then
-        assertNotNull(result);
-        repository.save(comment);
-        mapper.toDto(comment);
-        verify(repository).save(comment);
-        verify(mapper).toDto(comment);
+        // Act
+        GeneralCommentDto result = service.updateComment(updatedDto);
+
+        // Assert
+        assertNotNull(result, "The updated comment DTO should not be null.");
+        assertEquals("Updated content", result.getContent(), "The content should be updated.");
     }
 
     @Test
     @DisplayName("댓글 삭제 테스트")
-    void deleteComment_shouldCallDeleteById() {
+    void testDeleteComment() {
         // Given
-        String commentId = "1";
-        doNothing().when(repository).deleteById(commentId);
+        String commentId = comment.getCommentId();
+        //when(repository.existsById(commentId)).thenReturn(true);
 
-        // When
-        service.deleteComment(commentId);
-
-        // Then
-        repository.deleteById(commentId);
-        verify(repository).deleteById(commentId);
+        // Act & Assert
+        assertDoesNotThrow(() -> service.deleteComment(commentId), "Deleting a comment should not throw any exceptions.");
     }
 }

@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 import com.project.foradhd.domain.board.business.service.Impl.GeneralBoardServiceImpl;
 import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
 import com.project.foradhd.domain.board.persistence.entity.PostLike;
-import com.project.foradhd.domain.board.persistence.repository.GeneralBoardRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostLikeRepository;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
 import com.project.foradhd.domain.board.web.mapper.GeneralPostMapper;

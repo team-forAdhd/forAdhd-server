@@ -1,14 +1,10 @@
 package com.project.foradhd.domain.board.persistence.entity;
 
 import jakarta.persistence.*;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import java.time.LocalDateTime;
-
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import java.util.List;
+import com.project.foradhd.domain.user.persistence.entity.User;
 
 @Getter
 @Setter
@@ -19,48 +15,47 @@ import lombok.AllArgsConstructor;
 @Table(name = "general_post")
 public class GeneralPost {
 
-    @jakarta.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id", length = 32, columnDefinition = "VARCHAR(32)")
-    private String postId;
+    @Column(name = "post_id")
+    private Long postId;
 
-    @Column(name = "user_id")
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "writer_id", referencedColumnName = "user_id")
+    private User writer; // 'User' 엔티티와의 관계
 
-    @Column(name = "writer_id", length = 32, columnDefinition = "VARCHAR(32)")
-    private String writerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
+    private Category category; // 'Category' 엔티티와의 관계
 
-    @Column(name = "category_id", length = 16, columnDefinition = "BINARY(16)")
-    private String categoryId;
-
-    @Column(name = "writer_name", length = 50, columnDefinition = "VARCHAR(50)")
+    @Column(name = "writer_name", length = 50)
     private String writerName;
 
-    @Column(name = "category_name", length = 100, columnDefinition = "VARCHAR(100)")
+    @Column(name = "category_name", length = 100)
     private String categoryName;
 
-    @Column(name = "title", columnDefinition = "LONGTEXT")
+    @Column(name = "title", length = 255)
     private String title;
 
     @Column(name = "content", columnDefinition = "LONGTEXT")
     private String content;
 
-    @Column(name = "anonymous")
+    @Column(name = "anonymous", columnDefinition = "TINYINT(1)")
     private boolean anonymous;
 
     @Column(name = "images", columnDefinition = "TEXT")
     private String images;
 
-    @Column(name = "like_count")
+    @Column(name = "like_count", columnDefinition = "BIGINT")
     private long likeCount;
 
-    @Column(name = "comment_count")
+    @Column(name = "comment_count", columnDefinition = "BIGINT")
     private long commentCount;
 
-    @Column(name = "scrap_count")
+    @Column(name = "scrap_count", columnDefinition = "BIGINT")
     private long scrapCount;
 
-    @Column(name = "view_count")
+    @Column(name = "view_count", columnDefinition = "BIGINT")
     private long viewCount;
 
     @Column(name = "tags", columnDefinition = "TEXT")
@@ -72,6 +67,9 @@ public class GeneralPost {
     @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime lastModifiedAt;
 
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments; // 이 게시글에 대한 댓글
+
     public void incrementLikeCount() {
         this.likeCount++;
     }
@@ -80,4 +78,3 @@ public class GeneralPost {
         if (this.likeCount > 0) this.likeCount--;
     }
 }
-
