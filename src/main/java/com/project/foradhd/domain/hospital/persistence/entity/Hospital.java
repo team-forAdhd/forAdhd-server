@@ -19,7 +19,7 @@ public class Hospital extends BaseTimeEntity {
     @Id
     @GenericGenerator(name = "uuid-generator", type = com.project.foradhd.global.util.UUIDGenerator.class)
     @GeneratedValue(generator = "uuid-generator")
-    @Column(name = "hospital_id")
+    @Column(name = "hospital_id", columnDefinition = "varchar(32)")
     private String id;
 
     @Column(nullable = false)
