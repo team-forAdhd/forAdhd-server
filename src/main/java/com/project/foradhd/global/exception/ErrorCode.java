@@ -25,6 +25,9 @@ public enum ErrorCode {
     REQUIRED_TERMS_APPROVAL(BAD_REQUEST, "필수 이용 약관에 동의해야 합니다."),
     EMAIL_AUTH_TIMEOUT(BAD_REQUEST, "이메일 인증 가능 시간을 초과했습니다."),
 
+    //hospital
+    NOT_FOUND_HOSPITAL(NOT_FOUND, "존재하지 않는 병원입니다."),
+
     //validation
     INVALID_REQUEST(BAD_REQUEST, "잘못된 요청입니다."),
 

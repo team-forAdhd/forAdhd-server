@@ -1,13 +1,12 @@
 package com.project.foradhd.domain.hospital.persistence.entity;
 
 import com.project.foradhd.global.audit.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.locationtech.jts.geom.Point;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -33,4 +32,7 @@ public class Hospital extends BaseTimeEntity {
 
     @Column(length = 11)
     private String phone;
+
+    @OneToMany(mappedBy = "hospital", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Doctor> doctorList;
 }

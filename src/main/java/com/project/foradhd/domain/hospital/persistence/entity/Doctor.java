@@ -45,4 +45,14 @@ public class Doctor extends BaseTimeEntity {
 
     @Column(columnDefinition = "longtext")
     private String profile;
+
+    public Double calculateTotalGrade() {
+        Long totalReviewCount = calculateTotalReviewCount();
+        if (totalReviewCount == 0) return 0D;
+        return (double) totalGradeSum / totalReviewCount;
+    }
+
+    public Long calculateTotalReviewCount() {
+        return (long) totalReceiptReviewCount + totalBriefReviewCount;
+    }
 }
