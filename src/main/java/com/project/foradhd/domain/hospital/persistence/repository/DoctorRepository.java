@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface DoctorRepository extends JpaRepository<Doctor, String> {
@@ -16,4 +17,12 @@ public interface DoctorRepository extends JpaRepository<Doctor, String> {
         where d.id = :doctorId and d.deleted = false
     """)
     Optional<Doctor> findByIdAndHospitalId(@Param("doctorId") String doctorId, @Param("hospitalId") String hospitalId);
+
+    @Query("""
+        select d
+        from Doctor d
+        where d.hospital.id = :hospitalId and d.deleted = false
+        order by d.name asc
+    """)
+    List<Doctor> findAllByHospitalId(String hospitalId);
 }

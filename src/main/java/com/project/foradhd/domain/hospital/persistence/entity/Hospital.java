@@ -7,8 +7,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 import org.locationtech.jts.geom.Point;
 
-import java.util.List;
-
 @Getter
 @Builder
 @AllArgsConstructor
@@ -38,7 +36,4 @@ public class Hospital extends BaseTimeEntity {
     @ColumnDefault("0")
     @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
-
-    @OneToMany(mappedBy = "hospital", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Doctor> doctorList;
 }

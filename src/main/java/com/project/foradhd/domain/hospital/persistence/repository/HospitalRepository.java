@@ -10,11 +10,9 @@ import java.util.Optional;
 public interface HospitalRepository extends JpaRepository<Hospital, String> {
 
     @Query("""
-        select distinct h 
-        from Hospital h 
-        left join fetch h.doctorList d 
-        where h.id = :hospitalId
-        order by d.name asc
+        select h
+        from Hospital h
+        where h.id = :hospitalId and h.deleted = false
     """)
-    Optional<Hospital> findByIdFetch(@Param("hospitalId") String hospitalId);
+    Optional<Hospital> findById(@Param("hospitalId") String hospitalId);
 }

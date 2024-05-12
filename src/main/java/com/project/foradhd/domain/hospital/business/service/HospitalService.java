@@ -35,12 +35,13 @@ public class HospitalService {
     private final HospitalBookmarkRepository hospitalBookmarkRepository;
 
     public HospitalDetailsData getHospitalDetails(String userId, String hospitalId) {
-        Hospital hospital = getHospitalFetch(hospitalId);
+        Hospital hospital = getHospital(hospitalId);
+        List<Doctor> doctorList = doctorRepository.findAllByHospitalId(hospitalId);
         HospitalBookmark notHospitalBookmark = HospitalBookmark.builder().deleted(true).build();
         HospitalBookmark hospitalBookmark = hospitalBookmarkRepository.findById(userId, hospitalId)
                 .orElse(notHospitalBookmark);
 
-        List<HospitalDetailsData.DoctorData> doctorList = hospital.getDoctorList().stream()
+        List<HospitalDetailsData.DoctorData> doctorDataList = doctorList.stream()
                 .map(doctor -> HospitalDetailsData.DoctorData.builder()
                         .doctorId(doctor.getId())
                         .name(doctor.getName())
@@ -57,12 +58,12 @@ public class HospitalService {
                 .latitude(hospital.getLocation().getY())
                 .longitude(hospital.getLocation().getX())
                 .isBookmarked(!hospitalBookmark.getDeleted())
-                .doctorList(doctorList)
+                .doctorList(doctorDataList)
                 .build();
     }
 
-    public Hospital getHospitalFetch(String hospitalId) {
-        return hospitalRepository.findByIdFetch(hospitalId)
+    public Hospital getHospital(String hospitalId) {
+        return hospitalRepository.findById(hospitalId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL));
     }
 
@@ -71,7 +72,7 @@ public class HospitalService {
         HospitalBriefReviewSummary briefReviewSummary = hospitalBriefReviewRepository.getSummaryByDoctorId(doctorId);
         Long totalBriefReviewCount = briefReviewSummary.getTotalBriefReviewCount();
 
-        DoctorDetailsData.BriefReviewData briefReview = DoctorDetailsData.BriefReviewData.builder()
+        DoctorDetailsData.BriefReviewData briefReviewData = DoctorDetailsData.BriefReviewData.builder()
                 .totalReviewCount(totalBriefReviewCount)
                 .kindness(calculate(briefReviewSummary.getTotalKindnessSum(), totalBriefReviewCount))
                 .adhdUnderstanding(calculate(briefReviewSummary.getTotalAdhdUnderstandingSum(), totalBriefReviewCount))
@@ -82,7 +83,7 @@ public class HospitalService {
                 .totalGrade(doctor.calculateTotalGrade())
                 .totalReviewCount(doctor.calculateTotalReviewCount())
                 .profile(doctor.getProfile())
-                .briefReview(briefReview)
+                .briefReview(briefReviewData)
                 .build();
     }
 
