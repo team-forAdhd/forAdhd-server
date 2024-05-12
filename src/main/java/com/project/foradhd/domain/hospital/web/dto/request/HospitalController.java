@@ -3,9 +3,9 @@ package com.project.foradhd.domain.hospital.web.dto.request;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalBriefReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
+import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
-import com.project.foradhd.domain.hospital.persistence.entity.Doctor;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalReceiptReview;
 import com.project.foradhd.domain.hospital.web.dto.response.DoctorDetailsResponse;
 import com.project.foradhd.domain.hospital.web.dto.response.HospitalDetailsResponse;
@@ -42,8 +42,8 @@ public class HospitalController {
 
     @GetMapping("/{hospitalId}/doctors/{doctorId}")
     public ResponseEntity<DoctorDetailsResponse> getDoctorDetails(@PathVariable String hospitalId, @PathVariable String doctorId) {
-        Doctor doctor = hospitalService.getDoctorDetails(doctorId);
-        DoctorDetailsResponse doctorDetailsResponse = hospitalMapper.toDoctorDetailsResponse(doctorId);
+        DoctorDetailsData doctorDetailsData = hospitalService.getDoctorDetails(hospitalId, doctorId);
+        DoctorDetailsResponse doctorDetailsResponse = hospitalMapper.toDoctorDetailsResponse(doctorDetailsData);
         return ResponseEntity.ok(doctorDetailsResponse);
     }
 

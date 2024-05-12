@@ -3,6 +3,7 @@ package com.project.foradhd.domain.hospital.web.mapper;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalBriefReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
+import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalReceiptReview;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalBriefReviewCreateRequest;
@@ -31,9 +32,7 @@ public interface HospitalMapper {
     @Named("mapToDoctor")
     HospitalDetailsResponse.DoctorResponse mapToDoctor(HospitalDetailsData.DoctorData doctor);
 
-    default DoctorDetailsResponse toDoctorDetailsResponse(String doctorId) {
-        return null;
-    }
+    DoctorDetailsResponse toDoctorDetailsResponse(DoctorDetailsData doctorDetailsData);
 
     default HospitalReceiptReviewListResponse toReceiptReviewListResponse(List<HospitalReceiptReview> receiptReviewList) {
         return null;
