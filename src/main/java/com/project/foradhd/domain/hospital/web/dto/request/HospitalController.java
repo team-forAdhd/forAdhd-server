@@ -97,10 +97,11 @@ public class HospitalController {
     }
 
     @PutMapping("/doctors/receipt-reviews/{hospitalReceiptReviewId}")
-    public ResponseEntity<Void> updateReceiptReview(@PathVariable String hospitalReceiptReviewId,
+    public ResponseEntity<Void> updateReceiptReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalReceiptReviewId,
                                                     @RequestBody @Valid HospitalReceiptReviewUpdateRequest request) {
         HospitalReceiptReviewUpdateData hospitalReceiptReviewUpdateData = hospitalMapper.toHospitalReceiptReviewUpdateData(request);
-        hospitalService.updateReceiptReview(hospitalReceiptReviewId, hospitalReceiptReviewUpdateData);
+        hospitalService.updateReceiptReview(userId, hospitalReceiptReviewId, hospitalReceiptReviewUpdateData);
         return ResponseEntity.ok().build();
     }
 

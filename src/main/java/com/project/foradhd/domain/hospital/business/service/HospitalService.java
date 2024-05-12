@@ -175,9 +175,12 @@ public class HospitalService {
     }
 
     @Transactional
-    public void updateReceiptReview(String hospitalReceiptReviewId,
+    public void updateReceiptReview(String userId, String hospitalReceiptReviewId,
                                     HospitalReceiptReviewUpdateData hospitalReceiptReviewUpdateData) {
-
+        HospitalReceiptReview hospitalReceiptReview = getHospitalReceiptReview(hospitalReceiptReviewId);
+        validateReceiptReviewer(hospitalReceiptReview, userId);
+        hospitalReceiptReview.update(hospitalReceiptReviewUpdateData.getContent(),
+                hospitalReceiptReviewUpdateData.getImageList());
     }
 
     @Transactional

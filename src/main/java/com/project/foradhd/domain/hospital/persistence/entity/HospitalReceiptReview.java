@@ -61,4 +61,9 @@ public class HospitalReceiptReview extends BaseTimeEntity {
     public Integer calculateTotalGradeSum() {
         return kindness + adhdUnderstanding + enoughMedicalTime;
     }
+
+    public void update(String content, List<String> images) {
+        this.content = content;
+        this.images = images;
+    }
 }
