@@ -12,11 +12,10 @@ import java.time.LocalDateTime;
 public class PostScrapFilterDto {
     private Long scrapId;
     private Long postId;
-    private Long userId;
+    private String userId;
     private LocalDateTime createdAt;
 
-    // Constructors for @Builder
-    public PostScrapFilterDto(Long scrapId, Long postId, Long userId, LocalDateTime createdAt) {
+    public PostScrapFilterDto(Long scrapId, Long postId, String userId, LocalDateTime createdAt) {
         this.scrapId = scrapId;
         this.postId = postId;
         this.userId = userId;

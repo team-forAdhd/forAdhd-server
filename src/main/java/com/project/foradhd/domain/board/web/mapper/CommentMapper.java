@@ -1,45 +1,41 @@
 package com.project.foradhd.domain.board.web.mapper;
 
 import com.project.foradhd.domain.board.persistence.entity.Comment;
+import com.project.foradhd.domain.board.persistence.repository.GeneralPostRepository;
+import com.project.foradhd.domain.user.persistence.repository.UserRepository;
+import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
+import com.project.foradhd.domain.user.persistence.entity.User;
+import org.mapstruct.*;
 import com.project.foradhd.domain.board.web.dto.CommentDto;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+
+@Mapper(componentModel = "spring", uses = {UserRepository.class, GeneralPost.class})
 public interface CommentMapper {
 
     CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
 
-    @Mapping(target = "commentId", source = "commentId")
-    @Mapping(target = "postId", source = "post.postId")
-    @Mapping(target = "writerId", source = "writer.writerId")
-    @Mapping(target = "content", source = "content")
-    @Mapping(target = "anonymous", source = "anonymous")
-    @Mapping(target = "likeCount", source = "likeCount")
-    @Mapping(target = "createdAt", source = "createdAt")
-    @Mapping(target = "lastModifiedAt", source = "lastModifiedAt")
-    CommentDto toDto(Comment comment);
+    @Mapping(source = "postId", target = "postId", qualifiedByName = "getPostId")
+    CommentDto toDto(Comment entity);
 
-    @Mapping(target = "post.postId", source = "postId")
-    @Mapping(target = "writer.writerId", source = "writerId")
-    @Mapping(target = "commentId", source = "commentId")
-    @Mapping(target = "content", source = "content")
-    @Mapping(target = "anonymous", source = "anonymous")
-    @Mapping(target = "likeCount", source = "likeCount")
-    @Mapping(target = "createdAt", source = "createdAt")
-    @Mapping(target = "lastModifiedAt", source = "lastModifiedAt")
-    Comment toEntity(CommentDto commentDto);
+    @Mapping(source = "postId", target = "postId", qualifiedByName = "postIdToPost")
+    Comment toEntity(CommentDto dto);
 
-    void updateCommentFromDto(CommentDto commentDto, @MappingTarget Comment comment);
+    @Mapping(source = "postId", target = "postId", qualifiedByName = "postIdToPost")
+    void updateCommentFromDto(CommentDto dto, @MappingTarget Comment entity);
 
-    default Comment fromId(Long id) {
-        if (id == null) {
+    @Named("postIdToPost")
+    default GeneralPost postIdToPost(Long postId) {
+        if (postId == null) {
             return null;
         }
-        Comment comment = new Comment();
-        comment.setCommentId(id);
-        return comment;
+        GeneralPost post = new GeneralPost();
+        post.setPostId(postId);
+        return post;
+    }
+
+    @Named("getPostId")
+    default Long getPostId(GeneralPost post) {
+        return post != null ? post.getPostId() : null;
     }
 }

@@ -36,7 +36,7 @@ public class PostScrapFilterServiceImpl implements PostScrapFilterService {
     }
 
     @Override
-    public Page<GeneralPostDto> getScrapsByUser(Long userId, Pageable pageable, SortOption sortOption) {
+    public Page<GeneralPostDto> getScrapsByUser(String userId, Pageable pageable, SortOption sortOption) {
         pageable = applySorting(pageable, sortOption);
         Page<PostScrapFilter> scrapPage = scrapFilterRepository.findByUserId(userId, pageable);
         return scrapPage.map(scrap -> generalPostMapper.toDto(scrap.getPost()));

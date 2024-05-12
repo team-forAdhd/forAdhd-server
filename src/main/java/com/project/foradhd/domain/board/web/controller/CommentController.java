@@ -44,13 +44,13 @@ public class CommentController {
         return commentService.updateComment(commentDto);
     }
 
-    @GetMapping("/user/{writerId}")
+    @GetMapping("/{writerId}/my-comments")
     public ResponseEntity<Page<CommentDto>> getMyComments(@PathVariable Long writerId, Pageable pageable) {
         Page<CommentDto> comments = commentService.getMyComments(writerId, pageable);
         return ResponseEntity.ok(comments);
     }
 
-    @GetMapping("/post/{postId}")
+    @GetMapping("/{postId}/comments")
     public ResponseEntity<Page<CommentDto>> getCommentsByPost(@PathVariable Long postId, Pageable pageable, SortOption sortOption) {
         Page<CommentDto> comments = commentService.getCommentsByPost(postId, pageable, sortOption);
         return ResponseEntity.ok(comments);

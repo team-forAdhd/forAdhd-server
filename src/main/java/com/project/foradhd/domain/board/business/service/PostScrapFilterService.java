@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface PostScrapFilterService {
     // 사용자의 스크랩한 게시글 목록 조회
-    Page<GeneralPostDto> getScrapsByUser(Long userId, Pageable pageable, SortOption sortOption);
+    Page<GeneralPostDto> getScrapsByUser(String userId, Pageable pageable, SortOption sortOption);
 
     // 스크랩 생성
     PostScrapFilterDto createScrap(PostScrapFilterDto postScrapDto);

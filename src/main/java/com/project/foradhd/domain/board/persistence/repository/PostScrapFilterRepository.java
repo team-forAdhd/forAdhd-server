@@ -11,11 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostScrapFilterRepository extends PagingAndSortingRepository<PostScrapFilter, Long> {
     // 사용자가 스크랩한 포스트 목록 조회
-    Page<PostScrapFilter> findByUserId(Long userId, Pageable pageable);
-
+    Page<PostScrapFilter> findByUserId(String userId, Pageable pageable);
     void deleteById(Long scrapId);
-
     PostScrapFilter save(PostScrapFilter scrap);
-
     boolean existsById(Long scrapId);
 }

@@ -19,7 +19,6 @@ public class CommentDto {
     private LocalDateTime createdAt;
     private LocalDateTime lastModifiedAt;
 
-    // Constructors for @Builder
     CommentDto(Long commentId, Long postId, Long writerId, String content,
                boolean anonymous, long likeCount, LocalDateTime createdAt,
                LocalDateTime lastModifiedAt) {

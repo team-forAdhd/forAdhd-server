@@ -27,7 +27,6 @@ public class GeneralPostDto {
     private LocalDateTime createdAt;
     private LocalDateTime lastModifiedAt;
 
-    // Constructors for @Builder
     GeneralPostDto(Long postId, Long writerId, String writerName, Long categoryId, String categoryName,
                    String title, String content, boolean anonymous, String images, long likeCount,
                    long commentCount, long scrapCount, long viewCount, String tags,

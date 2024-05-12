@@ -34,6 +34,7 @@ public class GeneralPostServiceImpl implements GeneralPostService {
         this.scrapFilterRepository = scrapFilterRepository;
     }
 
+
     @Override
     public GeneralPostDto getPost(Long postId) {
         GeneralPost post = postRepository.findById(postId)
@@ -72,7 +73,7 @@ public class GeneralPostServiceImpl implements GeneralPostService {
 
     @Override
     public Page<GeneralPostDto> getMyScraps(String userId, Pageable pageable) {
-        return scrapFilterRepository.findByUserId(Long.valueOf(userId), pageable)
+        return scrapFilterRepository.findByUserId(userId, pageable)
                 .map(scrap -> postMapper.toDto(scrap.getPost()));
     }
 

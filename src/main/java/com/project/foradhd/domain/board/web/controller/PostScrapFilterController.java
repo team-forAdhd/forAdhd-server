@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/v1/posts/scrap/")
@@ -23,7 +24,7 @@ public class PostScrapFilterController {
     // 내가 스크랩한 게시글 조회
     @GetMapping("/{userId}")
     public ResponseEntity<Page<GeneralPostDto>> getScrapsByUser(
-            @PathVariable Long userId,
+            @PathVariable String userId,
             @RequestParam(defaultValue = "NEWEST_FIRST") SortOption sortOption,
             Pageable pageable) {
 

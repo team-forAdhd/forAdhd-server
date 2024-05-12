@@ -2,36 +2,38 @@ package com.project.foradhd.domain.board.web.mapper;
 
 import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
+import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.repository.UserRepository;
+import com.project.foradhd.domain.board.persistence.entity.Category;
+import org.mapstruct.Context;
+import org.mapstruct.Named;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {Category.class})
 public interface GeneralPostMapper {
 
     GeneralPostMapper INSTANCE = Mappers.getMapper(GeneralPostMapper.class);
 
-    @Mapping(target = "postId", source = "postId")
-    @Mapping(target = "writerId", source = "writer.writerId")
-    @Mapping(target = "writerName", source = "writerName")
-    @Mapping(target = "categoryId", source = "category.categoryId")
-    @Mapping(target = "categoryName", source = "categoryName")
-    @Mapping(target = "title", source = "title")
-    @Mapping(target = "content", source = "content")
-    @Mapping(target = "anonymous", source = "anonymous")
-    @Mapping(target = "images", source = "images")
-    @Mapping(target = "likeCount", source = "likeCount")
-    @Mapping(target = "commentCount", source = "commentCount")
-    @Mapping(target = "scrapCount", source = "scrapCount")
-    @Mapping(target = "viewCount", source = "viewCount")
-    @Mapping(target = "tags", source = "tags")
-    @Mapping(target = "createdAt", source = "createdAt")
-    @Mapping(target = "lastModifiedAt", source = "lastModifiedAt")
+    @Mapping(source = "categoryId", target = "categoryId", qualifiedByName = "getCategoryId")
     GeneralPostDto toDto(GeneralPost post);
 
-    @Mapping(target = "writer.writerId", source = "writerId")
-    @Mapping(target = "category.categoryId", source = "categoryId")
-    @Mapping(target = "writerName", ignore = true)  // Assuming no direct mapping as it should be fetched from the user entity
-    @Mapping(target = "categoryName", ignore = true) // Assuming no direct mapping as it should be fetched from the category entity
-    GeneralPost toEntity(GeneralPostDto postDto);
+    @Mapping(source = "categoryId", target = "categoryId", qualifiedByName = "categoryIdToCategory")
+    GeneralPost toEntity(GeneralPostDto dto);
+
+    @Named("getCategoryId")
+    default Long getCategoryId(Category category) {
+        return category.getCategoryId();
+    }
+
+    @Named("categoryIdToCategory")
+    default Category categoryIdToCategory(Long categoryId){
+        if (categoryId == null) {
+            return null;
+        }
+        Category category = new Category();
+        category.setCategoryId(categoryId);
+        return category;
+    }
 }

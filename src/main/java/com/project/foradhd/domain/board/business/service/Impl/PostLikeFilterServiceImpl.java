@@ -51,5 +51,4 @@ public class PostLikeFilterServiceImpl implements PostLikeFilterService {
         }
         generalPostRepository.save(post);
     }
-
 }

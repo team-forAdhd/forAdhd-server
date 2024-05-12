@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import com.project.foradhd.domain.user.persistence.entity.User;
 
 @Getter
 @Setter
@@ -22,11 +21,10 @@ public class Comment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", referencedColumnName = "post_id")
-    private GeneralPost post; // 이 댓글이 속한 게시글
+    private GeneralPost postId; // 이 댓글이 속한 게시글 id
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writer_id", referencedColumnName = "user_id")
-    private User writer; // 댓글 작성자
+    @Column(name = "writer_id")
+    private String writerId;
 
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;

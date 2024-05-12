@@ -20,13 +20,12 @@ public class GeneralPost {
     @Column(name = "post_id")
     private Long postId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writer_id", referencedColumnName = "user_id")
-    private User writer; // 'User' 엔티티와의 관계
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long writerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", referencedColumnName = "category_id")
-    private Category category; // 'Category' 엔티티와의 관계
+    private Category categoryId;
 
     @Column(name = "writer_name", length = 50)
     private String writerName;
@@ -67,9 +66,6 @@ public class GeneralPost {
     @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime lastModifiedAt;
 
-    @OneToMany(mappedBy = "post")
-    private List<Comment> comments; // 이 게시글에 대한 댓글
-
     public void incrementLikeCount() {
         this.likeCount++;
     }
@@ -77,4 +73,5 @@ public class GeneralPost {
     public void decrementLikeCount() {
         if (this.likeCount > 0) this.likeCount--;
     }
+
 }
