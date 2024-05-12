@@ -52,4 +52,9 @@ public class HospitalReceiptReview extends BaseTimeEntity {
     @ColumnDefault("0")
     @Column(nullable = false)
     private Integer helpCount = 0;
+
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Boolean deleted = Boolean.FALSE;
 }

@@ -46,6 +46,11 @@ public class Doctor extends BaseTimeEntity {
     @Column(columnDefinition = "longtext")
     private String profile;
 
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Boolean deleted = Boolean.FALSE;
+
     public Double calculateTotalGrade() {
         Long totalReviewCount = calculateTotalReviewCount();
         if (totalReviewCount == 0) return 0D;

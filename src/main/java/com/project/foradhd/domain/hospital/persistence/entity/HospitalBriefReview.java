@@ -4,6 +4,7 @@ import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
 @Getter
@@ -35,4 +36,9 @@ public class HospitalBriefReview extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Integer enoughMedicalTime;
+
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Boolean deleted = Boolean.FALSE;
 }
