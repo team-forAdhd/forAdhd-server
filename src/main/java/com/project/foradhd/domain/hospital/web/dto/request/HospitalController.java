@@ -90,9 +90,10 @@ public class HospitalController {
     }
 
     @PostMapping("/doctors/receipt-reviews/{hospitalReceiptReviewId}/help")
-    public ResponseEntity<Void> markReceiptReviewAsHelpful(@PathVariable String hospitalReceiptReviewId,
+    public ResponseEntity<Void> markReceiptReviewAsHelpful(@AuthUserId String userId,
+                                                        @PathVariable String hospitalReceiptReviewId,
                                                         @RequestParam Boolean help) {
-        hospitalService.markReceiptReviewAsHelpful(hospitalReceiptReviewId, help);
+        hospitalService.markReceiptReviewAsHelpful(userId, hospitalReceiptReviewId, help);
         return ResponseEntity.ok().build();
     }
 

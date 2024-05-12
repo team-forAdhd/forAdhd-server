@@ -62,6 +62,10 @@ public class HospitalReceiptReview extends BaseTimeEntity {
         return kindness + adhdUnderstanding + enoughMedicalTime;
     }
 
+    public void updateHelpCount(Integer helpCount) {
+        this.helpCount = helpCount;
+    }
+
     public void update(String content, List<String> images) {
         this.content = content;
         this.images = images;

@@ -31,6 +31,7 @@ public class HospitalService {
     private final HospitalBookmarkRepository hospitalBookmarkRepository;
     private final HospitalReceiptReviewRepository hospitalReceiptReviewRepository;
     private final HospitalBriefReviewRepository hospitalBriefReviewRepository;
+    private final HospitalReceiptReviewHelpRepository hospitalReceiptReviewHelpRepository;
 
     public HospitalDetailsData getHospitalDetails(String userId, String hospitalId) {
         Hospital hospital = getHospital(hospitalId);
@@ -170,8 +171,16 @@ public class HospitalService {
     }
 
     @Transactional
-    public void markReceiptReviewAsHelpful(String hospitalReceiptReviewId, Boolean help) {
-
+    public void markReceiptReviewAsHelpful(String userId, String hospitalReceiptReviewId, Boolean help) {
+        HospitalReceiptReview hospitalReceiptReview = getHospitalReceiptReview(hospitalReceiptReviewId);
+        HospitalReceiptReviewHelp hospitalReceiptReviewHelp = HospitalReceiptReviewHelp.builder()
+                .id(new HospitalReceiptReviewHelp.HospitalReceiptReviewHelpId(
+                        User.builder().id(userId).build(), hospitalReceiptReview))
+                .deleted(!help)
+                .build();
+        hospitalReceiptReviewHelpRepository.save(hospitalReceiptReviewHelp);
+        Integer helpCount = hospitalReceiptReviewHelpRepository.countHelp(hospitalReceiptReviewId);
+        hospitalReceiptReview.updateHelpCount(helpCount);
     }
 
     @Transactional
