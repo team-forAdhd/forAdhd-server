@@ -9,11 +9,13 @@ import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalBriefRevi
 import com.project.foradhd.domain.hospital.persistence.entity.Doctor;
 import com.project.foradhd.domain.hospital.persistence.entity.Hospital;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalBookmark;
+import com.project.foradhd.domain.hospital.persistence.entity.HospitalBookmark.HospitalBookmarkId;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalReceiptReview;
 import com.project.foradhd.domain.hospital.persistence.repository.DoctorRepository;
 import com.project.foradhd.domain.hospital.persistence.repository.HospitalBookmarkRepository;
 import com.project.foradhd.domain.hospital.persistence.repository.HospitalBriefReviewRepository;
 import com.project.foradhd.domain.hospital.persistence.repository.HospitalRepository;
+import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -97,8 +99,14 @@ public class HospitalService {
     }
 
     @Transactional
-    public void bookmarkHospital(String hospitalId, Boolean bookmark) {
-
+    public void saveHospitalBookmark(String userId, String hospitalId, boolean bookmark) {
+        Hospital hospital = getHospital(hospitalId);
+        HospitalBookmark hospitalBookmark = HospitalBookmark.builder()
+                .id(new HospitalBookmarkId(
+                        User.builder().id(userId).build(), hospital))
+                .deleted(!bookmark)
+                .build();
+        hospitalBookmarkRepository.save(hospitalBookmark);
     }
 
     @Transactional

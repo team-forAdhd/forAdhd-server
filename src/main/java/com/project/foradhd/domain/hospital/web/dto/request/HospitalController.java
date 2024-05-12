@@ -56,9 +56,10 @@ public class HospitalController {
     }
 
     @PostMapping("/{hospitalId}/bookmark")
-    public ResponseEntity<Void> bookmarkHospital(@PathVariable String hospitalId,
+    public ResponseEntity<Void> bookmarkHospital(@AuthUserId String userId,
+                                                @PathVariable String hospitalId,
                                                 @RequestParam Boolean bookmark) {
-        hospitalService.bookmarkHospital(hospitalId, bookmark);
+        hospitalService.saveHospitalBookmark(userId, hospitalId, bookmark);
         return ResponseEntity.ok().build();
     }
 
