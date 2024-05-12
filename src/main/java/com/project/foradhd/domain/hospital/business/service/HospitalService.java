@@ -73,9 +73,9 @@ public class HospitalService {
 
         DoctorDetailsData.BriefReviewData briefReview = DoctorDetailsData.BriefReviewData.builder()
                 .totalReviewCount(totalBriefReviewCount)
-                .kindness(calculate(briefReviewSummary.getTotalKindness(), totalBriefReviewCount))
-                .adhdUnderstanding(calculate(briefReviewSummary.getTotalAdhdUnderstanding(), totalBriefReviewCount))
-                .enoughMedicalTime(calculate(briefReviewSummary.getTotalEnoughMedicalTime(), totalBriefReviewCount))
+                .kindness(calculate(briefReviewSummary.getTotalKindnessSum(), totalBriefReviewCount))
+                .adhdUnderstanding(calculate(briefReviewSummary.getTotalAdhdUnderstandingSum(), totalBriefReviewCount))
+                .enoughMedicalTime(calculate(briefReviewSummary.getTotalEnoughMedicalTimeSum(), totalBriefReviewCount))
                 .build();
         return DoctorDetailsData.builder()
                 .name(doctor.getName())

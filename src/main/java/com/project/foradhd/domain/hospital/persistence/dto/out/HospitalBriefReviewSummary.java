@@ -8,7 +8,7 @@ import lombok.Getter;
 public class HospitalBriefReviewSummary {
 
     private Long totalBriefReviewCount;
-    private Long totalKindness;
-    private Long totalAdhdUnderstanding;
-    private Long totalEnoughMedicalTime;
+    private Long totalKindnessSum;
+    private Long totalAdhdUnderstandingSum;
+    private Long totalEnoughMedicalTimeSum;
 }
