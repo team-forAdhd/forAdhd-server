@@ -25,6 +25,10 @@ jasypt:
     bean: jasyptEncryptor
     key: ${JASYPT_ENCRYPTOR_KEY}
 
+aws:
+  ses:
+    from: ${AWS_SES_FROM}
+
 ---
 spring:
   config:

@@ -1,29 +1,14 @@
 package com.project.foradhd.domain.user.web.controller;
 
-import com.project.foradhd.domain.user.business.dto.in.EmailUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.PasswordUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.ProfileUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.PushNotificationApprovalUpdateData;
-import com.project.foradhd.domain.user.business.dto.in.SignUpData;
-import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
-import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
-import com.project.foradhd.domain.user.business.dto.out.SignUpTokenData;
+import com.project.foradhd.domain.user.business.dto.in.*;
+import com.project.foradhd.domain.user.business.dto.out.UserTokenData;
 import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
+import com.project.foradhd.domain.user.business.service.UserEmailAuthService;
 import com.project.foradhd.domain.user.business.service.UserService;
-import com.project.foradhd.domain.user.business.service.UserSignUpTokenService;
+import com.project.foradhd.domain.user.business.service.UserTokenService;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.web.dto.request.EmailUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.request.NicknameCheckRequest;
-import com.project.foradhd.domain.user.web.dto.request.PasswordUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.request.ProfileUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.request.PushNotificationApprovalUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
-import com.project.foradhd.domain.user.web.dto.request.SnsSignUpRequest;
-import com.project.foradhd.domain.user.web.dto.request.TermsApprovalsUpdateRequest;
-import com.project.foradhd.domain.user.web.dto.response.NicknameCheckResponse;
-import com.project.foradhd.domain.user.web.dto.response.SignUpResponse;
-import com.project.foradhd.domain.user.web.dto.response.SnsSignUpResponse;
-import com.project.foradhd.domain.user.web.dto.response.UserProfileDetailsResponse;
+import com.project.foradhd.domain.user.web.dto.request.*;
+import com.project.foradhd.domain.user.web.dto.response.*;
 import com.project.foradhd.domain.user.web.mapper.UserMapper;
 import com.project.foradhd.global.AuthUserId;
 import jakarta.validation.Valid;
@@ -44,7 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
-    private final UserSignUpTokenService userSignUpTokenService;
+    private final UserTokenService userTokenService;
+    private final UserEmailAuthService userEmailAuthService;
     private final UserMapper userMapper;
 
     @GetMapping("/nickname-check")
@@ -64,8 +50,8 @@ public class UserController {
     public ResponseEntity<SignUpResponse> signUp(@RequestBody @Valid SignUpRequest request) {
         SignUpData signUpData = userMapper.toSignUpData(request);
         User user = userService.signUp(signUpData);
-        SignUpTokenData signUpTokenData = userSignUpTokenService.generateSignUpToken(user);
-        return new ResponseEntity<>(userMapper.toSignUpResponse(signUpTokenData, user), HttpStatus.CREATED);
+        UserTokenData userTokenData = userTokenService.generateToken(user);
+        return new ResponseEntity<>(userMapper.toSignUpResponse(userTokenData, user), HttpStatus.CREATED);
     }
 
     @PostMapping("/sns-sign-up")
@@ -73,18 +59,25 @@ public class UserController {
         @RequestBody @Valid SnsSignUpRequest request) {
         SnsSignUpData snsSignUpData = userMapper.toSnsSignUpData(userId, request);
         User user = userService.snsSignUp(userId, snsSignUpData);
-        SignUpTokenData signUpTokenData = userSignUpTokenService.generateSignUpToken(user);
-        return new ResponseEntity<>(userMapper.toSnsSignUpResponse(signUpTokenData, user), HttpStatus.CREATED);
+        UserTokenData userTokenData = userTokenService.generateToken(user);
+        return new ResponseEntity<>(userMapper.toSnsSignUpResponse(userTokenData, user), HttpStatus.CREATED);
     }
 
     @PostMapping("/email-auth")
-    public ResponseEntity<Void> authenticateEmail() {
-        return ResponseEntity.created(null).build();
+    public ResponseEntity<Void> authenticateEmail(@AuthUserId String userId,
+                                                @RequestBody @Valid EmailAuthRequest request) {
+        EmailAuthData emailAuthData = userMapper.toEmailAuthData(request);
+        userEmailAuthService.authenticateEmail(userId, emailAuthData);
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/email-auth")
-    public ResponseEntity<Void> validateEmailAuth() {
-        return ResponseEntity.ok().build();
+    @PutMapping("/email-auth")
+    public ResponseEntity<EmailAuthValidationResponse> validateEmailAuth(@AuthUserId String userId,
+                                                                @RequestBody @Valid EmailAuthValidationRequest request) {
+        EmailAuthValidationData emailAuthValidationData = userMapper.toEmailAuthValidationData(request);
+        User user = userEmailAuthService.validateEmailAuth(userId, emailAuthValidationData);
+        UserTokenData userTokenData = userTokenService.generateToken(user);
+        return ResponseEntity.ok(userMapper.toEmailAuthValidationResponse(userTokenData));
     }
 
     @PutMapping("/profile")
@@ -100,14 +93,6 @@ public class UserController {
         @RequestBody @Valid PasswordUpdateRequest request) {
         PasswordUpdateData passwordUpdateData = userMapper.toPasswordUpdateData(request);
         userService.updatePassword(userId, passwordUpdateData);
-        return ResponseEntity.ok().build();
-    }
-
-    @PutMapping("/email")
-    public ResponseEntity<Void> updateEmail(@AuthUserId String userId,
-        @RequestBody @Valid EmailUpdateRequest request) {
-        EmailUpdateData emailUpdateData = userMapper.toEmailUpdateData(request);
-        userService.updateEmail(userId, emailUpdateData);
         return ResponseEntity.ok().build();
     }
 
