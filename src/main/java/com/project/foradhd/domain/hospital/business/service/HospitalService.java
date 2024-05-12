@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.project.foradhd.global.util.AverageCalculator.calculate;
+
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -71,9 +73,9 @@ public class HospitalService {
 
         DoctorDetailsData.BriefReviewData briefReview = DoctorDetailsData.BriefReviewData.builder()
                 .totalReviewCount(totalBriefReviewCount)
-                .kindness((double) briefReviewSummary.getTotalKindness() / totalBriefReviewCount)
-                .adhdUnderstanding((double) briefReviewSummary.getTotalAdhdUnderstanding() / totalBriefReviewCount)
-                .enoughMedicalTime((double) briefReviewSummary.getTotalEnoughMedicalTime() / totalBriefReviewCount)
+                .kindness(calculate(briefReviewSummary.getTotalKindness(), totalBriefReviewCount))
+                .adhdUnderstanding(calculate(briefReviewSummary.getTotalAdhdUnderstanding(), totalBriefReviewCount))
+                .enoughMedicalTime(calculate(briefReviewSummary.getTotalEnoughMedicalTime(), totalBriefReviewCount))
                 .build();
         return DoctorDetailsData.builder()
                 .name(doctor.getName())
