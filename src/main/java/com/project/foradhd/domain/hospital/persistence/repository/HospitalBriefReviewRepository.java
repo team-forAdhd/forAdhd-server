@@ -19,6 +19,13 @@ public interface HospitalBriefReviewRepository extends JpaRepository<HospitalBri
     Optional<HospitalBriefReview> findById(@Param("hospitalBriefReviewId") String hospitalBriefReviewId);
 
     @Query("""
+        select hbr
+        from HospitalBriefReview hbr
+        where hbr.user.id = :userId and hbr.doctor.id = :doctorId and hbr.deleted = false
+    """)
+    Optional<HospitalBriefReview> findByUserIdAndDoctorId(@Param("userId") String userId, @Param("doctorId") String doctorId);
+
+    @Query("""
         select new com.project.foradhd.domain.hospital.persistence.dto.out.HospitalBriefReviewSummary(
             count(hbr), sum(hbr.kindness), sum(hbr.adhdUnderstanding), sum(hbr.enoughMedicalTime))
         from HospitalBriefReview hbr

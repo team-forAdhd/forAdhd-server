@@ -61,9 +61,19 @@ public class Doctor extends BaseTimeEntity {
         return (long) totalReceiptReviewCount + totalBriefReviewCount;
     }
 
+    public void updateByCreatedReceiptReview(Integer receiptReviewTotalGradeSum) {
+        totalGradeSum += receiptReviewTotalGradeSum;
+        totalReceiptReviewCount++;
+    }
+
     public void updateByDeletedReceiptReview(Integer receiptReviewTotalGradeSum) {
         totalGradeSum -= receiptReviewTotalGradeSum;
         totalReceiptReviewCount--;
+    }
+
+    public void updateByCreatedBriefReview(Integer briefReviewTotalGradeSum) {
+        totalGradeSum += briefReviewTotalGradeSum;
+        totalBriefReviewCount++;
     }
 
     public void updateByDeletedBriefReview(Integer briefReviewTotalGradeSum) {

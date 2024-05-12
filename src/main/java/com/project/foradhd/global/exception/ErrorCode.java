@@ -32,6 +32,8 @@ public enum ErrorCode {
     NOT_FOUND_HOSPITAL_BRIEF_REVIEW(NOT_FOUND, "존재하지 않는 간단 리뷰입니다."),
     FORBIDDEN_HOSPITAL_RECEIPT_REVIEW(FORBIDDEN, "영수증 리뷰에 접근할 수 있는 권한이 없습니다."),
     FORBIDDEN_HOSPITAL_BRIEF_REVIEW(FORBIDDEN, "간단 리뷰에 접근할 수 있는 권한이 없습니다."),
+    ALREADY_EXISTS_HOSPITAL_RECEIPT_REVIEW(CONFLICT, "이미 작성한 영수증 리뷰가 있습니다."),
+    ALREADY_EXISTS_HOSPITAL_BRIEF_REVIEW(CONFLICT, "이미 작성한 간단 리뷰가 있습니다."),
 
     //validation
     INVALID_REQUEST(BAD_REQUEST, "잘못된 요청입니다."),

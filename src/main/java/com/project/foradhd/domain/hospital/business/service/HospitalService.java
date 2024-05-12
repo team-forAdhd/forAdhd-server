@@ -121,8 +121,21 @@ public class HospitalService {
     }
 
     @Transactional
-    public void createBriefReview(HospitalBriefReviewCreateData hospitalBriefReviewCreateData) {
+    public void createBriefReview(String userId, String hospitalId, String doctorId,
+                                HospitalBriefReviewCreateData hospitalBriefReviewCreateData) {
+        Doctor doctor = getDoctor(hospitalId, doctorId);
+        validateDuplicatedHospitalBriefReview(userId, doctorId);
+        HospitalBriefReview hospitalBriefReview = HospitalBriefReview.builder()
+                .user(User.builder().id(userId).build())
+                .doctor(doctor)
+                .kindness(hospitalBriefReviewCreateData.getKindness())
+                .adhdUnderstanding(hospitalBriefReviewCreateData.getAdhdUnderstanding())
+                .enoughMedicalTime(hospitalBriefReviewCreateData.getEnoughMedicalTime())
+                .build();
 
+        Integer briefReviewTotalGradeSum = hospitalBriefReview.calculateTotalGradeSum();
+        doctor.updateByCreatedBriefReview(briefReviewTotalGradeSum);
+        hospitalBriefReviewRepository.save(hospitalBriefReview);
     }
 
     @Transactional
@@ -137,8 +150,23 @@ public class HospitalService {
     }
 
     @Transactional
-    public void createReceiptReview(HospitalReceiptReviewCreateData hospitalReceiptReviewCreateData) {
+    public void createReceiptReview(String userId, String hospitalId, String doctorId,
+                                    HospitalReceiptReviewCreateData hospitalReceiptReviewCreateData) {
+        Doctor doctor = getDoctor(hospitalId, doctorId);
+        validateDuplicatedHospitalReceiptReview(userId, doctorId);
+        HospitalReceiptReview hospitalReceiptReview = HospitalReceiptReview.builder()
+                .user(User.builder().id(userId).build())
+                .doctor(doctor)
+                .kindness(hospitalReceiptReviewCreateData.getKindness())
+                .adhdUnderstanding(hospitalReceiptReviewCreateData.getAdhdUnderstanding())
+                .enoughMedicalTime(hospitalReceiptReviewCreateData.getEnoughMedicalTime())
+                .content(hospitalReceiptReviewCreateData.getContent())
+                .images(hospitalReceiptReviewCreateData.getImageList())
+                .build();
 
+        Integer receiptReviewTotalGradeSum = hospitalReceiptReview.calculateTotalGradeSum();
+        doctor.updateByCreatedReceiptReview(receiptReviewTotalGradeSum);
+        hospitalReceiptReviewRepository.save(hospitalReceiptReview);
     }
 
     @Transactional
@@ -161,6 +189,20 @@ public class HospitalService {
         Integer receiptReviewTotalGradeSum = hospitalReceiptReview.calculateTotalGradeSum();
         doctor.updateByDeletedReceiptReview(receiptReviewTotalGradeSum);
         hospitalReceiptReviewRepository.deleteSoftly(hospitalReceiptReviewId);
+    }
+
+    private void validateDuplicatedHospitalBriefReview(String userId, String doctorId) {
+        boolean existsHospitalBriefReview = hospitalBriefReviewRepository.findByUserIdAndDoctorId(userId, doctorId).isPresent();
+        if (existsHospitalBriefReview) {
+            throw new BusinessException(ErrorCode.ALREADY_EXISTS_HOSPITAL_BRIEF_REVIEW);
+        }
+    }
+
+    private void validateDuplicatedHospitalReceiptReview(String userId, String doctorId) {
+        boolean existsHospitalReceiptReview = hospitalReceiptReviewRepository.findByUserIdAndDoctorId(userId, doctorId).isPresent();
+        if (existsHospitalReceiptReview) {
+            throw new BusinessException(ErrorCode.ALREADY_EXISTS_HOSPITAL_RECEIPT_REVIEW);
+        }
     }
 
     public void validateBriefReviewer(HospitalBriefReview hospitalBriefReview, String userId) {

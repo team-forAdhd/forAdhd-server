@@ -14,6 +14,7 @@ import com.project.foradhd.domain.hospital.web.mapper.HospitalMapper;
 import com.project.foradhd.global.AuthUserId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,11 +65,12 @@ public class HospitalController {
     }
 
     @PostMapping("/{hospitalId}/doctors/{doctorId}/brief-reviews")
-    public ResponseEntity<Void> createBriefReview(@PathVariable String hospitalId, @PathVariable String doctorId,
+    public ResponseEntity<Void> createBriefReview(@AuthUserId String userId,
+                                                @PathVariable String hospitalId, @PathVariable String doctorId,
                                                 @RequestBody @Valid HospitalBriefReviewCreateRequest request) {
         HospitalBriefReviewCreateData hospitalBriefReviewCreateData = hospitalMapper.toHospitalBriefReviewCreateData(request);
-        hospitalService.createBriefReview(hospitalBriefReviewCreateData);
-        return ResponseEntity.ok().build();
+        hospitalService.createBriefReview(userId, hospitalId, doctorId, hospitalBriefReviewCreateData);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("/doctors/brief-reviews/{hospitalBriefReviewId}")
@@ -79,11 +81,12 @@ public class HospitalController {
     }
 
     @PostMapping("/{hospitalId}/doctors/{doctorId}/receipt-reviews")
-    public ResponseEntity<Void> createReceiptReview(@PathVariable String hospitalId, @PathVariable String doctorId,
+    public ResponseEntity<Void> createReceiptReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalId, @PathVariable String doctorId,
                                                     @RequestBody @Valid HospitalReceiptReviewCreateRequest request) {
         HospitalReceiptReviewCreateData hospitalReceiptReviewCreateData = hospitalMapper.toHospitalReceiptReviewCreateData(request);
-        hospitalService.createReceiptReview(hospitalReceiptReviewCreateData);
-        return ResponseEntity.ok().build();
+        hospitalService.createReceiptReview(userId, hospitalId, doctorId, hospitalReceiptReviewCreateData);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/doctors/receipt-reviews/{hospitalReceiptReviewId}/help")
