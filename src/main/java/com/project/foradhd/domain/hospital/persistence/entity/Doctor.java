@@ -6,7 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
-import static com.project.foradhd.global.util.AverageCalculator.calculate;
+import static com.project.foradhd.global.util.AverageCalculator.calculateAverage;
 
 @Getter
 @Builder
@@ -54,7 +54,7 @@ public class Doctor extends BaseTimeEntity {
     private Boolean deleted = Boolean.FALSE;
 
     public Double calculateTotalGrade() {
-        return calculate(totalGradeSum, calculateTotalReviewCount());
+        return calculateAverage(totalGradeSum, calculateTotalReviewCount() * 3);
     }
 
     public Long calculateTotalReviewCount() {
