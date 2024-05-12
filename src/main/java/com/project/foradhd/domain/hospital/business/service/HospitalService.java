@@ -6,15 +6,9 @@ import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReview
 import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalBriefReviewSummary;
-import com.project.foradhd.domain.hospital.persistence.entity.Doctor;
-import com.project.foradhd.domain.hospital.persistence.entity.Hospital;
-import com.project.foradhd.domain.hospital.persistence.entity.HospitalBookmark;
+import com.project.foradhd.domain.hospital.persistence.entity.*;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalBookmark.HospitalBookmarkId;
-import com.project.foradhd.domain.hospital.persistence.entity.HospitalReceiptReview;
-import com.project.foradhd.domain.hospital.persistence.repository.DoctorRepository;
-import com.project.foradhd.domain.hospital.persistence.repository.HospitalBookmarkRepository;
-import com.project.foradhd.domain.hospital.persistence.repository.HospitalBriefReviewRepository;
-import com.project.foradhd.domain.hospital.persistence.repository.HospitalRepository;
+import com.project.foradhd.domain.hospital.persistence.repository.*;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
@@ -23,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.project.foradhd.global.util.AverageCalculator.calculate;
 
@@ -33,8 +28,9 @@ public class HospitalService {
 
     private final HospitalRepository hospitalRepository;
     private final DoctorRepository doctorRepository;
-    private final HospitalBriefReviewRepository hospitalBriefReviewRepository;
     private final HospitalBookmarkRepository hospitalBookmarkRepository;
+    private final HospitalReceiptReviewRepository hospitalReceiptReviewRepository;
+    private final HospitalBriefReviewRepository hospitalBriefReviewRepository;
 
     public HospitalDetailsData getHospitalDetails(String userId, String hospitalId) {
         Hospital hospital = getHospital(hospitalId);
@@ -89,9 +85,24 @@ public class HospitalService {
                 .build();
     }
 
+    public Doctor getDoctor(String doctorId) {
+        return doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_DOCTOR));
+    }
+
     public Doctor getDoctor(String hospitalId, String doctorId) {
         return doctorRepository.findByIdAndHospitalId(doctorId, hospitalId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_DOCTOR));
+    }
+
+    public HospitalBriefReview getHospitalBriefReview(String hospitalBriefReviewId) {
+        return hospitalBriefReviewRepository.findById(hospitalBriefReviewId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL_BRIEF_REVIEW));
+    }
+
+    public HospitalReceiptReview getHospitalReceiptReview(String hospitalReceiptReviewId) {
+        return hospitalReceiptReviewRepository.findById(hospitalReceiptReviewId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL_RECEIPT_REVIEW));
     }
 
     public List<HospitalReceiptReview> getReceiptReviewList(String hospitalId, String doctorId) {
@@ -115,8 +126,14 @@ public class HospitalService {
     }
 
     @Transactional
-    public void deleteBriefReview(String hospitalBriefReviewId) {
+    public void deleteBriefReview(String userId, String hospitalBriefReviewId) {
+        HospitalBriefReview hospitalBriefReview = getHospitalBriefReview(hospitalBriefReviewId);
+        validateBriefReviewer(hospitalBriefReview, userId);
+        Doctor doctor = getDoctor(hospitalBriefReview.getDoctor().getId());
 
+        Integer briefReviewTotalGradeSum = hospitalBriefReview.calculateTotalGradeSum();
+        doctor.updateByDeletedBriefReview(briefReviewTotalGradeSum);
+        hospitalBriefReviewRepository.deleteSoftly(hospitalBriefReviewId);
     }
 
     @Transactional
@@ -136,7 +153,27 @@ public class HospitalService {
     }
 
     @Transactional
-    public void deleteReceiptReview(String hospitalReceiptReviewId) {
+    public void deleteReceiptReview(String userId, String hospitalReceiptReviewId) {
+        HospitalReceiptReview hospitalReceiptReview = getHospitalReceiptReview(hospitalReceiptReviewId);
+        validateReceiptReviewer(hospitalReceiptReview, userId);
+        Doctor doctor = getDoctor(hospitalReceiptReview.getDoctor().getId());
 
+        Integer receiptReviewTotalGradeSum = hospitalReceiptReview.calculateTotalGradeSum();
+        doctor.updateByDeletedReceiptReview(receiptReviewTotalGradeSum);
+        hospitalReceiptReviewRepository.deleteSoftly(hospitalReceiptReviewId);
+    }
+
+    public void validateBriefReviewer(HospitalBriefReview hospitalBriefReview, String userId) {
+        String reviewerId = hospitalBriefReview.getUser().getId();
+        if (!Objects.equals(reviewerId, userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_HOSPITAL_BRIEF_REVIEW);
+        }
+    }
+
+    public void validateReceiptReviewer(HospitalReceiptReview hospitalReceiptReview, String userId) {
+        String reviewerId = hospitalReceiptReview.getUser().getId();
+        if (!Objects.equals(reviewerId, userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_HOSPITAL_RECEIPT_REVIEW);
+        }
     }
 }

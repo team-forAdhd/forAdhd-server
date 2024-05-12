@@ -57,4 +57,8 @@ public class HospitalReceiptReview extends BaseTimeEntity {
     @ColumnDefault("0")
     @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
+
+    public Integer calculateTotalGradeSum() {
+        return kindness + adhdUnderstanding + enoughMedicalTime;
+    }
 }

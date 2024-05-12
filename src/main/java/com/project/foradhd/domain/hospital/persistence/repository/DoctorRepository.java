@@ -13,6 +13,13 @@ public interface DoctorRepository extends JpaRepository<Doctor, String> {
     @Query("""
         select d
         from Doctor d
+        where d.id = :doctorId and d.deleted = false
+    """)
+    Optional<Doctor> findById(@Param("doctorId") String doctorId);
+
+    @Query("""
+        select d
+        from Doctor d
         inner join Hospital h on h.id = d.hospital.id and h.id = :hospitalId and h.deleted = false
         where d.id = :doctorId and d.deleted = false
     """)

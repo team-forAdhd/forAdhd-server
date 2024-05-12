@@ -72,8 +72,9 @@ public class HospitalController {
     }
 
     @DeleteMapping("/doctors/brief-reviews/{hospitalBriefReviewId}")
-    public ResponseEntity<Void> deleteBriefReview(@PathVariable String hospitalBriefReviewId) {
-        hospitalService.deleteBriefReview(hospitalBriefReviewId);
+    public ResponseEntity<Void> deleteBriefReview(@AuthUserId String userId,
+                                                @PathVariable String hospitalBriefReviewId) {
+        hospitalService.deleteBriefReview(userId, hospitalBriefReviewId);
         return ResponseEntity.ok().build();
     }
 
@@ -101,8 +102,9 @@ public class HospitalController {
     }
 
     @DeleteMapping("/doctors/receipt-reviews/{hospitalReceiptReviewId}")
-    public ResponseEntity<Void> deleteReceiptReview(@PathVariable String hospitalReceiptReviewId) {
-        hospitalService.deleteReceiptReview(hospitalReceiptReviewId);
+    public ResponseEntity<Void> deleteReceiptReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalReceiptReviewId) {
+        hospitalService.deleteReceiptReview(userId, hospitalReceiptReviewId);
         return ResponseEntity.ok().build();
     }
 }
