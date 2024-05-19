@@ -69,6 +69,12 @@ dependencies {
 
 	//Hibernate Spatial (지리 데이터에 대한 표준 인터페이스)
 	implementation 'org.hibernate:hibernate-spatial:6.4.4.Final'
+
+	//Querydsl
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 }
 
 tasks.named('test') {
