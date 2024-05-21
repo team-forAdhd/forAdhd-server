@@ -1,49 +1,40 @@
 package com.project.foradhd.domain.board.business.service.Impl;
 
-import com.project.foradhd.domain.board.business.service.CommentLikeFilterService;
 import com.project.foradhd.domain.board.business.service.CommentService;
 import com.project.foradhd.domain.board.persistence.entity.Comment;
+import com.project.foradhd.domain.board.persistence.entity.CommentLikeFilter;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
+import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
-import com.project.foradhd.domain.board.web.dto.CommentDto;
-import com.project.foradhd.domain.board.web.mapper.CommentMapper;
-import com.project.foradhd.domain.board.business.service.CommentLikeFilterService;
+import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.CommentNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository repository;
-    private final CommentMapper mapper;
-    private final CommentLikeFilterService commentLikeFilterService;
-
-    @Autowired
-    public CommentServiceImpl(CommentRepository repository, CommentMapper mapper, CommentLikeFilterService commentLikeFilterService) {
-        this.repository = repository;
-        this.mapper = mapper;
-        this.commentLikeFilterService = commentLikeFilterService;
-    }
+    private final CommentLikeFilterRepository commentLikeFilterRepository;
 
     @Override
-    public CommentDto getComment(Long commentId) {
-        Comment comment = repository.findById(commentId)
+    public Comment getComment(Long commentId) {
+        return repository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comment with ID " + commentId + " not found"));
-        return mapper.toDto(comment);
     }
 
     @Override
-    public CommentDto createComment(CommentDto commentDto) {
-        Comment comment = mapper.toEntity(commentDto);
-        Comment savedComment = repository.save(comment);
-        return mapper.toDto(savedComment);
+    @Transactional
+    public Comment createComment(Comment comment) {
+        return repository.save(comment);
     }
 
     @Override
@@ -55,30 +46,34 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDto updateComment(CommentDto commentDto) {
-        Comment existingComment = repository.findById(commentDto.getCommentId())
-                .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + commentDto.getCommentId()));
-        mapper.updateCommentFromDto(commentDto, existingComment);
-        Comment updatedComment = repository.save(existingComment);
-        return mapper.toDto(updatedComment);
+    @Transactional
+    public Comment updateComment(Comment comment) {
+        Comment existingComment = repository.findById(comment.getId())
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + comment.getId()));
+        existingComment.setContent(comment.getContent());
+        return repository.save(existingComment);
     }
 
     @Override
-    public Page<CommentDto> getMyComments(Long writerId, Pageable pageable) {
-        return repository.findByWriterId(writerId, pageable)
-                .map(mapper::toDto);
+    public Page<Comment> getMyComments(Long writerId, Pageable pageable) {
+        return repository.findByWriterId(writerId, pageable);
     }
 
     @Override
-    public Page<CommentDto> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption) {
+    public Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption) {
         pageable = applySorting(pageable, sortOption);
-        return repository.findByPostId(postId, pageable)
-                .map(mapper::toDto);
+        return repository.findByPostId(postId, pageable);
     }
 
     @Override
-    public void toggleCommentLike(Long userId, Long commentId) {
-        commentLikeFilterService.toggleLike(userId, commentId);
+    public void toggleCommentLike(Long commentId, String userId) {
+        Optional<CommentLikeFilter> likeFilter = commentLikeFilterRepository.findByCommentIdAndUserId(commentId, userId);
+        if (likeFilter.isPresent()) {
+            commentLikeFilterRepository.deleteByCommentIdAndUserId(commentId, userId);
+            commentLikeFilterRepository.decrementLikeCount(commentId);
+        } else {
+            commentLikeFilterRepository.incrementLikeCount(commentId);
+        }
     }
 
     private Pageable applySorting(Pageable pageable, SortOption sortOption) {

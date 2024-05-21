@@ -57,9 +57,9 @@ dependencies {
 	//MapStruct
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0' //lombok annotation processor와의 충돌 제거
 	testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 	testImplementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0' //lombok annotation processor와의 충돌 제거
 
 	//Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'

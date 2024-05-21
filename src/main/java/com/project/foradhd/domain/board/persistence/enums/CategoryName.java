@@ -1,0 +1,8 @@
+package com.project.foradhd.domain.board.persistence.enums;
+
+public enum CategoryName {
+    TEENS,
+    TWENTIES,
+    THIRTIES_AND_ABOVE,
+    PARENTS,
+}

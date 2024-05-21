@@ -1,54 +1,46 @@
 package com.project.foradhd.domain.board.business.service.Impl;
 
 import com.project.foradhd.domain.board.business.service.PostLikeFilterService;
+import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.entity.PostLikeFilter;
-import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
 import com.project.foradhd.domain.board.persistence.repository.PostLikeFilterRepository;
-import com.project.foradhd.domain.board.persistence.repository.GeneralPostRepository;
+import com.project.foradhd.domain.board.persistence.repository.PostRepository;
+import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.global.exception.UserNotFoundException;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.global.exception.BoardNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class PostLikeFilterServiceImpl implements PostLikeFilterService {
 
     private final PostLikeFilterRepository postLikeFilterRepository;
-    private final GeneralPostRepository generalPostRepository;
-    private final UserRepository userRepository;
-
-    @Autowired
-    public PostLikeFilterServiceImpl(PostLikeFilterRepository postLikeFilterRepository, GeneralPostRepository generalPostRepository, UserRepository userRepository) {
-        this.postLikeFilterRepository = postLikeFilterRepository;
-        this.generalPostRepository = generalPostRepository;
-        this.userRepository = userRepository;
-    }
+    private final PostRepository postRepository;
+    private final UserService userService;
 
     @Override
-    public void toggleLike(Long userId, Long postId) {
-        GeneralPost post = generalPostRepository.findById(postId)
+    public void toggleLike(String userId, Long postId) {
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BoardNotFoundException("Post with ID " + postId + " not found"));
 
-        User user = userRepository.findById(String.valueOf(userId))
-                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
+        User user = userService.getUser(userId);
 
         if (postLikeFilterRepository.existsByUserIdAndPostId(userId, postId)) {
             postLikeFilterRepository.deleteByUserIdAndPostId(userId, postId);
             post.decrementLikeCount();
         } else {
-            PostLikeFilter newLike = new PostLikeFilter();
-            newLike.setUser(user);
-            newLike.setPost(post);
-            newLike.setCreatedAt(LocalDateTime.now());
+            PostLikeFilter newLike = PostLikeFilter.builder()
+                    .user(user)
+                    .post(post)
+                    .build();
             postLikeFilterRepository.save(newLike);
             post.incrementLikeCount();
         }
-        generalPostRepository.save(post);
+        postRepository.save(post);
     }
 }

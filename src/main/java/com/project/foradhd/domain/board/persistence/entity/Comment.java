@@ -1,7 +1,12 @@
 package com.project.foradhd.domain.board.persistence.entity;
 
+import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -10,34 +15,28 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "comment")
-public class Comment {
+public class Comment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
-    private Long commentId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", referencedColumnName = "post_id")
-    private GeneralPost postId; // 이 댓글이 속한 게시글 id
+    private Post post; // 이 댓글이 속한 게시글 id
 
-    @Column(name = "writer_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private User user; // 댓글 작성자 id
+
     private String writerId;
 
-    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP")
-    private LocalDateTime createdAt;
-
-    @Column(name = "last_modified_at", columnDefinition = "TIMESTAMP")
-    private LocalDateTime lastModifiedAt;
-
-    @Column(name = "anonymous", columnDefinition = "TINYINT(1)")
     private boolean anonymous;
-
-    @Column(name = "like_count", columnDefinition = "BIGINT")
     private long likeCount;
 }

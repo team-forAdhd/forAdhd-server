@@ -1,16 +1,16 @@
 package com.project.foradhd.domain.board.business.service;
 
+import com.project.foradhd.domain.board.persistence.entity.Comment;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
-import com.project.foradhd.domain.board.web.dto.CommentDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CommentService {
-    CommentDto getComment(Long commentId);
-    CommentDto createComment(CommentDto commentDto);
+    Comment getComment(Long commentId);
+    Comment createComment(Comment comment);
     void deleteComment(Long commentId);
-    CommentDto updateComment(CommentDto commentDto);
-    void toggleCommentLike(Long userId, Long commentId);
-    Page<CommentDto> getMyComments(Long writerId, Pageable pageable);
-    Page<CommentDto> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption);
+    Comment updateComment(Comment comment);
+    Page<Comment> getMyComments(Long writerId, Pageable pageable);
+    Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption);
+    void toggleCommentLike(Long commentId, String userId);
 }

@@ -1,10 +1,9 @@
 package com.project.foradhd.domain.board.business.service;
 
 import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.project.foradhd.domain.board.business.service.Impl.GeneralPostServiceImpl;
+import com.project.foradhd.domain.board.business.service.Impl.PostServiceImpl;
 import com.project.foradhd.domain.board.persistence.entity.Category;
 import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
@@ -12,7 +11,7 @@ import com.project.foradhd.domain.board.persistence.repository.CommentRepository
 import com.project.foradhd.domain.board.persistence.repository.GeneralPostRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostScrapFilterRepository;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
-import com.project.foradhd.domain.board.web.mapper.GeneralPostMapper;
+import com.project.foradhd.domain.board.web.mapper.PostMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +24,6 @@ import org.springframework.data.domain.*;
 
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -36,14 +34,14 @@ class GeneralPostServiceImplTest {
     @Mock
     private GeneralPostRepository postRepository;
     @Mock
-    private GeneralPostMapper postMapper;
+    private PostMapper postMapper;
     @Mock
     private CommentRepository commentRepository;
     @Mock
     private PostScrapFilterRepository scrapFilterRepository;
 
     @InjectMocks
-    private GeneralPostServiceImpl postService;
+    private PostServiceImpl postService;
 
     @BeforeEach
     void setUp() {

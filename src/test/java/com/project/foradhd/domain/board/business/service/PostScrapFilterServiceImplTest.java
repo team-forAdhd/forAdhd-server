@@ -6,19 +6,15 @@ import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.GeneralPostRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostScrapFilterRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
 import com.project.foradhd.domain.board.web.dto.PostScrapFilterDto;
-import com.project.foradhd.domain.board.web.mapper.GeneralPostMapper;
+import com.project.foradhd.domain.board.web.mapper.PostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapFilterMapper;
 import com.project.foradhd.global.exception.ScrapNotFoundException;
-import org.mockito.Mockito;
 import org.springframework.data.domain.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.mockito.MockitoAnnotations;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,7 +41,7 @@ class PostScrapFilterServiceImplTest {
     @Mock
     private PostScrapFilterMapper scrapFilterMapper;
     @Mock
-    private GeneralPostMapper generalPostMapper;
+    private PostMapper postMapper;
     @InjectMocks
     private PostScrapFilterServiceImpl scrapFilterService;
 
@@ -75,14 +70,14 @@ class PostScrapFilterServiceImplTest {
                 .build();
 
         when(scrapFilterRepository.findByUserId(userId, pageable)).thenReturn(scrapPage);
-        when(generalPostMapper.toDto(any(GeneralPost.class))).thenReturn(postDto);
+        when(postMapper.toDto(any(GeneralPost.class))).thenReturn(postDto);
 
         Page<GeneralPostDto> result = scrapFilterService.getScrapsByUser(userId, pageable, SortOption.NEWEST_FIRST);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         verify(scrapFilterRepository).findByUserId(userId, pageable);
-        verify(generalPostMapper).toDto(any(GeneralPost.class));
+        verify(postMapper).toDto(any(GeneralPost.class));
     }
 
     @Test

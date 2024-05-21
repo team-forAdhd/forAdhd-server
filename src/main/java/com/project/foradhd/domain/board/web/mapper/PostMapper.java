@@ -1,30 +1,27 @@
 package com.project.foradhd.domain.board.web.mapper;
 
-import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
-import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
-import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.repository.UserRepository;
+import com.project.foradhd.domain.board.persistence.entity.Post;
+import com.project.foradhd.domain.board.web.dto.PostDto;
 import com.project.foradhd.domain.board.persistence.entity.Category;
-import org.mapstruct.Context;
 import org.mapstruct.Named;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring", uses = {Category.class})
-public interface GeneralPostMapper {
+public interface PostMapper {
 
-    GeneralPostMapper INSTANCE = Mappers.getMapper(GeneralPostMapper.class);
+    PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
 
     @Mapping(source = "categoryId", target = "categoryId", qualifiedByName = "getCategoryId")
-    GeneralPostDto toDto(GeneralPost post);
+    PostDto toDto(Post post);
 
     @Mapping(source = "categoryId", target = "categoryId", qualifiedByName = "categoryIdToCategory")
-    GeneralPost toEntity(GeneralPostDto dto);
+    Post toEntity(PostDto dto);
 
     @Named("getCategoryId")
     default Long getCategoryId(Category category) {
-        return category.getCategoryId();
+        return category.getId();
     }
 
     @Named("categoryIdToCategory")
@@ -33,7 +30,7 @@ public interface GeneralPostMapper {
             return null;
         }
         Category category = new Category();
-        category.setCategoryId(categoryId);
+        category.setId(categoryId);
         return category;
     }
 }
