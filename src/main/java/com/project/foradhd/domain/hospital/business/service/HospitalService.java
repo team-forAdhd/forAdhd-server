@@ -1,18 +1,25 @@
 package com.project.foradhd.domain.hospital.business.service;
 
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalBriefReviewCreateData;
+import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
 import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
+import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
+import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalBriefReviewSummary;
+import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalNearbyDto;
 import com.project.foradhd.domain.hospital.persistence.entity.*;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalBookmark.HospitalBookmarkId;
 import com.project.foradhd.domain.hospital.persistence.repository.*;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
+import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +39,34 @@ public class HospitalService {
     private final HospitalReceiptReviewRepository hospitalReceiptReviewRepository;
     private final HospitalBriefReviewRepository hospitalBriefReviewRepository;
     private final HospitalReceiptReviewHelpRepository hospitalReceiptReviewHelpRepository;
+
+    public HospitalListNearbyData getHospitalListNearby(String userId, HospitalListNearbySearchCond searchCond,
+                                                        Pageable pageable) {
+        Page<HospitalNearbyDto> hospitalPaging = hospitalRepository.findAllNearby(userId, searchCond, pageable);
+        List<HospitalNearbyData> hospitalList = hospitalPaging.getContent().stream()
+                .map(dto -> {
+                    Hospital hospital = dto.getHospital();
+                    long totalGradeSum = dto.getTotalGradeSum();
+                    int totalReviewCount = dto.getTotalBriefReviewCount() + dto.getTotalReceiptReviewCount();
+                    return HospitalNearbyData.builder()
+                            .hospitalId(hospital.getId())
+                            .name(hospital.getName())
+                            .totalGrade(calculateAverage(totalGradeSum, totalReviewCount * 3L))
+                            .totalReviewCount(totalReviewCount)
+                            .latitude(hospital.getLocation().getY())
+                            .longitude(hospital.getLocation().getX())
+                            .distance(dto.getDistance())
+                            .isBookmarked(dto.isBookmarked())
+                            .build();
+                })
+                .toList();
+        PagingResponse paging = PagingResponse.from(hospitalPaging);
+
+        return HospitalListNearbyData.builder()
+                .hospitalList(hospitalList)
+                .paging(paging)
+                .build();
+    }
 
     public HospitalDetailsData getHospitalDetails(String userId, String hospitalId) {
         Hospital hospital = getHospital(hospitalId);
