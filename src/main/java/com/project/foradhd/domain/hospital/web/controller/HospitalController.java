@@ -1,19 +1,27 @@
-package com.project.foradhd.domain.hospital.web.dto.request;
+package com.project.foradhd.domain.hospital.web.controller;
 
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalBriefReviewCreateData;
+import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
 import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
+import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalReceiptReview;
+import com.project.foradhd.domain.hospital.web.dto.request.HospitalBriefReviewCreateRequest;
+import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
+import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
+import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewUpdateRequest;
 import com.project.foradhd.domain.hospital.web.dto.response.DoctorDetailsResponse;
 import com.project.foradhd.domain.hospital.web.dto.response.HospitalDetailsResponse;
+import com.project.foradhd.domain.hospital.web.dto.response.HospitalListNearbyResponse;
 import com.project.foradhd.domain.hospital.web.dto.response.HospitalReceiptReviewListResponse;
 import com.project.foradhd.domain.hospital.web.mapper.HospitalMapper;
 import com.project.foradhd.global.AuthUserId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +37,13 @@ public class HospitalController {
     private final HospitalMapper hospitalMapper;
 
     @GetMapping("/nearby")
-    public ResponseEntity<Void> getHospitalListNearby() {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<HospitalListNearbyResponse> getHospitalListNearby(@AuthUserId String userId,
+                                                                            @ModelAttribute HospitalListNearbyRequest request,
+                                                                            Pageable pageable) {
+        HospitalListNearbySearchCond searchCond = hospitalMapper.mapToSearchCond(request);
+        HospitalListNearbyData hospitalListNearbyData = hospitalService.getHospitalListNearby(userId, searchCond, pageable);
+        HospitalListNearbyResponse hospitalListNearbyResponse = hospitalMapper.toHospitalListNearbyResponse(hospitalListNearbyData);
+        return ResponseEntity.ok(hospitalListNearbyResponse);
     }
 
     @GetMapping("/{hospitalId}")
@@ -48,6 +61,7 @@ public class HospitalController {
         return ResponseEntity.ok(doctorDetailsResponse);
     }
 
+    //TODO
     @GetMapping("/{hospitalId}/doctors/{doctorId}/receipt-reviews")
     public ResponseEntity<HospitalReceiptReviewListResponse> getReceiptReviewList(@PathVariable String hospitalId, @PathVariable String doctorId) {
         List<HospitalReceiptReview> receiptReviewList = hospitalService.getReceiptReviewList(hospitalId, doctorId);
