@@ -8,12 +8,16 @@ import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
+import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData;
+import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData.ReceiptReviewData;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalBriefReviewSummary;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalNearbyDto;
+import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalReceiptReviewDto;
 import com.project.foradhd.domain.hospital.persistence.entity.*;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalBookmark.HospitalBookmarkId;
 import com.project.foradhd.domain.hospital.persistence.repository.*;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
@@ -141,8 +145,34 @@ public class HospitalService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL_RECEIPT_REVIEW));
     }
 
-    public List<HospitalReceiptReview> getReceiptReviewList(String hospitalId, String doctorId) {
-        return null;
+    public HospitalReceiptReviewListData getReceiptReviewList(String userId, String hospitalId, String doctorId, Pageable pageable) {
+        Page<HospitalReceiptReviewDto> hospitalReceiptReviewPaging = hospitalReceiptReviewRepository
+                .findAll(userId, hospitalId, doctorId, pageable);
+        List<ReceiptReviewData> receiptReviewList = hospitalReceiptReviewPaging.getContent()
+                .stream()
+                .map(dto -> {
+                    HospitalReceiptReview receiptReview = dto.getHospitalReceiptReview();
+                    UserProfile writerProfile = dto.getUserProfile();
+                    long totalGradeSum = receiptReview.getKindness() + receiptReview.getAdhdUnderstanding() + receiptReview.getEnoughMedicalTime();
+                    return ReceiptReviewData.builder()
+                            .writerId(writerProfile.getUser().getId())
+                            .name(writerProfile.getNickname())
+                            .image(writerProfile.getProfileImage())
+                            .totalGrade(calculateAverage(totalGradeSum, 3L))
+                            .createdAt(receiptReview.getCreatedAt())
+                            .reviewImageList(receiptReview.getImages())
+                            .content(receiptReview.getContent())
+                            .helpCount(receiptReview.getHelpCount())
+                            .isHelped(dto.isHelped())
+                            .isMine(dto.isMine())
+                            .build();
+                }).toList();
+        PagingResponse paging = PagingResponse.from(hospitalReceiptReviewPaging);
+
+        return HospitalReceiptReviewListData.builder()
+                .receiptReviewList(receiptReviewList)
+                .paging(paging)
+                .build();
     }
 
     @Transactional
