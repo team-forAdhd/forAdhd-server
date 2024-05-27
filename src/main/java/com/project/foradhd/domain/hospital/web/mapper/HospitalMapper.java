@@ -8,7 +8,7 @@ import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
-import com.project.foradhd.domain.hospital.persistence.entity.HospitalReceiptReview;
+import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalBriefReviewCreateRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
@@ -54,9 +54,19 @@ public interface HospitalMapper {
 
     DoctorDetailsResponse toDoctorDetailsResponse(DoctorDetailsData doctorDetailsData);
 
-    default HospitalReceiptReviewListResponse toReceiptReviewListResponse(List<HospitalReceiptReview> receiptReviewList) {
-        return null;
-    }
+    @Mappings({
+            @Mapping(target = "receiptReviewList", source = "receiptReviewList", qualifiedByName = "mapToReceiptReviewList")
+    })
+    HospitalReceiptReviewListResponse toReceiptReviewListResponse(HospitalReceiptReviewListData hospitalReceiptReviewListData);
+
+    @Named("mapToReceiptReviewList")
+    @IterableMapping(qualifiedByName = "mapToReceiptReview")
+    List<HospitalReceiptReviewListResponse.ReceiptReviewResponse>
+        mapToReceiptReviewList(List<HospitalReceiptReviewListData.ReceiptReviewData> receiptreviewList);
+
+    @Named("mapToReceiptReview")
+    HospitalReceiptReviewListResponse.ReceiptReviewResponse
+        mapToReceiptReview(HospitalReceiptReviewListData.ReceiptReviewData receiptReview);
 
     HospitalBriefReviewCreateData toHospitalBriefReviewCreateData(HospitalBriefReviewCreateRequest request);
 

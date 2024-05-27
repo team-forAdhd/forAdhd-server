@@ -7,8 +7,8 @@ import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReview
 import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
+import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
-import com.project.foradhd.domain.hospital.persistence.entity.HospitalReceiptReview;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalBriefReviewCreateRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
@@ -25,8 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/hospitals")
@@ -61,12 +59,13 @@ public class HospitalController {
         return ResponseEntity.ok(doctorDetailsResponse);
     }
 
-    //TODO
     @GetMapping("/{hospitalId}/doctors/{doctorId}/receipt-reviews")
-    public ResponseEntity<HospitalReceiptReviewListResponse> getReceiptReviewList(@PathVariable String hospitalId, @PathVariable String doctorId) {
-        List<HospitalReceiptReview> receiptReviewList = hospitalService.getReceiptReviewList(hospitalId, doctorId);
+    public ResponseEntity<HospitalReceiptReviewListResponse> getReceiptReviewList(@AuthUserId String userId,
+                                                                                @PathVariable String hospitalId, @PathVariable String doctorId,
+                                                                                Pageable pageable) {
+        HospitalReceiptReviewListData hospitalReceiptReviewListData = hospitalService.getReceiptReviewList(userId, hospitalId, doctorId, pageable);
         HospitalReceiptReviewListResponse hospitalReceiptReviewListResponse =
-                hospitalMapper.toReceiptReviewListResponse(receiptReviewList);
+                hospitalMapper.toReceiptReviewListResponse(hospitalReceiptReviewListData);
         return ResponseEntity.ok(hospitalReceiptReviewListResponse);
     }
 
