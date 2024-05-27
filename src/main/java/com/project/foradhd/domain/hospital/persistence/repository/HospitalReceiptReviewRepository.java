@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.hospital.persistence.repository;
 
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalReceiptReview;
+import com.project.foradhd.domain.hospital.persistence.repository.custom.HospitalReceiptReviewRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -8,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface HospitalReceiptReviewRepository extends JpaRepository<HospitalReceiptReview, String> {
+public interface HospitalReceiptReviewRepository extends JpaRepository<HospitalReceiptReview, String>, HospitalReceiptReviewRepositoryCustom {
 
     @Query("""
         select hrr
