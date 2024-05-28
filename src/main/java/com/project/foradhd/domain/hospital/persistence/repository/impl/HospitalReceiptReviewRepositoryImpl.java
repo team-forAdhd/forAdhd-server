@@ -3,6 +3,8 @@ package com.project.foradhd.domain.hospital.persistence.repository.impl;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalReceiptReviewDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.QHospitalReceiptReviewDto;
 import com.project.foradhd.domain.hospital.persistence.repository.custom.HospitalReceiptReviewRepositoryCustom;
+import com.project.foradhd.global.paging.persistence.repository.support.QuerydslPagingSupportRepository;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -23,9 +25,11 @@ import static com.project.foradhd.domain.user.persistence.entity.QUserProfile.us
 public class HospitalReceiptReviewRepositoryImpl implements HospitalReceiptReviewRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private final QuerydslPagingSupportRepository querydslPagingSupportRepository;
 
     @Override
     public Page<HospitalReceiptReviewDto> findAll(String userId, String hospitalId, String doctorId, Pageable pageable) {
+        OrderSpecifier<?>[] orderSpecifiers = querydslPagingSupportRepository.getOrderSpecifiers(pageable.getSort());
         List<HospitalReceiptReviewDto> content = queryFactory
                 .select(new QHospitalReceiptReviewDto(
                         hospitalReceiptReview, userProfile,
@@ -42,6 +46,7 @@ public class HospitalReceiptReviewRepositoryImpl implements HospitalReceiptRevie
                 .on(hospitalReceiptReview.id.eq(hospitalReceiptReviewHelp.id.hospitalReceiptReview.id),
                         hospitalReceiptReviewHelp.id.user.id.eq(userId),
                         hospitalReceiptReviewHelp.deleted.isFalse())
+                .orderBy(orderSpecifiers)
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
                 .fetch();
