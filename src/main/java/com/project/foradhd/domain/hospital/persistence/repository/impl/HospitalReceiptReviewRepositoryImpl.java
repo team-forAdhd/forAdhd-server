@@ -3,6 +3,7 @@ package com.project.foradhd.domain.hospital.persistence.repository.impl;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalReceiptReviewDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.QHospitalReceiptReviewDto;
 import com.project.foradhd.domain.hospital.persistence.repository.custom.HospitalReceiptReviewRepositoryCustom;
+import com.project.foradhd.domain.hospital.persistence.repository.enums.HospitalReceiptReviewSortingOrder;
 import com.project.foradhd.global.paging.persistence.repository.support.QuerydslPagingSupportRepository;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -29,7 +30,8 @@ public class HospitalReceiptReviewRepositoryImpl implements HospitalReceiptRevie
 
     @Override
     public Page<HospitalReceiptReviewDto> findAll(String userId, String hospitalId, String doctorId, Pageable pageable) {
-        OrderSpecifier<?>[] orderSpecifiers = querydslPagingSupportRepository.getOrderSpecifiers(pageable.getSort());
+        OrderSpecifier<?>[] orderSpecifiers = querydslPagingSupportRepository.getOrderSpecifiers(pageable.getSort(),
+                HospitalReceiptReviewSortingOrder::valueOf);
         List<HospitalReceiptReviewDto> content = queryFactory
                 .select(new QHospitalReceiptReviewDto(
                         hospitalReceiptReview, userProfile,
