@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -42,7 +43,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("Invalid request content", e);
         List<ValidationErrorResponse> validationErrors = e.getAllErrors().stream()
                 .map(objectError -> {
@@ -56,7 +57,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    protected ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         log.error("Invalid request content", e);
 
         //Check if the exception is due to JSON parsing error
@@ -70,6 +71,12 @@ public class GlobalExceptionHandler {
             List<ValidationErrorResponse> validationErrors = List.of(new ValidationErrorResponse(fieldName, message));
             return ErrorResponse.toResponseEntity(ErrorCode.INVALID_REQUEST, validationErrors);
         }
+        return ErrorResponse.toResponseEntity(ErrorCode.INVALID_REQUEST);
+    }
+
+    @ExceptionHandler(ServletRequestBindingException.class)
+    public ResponseEntity<ErrorResponse> handleServletRequestBindingException(ServletRequestBindingException e) {
+        log.error("Invalid request", e);
         return ErrorResponse.toResponseEntity(ErrorCode.INVALID_REQUEST);
     }
 
