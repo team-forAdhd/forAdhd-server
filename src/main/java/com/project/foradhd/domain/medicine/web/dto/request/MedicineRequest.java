@@ -6,8 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class MedicineRequest {
-    private String name;
-    private String engName;
-    private String manufacturer;
-    private String images;
+    private String itemName;
+    private String entpName;
+    private String drugShape;
+    private String colorClass1;
+    private String chart;
+    private String imageUrl;
 }

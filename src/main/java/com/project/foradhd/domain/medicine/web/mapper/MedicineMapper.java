@@ -9,16 +9,11 @@ import com.project.foradhd.domain.medicine.web.dto.response.MedicineBookmarkResp
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineFilteringResponse;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface MedicineMapper {
-    MedicineMapper INSTANCE = Mappers.getMapper(MedicineMapper.class);
-    MedicineFilteringResponse toMedicineFilteringResponseDto(JsonNode jsonNode);
-
-    Medicine medicineRequestDtoToMedicine(MedicineRequest dto);
-    MedicineResponse medicineToMedicineResponseDto(Medicine medicine);
-
-    MedicineBookmark medicineBookmarkRequestDtoToMedicineBookmark(MedicineBookmarkRequest dto);
-    MedicineBookmarkResponse medicineBookmarkToMedicineBookmarkResponseDto(MedicineBookmark medicineBookmark);
+    Medicine medicineRequestToMedicine(MedicineRequest dto);
+    MedicineResponse medicineToMedicineResponse(Medicine medicine);
 }

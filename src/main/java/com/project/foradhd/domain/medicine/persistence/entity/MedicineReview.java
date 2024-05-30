@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "medicine_review")
@@ -37,7 +38,7 @@ public class MedicineReview extends BaseTimeEntity {
     private String content;
 
     @Column
-    private String images; // JSON 형식으로 이미지 URL들 저장
+    private String images;
 
     @Column(nullable = false)
     private float grade;

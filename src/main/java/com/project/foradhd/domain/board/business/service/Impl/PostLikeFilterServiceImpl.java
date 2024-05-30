@@ -6,7 +6,6 @@ import com.project.foradhd.domain.board.persistence.entity.PostLikeFilter;
 import com.project.foradhd.domain.board.persistence.repository.PostLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
 import com.project.foradhd.domain.user.business.service.UserService;
-import com.project.foradhd.global.exception.UserNotFoundException;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BoardNotFoundException;
 import lombok.RequiredArgsConstructor;

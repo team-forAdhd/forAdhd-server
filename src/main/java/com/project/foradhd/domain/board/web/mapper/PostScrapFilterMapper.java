@@ -16,12 +16,10 @@ public interface PostScrapFilterMapper {
 
     @Mapping(source = "user", target= "userId", qualifiedByName = "getUserId")
     @Mapping(source= "post", target = "postId", qualifiedByName = "getPostId")
-    @Mapping(source = "postScrapFilterId", target = "scrapId")
     PostScrapFilterDto toDto(PostScrapFilter postScrapFilter);
 
     @Mapping(source = "userId", target = "user", qualifiedByName = "userIdToUser")
     @Mapping(source = "postId", target = "post", qualifiedByName = "postIdToPost")
-    @Mapping(source = "scrapId", target = "postScrapFilterId")
     PostScrapFilter toEntity(PostScrapFilterDto dto);
 
     @Named("getUserId")

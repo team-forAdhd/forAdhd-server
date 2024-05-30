@@ -3,6 +3,7 @@ package com.project.foradhd.domain.medicine.web.controller;
 import com.project.foradhd.domain.medicine.business.service.MedicineBookmarkService;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineBookmark;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineBookmarkResponse;
+import com.project.foradhd.domain.medicine.web.dto.response.MedicineResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
 import com.project.foradhd.global.AuthUserId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
-@RequestMapping("/api/bookmarks")
+@RequestMapping("/api/v1/medicine/bookmarks")
 public class MedicineBookmarkController {
     @Autowired
     private MedicineBookmarkService bookmarkService;
@@ -32,9 +36,7 @@ public class MedicineBookmarkController {
         Sort.Direction direction = sort.equals("oldest") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(direction, "createdAt"));
 
-        Page<MedicineBookmark> bookmarks = (Page<MedicineBookmark>) bookmarkService.findBookmarksByUserId(userId, sortedPageable);
-        Page<MedicineBookmarkResponse> bookmarkDtos = bookmarks.map(bookmark -> medicineMapper.medicineBookmarkToMedicineBookmarkResponseDto(bookmark));
-
-        return ResponseEntity.ok(bookmarkDtos);
+        return null;
     }
+
 }

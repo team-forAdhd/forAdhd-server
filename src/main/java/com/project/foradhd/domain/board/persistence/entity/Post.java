@@ -1,10 +1,12 @@
 package com.project.foradhd.domain.board.persistence.entity;
 
+import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -17,27 +19,28 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "general_post")
+@Table(name = "post")
 public class Post extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id")
     private Long id;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long writerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
-    private Category category;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private CategoryName category;
+
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Comment> comments;
 
     private String writerName;
-
-    private String categoryName;
 
     private String title;
 
@@ -45,7 +48,9 @@ public class Post extends BaseTimeEntity {
 
     private boolean anonymous;
 
-    private String images;
+    @ElementCollection
+    @CollectionTable(name = "post_images", joinColumns = @JoinColumn(name = "post_id"))
+    private List<String> images;
 
     private long likeCount;
 

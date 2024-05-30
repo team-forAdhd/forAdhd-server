@@ -10,7 +10,7 @@ public class MedicineReviewResponse {
     private String userId;
     private Long medicineId;
     private String content;
-    private List<String> images;
+    private String images;
     private float grade;
     private int helpCount;
 }

@@ -1,11 +1,12 @@
 package com.project.foradhd.domain.board.web.controller;
 
 import com.project.foradhd.domain.board.persistence.entity.Comment;
-import com.project.foradhd.domain.board.persistence.enums.SortOption;
-import com.project.foradhd.domain.board.web.dto.CommentDto;
 import com.project.foradhd.domain.board.business.service.CommentService;
+import com.project.foradhd.domain.board.persistence.enums.SortOption;
+import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
+import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
 import com.project.foradhd.domain.board.web.mapper.CommentMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -13,27 +14,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/comment")
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/comments")
 public class CommentController {
 
     private final CommentService commentService;
     private final CommentMapper commentMapper;
 
-    @Autowired
-    public CommentController(CommentService commentService, CommentMapper commentMapper) {
-        this.commentService = commentService;
-        this.commentMapper = commentMapper;
-    }
-
     @GetMapping("/{commentId}")
-    public ResponseEntity<CommentDto> getComment(@PathVariable Long commentId) {
+    public ResponseEntity<CommentResponseDto> getComment(@PathVariable Long commentId) {
         Comment comment = commentService.getComment(commentId);
         return ResponseEntity.ok(commentMapper.toDto(comment));
     }
 
     @PostMapping
-    public ResponseEntity<CommentDto> createComment(@RequestBody CommentDto commentDto) {
-        Comment comment = commentMapper.toEntity(commentDto);
+    public ResponseEntity<CommentResponseDto> createComment(@RequestBody CreateCommentRequestDto createCommentRequest) {
+        Comment comment = commentMapper.toEntity(createCommentRequest);
         Comment createdComment = commentService.createComment(comment);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentMapper.toDto(createdComment));
     }
@@ -45,22 +41,31 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<CommentDto> updateComment(@PathVariable Long commentId, @RequestBody CommentDto commentDto) {
-        Comment comment = commentMapper.toEntity(commentDto);
+    public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long commentId, @RequestBody CreateCommentRequestDto createCommentRequest) {
+        Comment comment = commentMapper.toEntity(createCommentRequest);
         comment.setId(commentId);
         Comment updatedComment = commentService.updateComment(comment);
         return ResponseEntity.ok(commentMapper.toDto(updatedComment));
     }
 
-    @GetMapping("/{writerId}/my-comments")
-    public ResponseEntity<Page<CommentDto>> getMyComments(@PathVariable Long writerId, Pageable pageable) {
+    @GetMapping("/user/{writerId}")
+    public ResponseEntity<Page<CommentResponseDto>> getMyComments(@PathVariable Long writerId, Pageable pageable) {
         Page<Comment> comments = commentService.getMyComments(writerId, pageable);
         return ResponseEntity.ok(comments.map(commentMapper::toDto));
     }
 
-    @GetMapping("/{postId}/comments")
-    public ResponseEntity<Page<CommentDto>> getCommentsByPost(@PathVariable Long postId, Pageable pageable, SortOption sortOption) {
+    @GetMapping("/post/{postId}")
+    public ResponseEntity<Page<CommentResponseDto>> getCommentsByPost(
+            @PathVariable Long postId,
+            Pageable pageable,
+            @RequestParam(required = false) SortOption sortOption) {
+
+        if (sortOption == null) {
+            sortOption = SortOption.NEWEST_FIRST;
+        }
+
         Page<Comment> comments = commentService.getCommentsByPost(postId, pageable, sortOption);
         return ResponseEntity.ok(comments.map(commentMapper::toDto));
     }
+
 }

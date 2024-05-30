@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class PostScrapFilterDto {
-    private Long scrapId;
+    private Long id;
     private Long postId;
     private String userId;
 }

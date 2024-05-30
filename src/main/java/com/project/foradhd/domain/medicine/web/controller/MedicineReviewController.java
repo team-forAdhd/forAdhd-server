@@ -5,21 +5,17 @@ import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineReviewMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/medicine/reviews")
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/medicine/reviews")
 public class MedicineReviewController {
     private final MedicineReviewService reviewService;
     private final MedicineReviewMapper reviewMapper;
-
-    @Autowired
-    public MedicineReviewController(MedicineReviewService reviewService, MedicineReviewMapper reviewMapper) {
-        this.reviewService = reviewService;
-        this.reviewMapper = reviewMapper;
-    }
 
     @PostMapping
     public ResponseEntity<MedicineReviewResponse> createReview(@RequestBody MedicineReviewRequest request) {

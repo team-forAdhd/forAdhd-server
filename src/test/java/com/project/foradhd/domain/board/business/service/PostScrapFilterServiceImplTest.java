@@ -1,130 +1,77 @@
 package com.project.foradhd.domain.board.business.service;
 
+import static org.mockito.BDDMockito.*;
+
 import com.project.foradhd.domain.board.business.service.Impl.PostScrapFilterServiceImpl;
-import com.project.foradhd.domain.board.persistence.entity.GeneralPost;
+import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
-import com.project.foradhd.domain.board.persistence.enums.SortOption;
-import com.project.foradhd.domain.board.persistence.repository.GeneralPostRepository;
+import com.project.foradhd.domain.board.persistence.repository.PostRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostScrapFilterRepository;
+import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.board.web.dto.GeneralPostDto;
-import com.project.foradhd.domain.board.web.dto.PostScrapFilterDto;
-import com.project.foradhd.domain.board.web.mapper.PostMapper;
-import com.project.foradhd.domain.board.web.mapper.PostScrapFilterMapper;
-import com.project.foradhd.global.exception.ScrapNotFoundException;
-import org.springframework.data.domain.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("게시글 스크랩 서비스 테스트")
-class PostScrapFilterServiceImplTest {
+public class PostScrapFilterServiceImplTest {
 
     @Mock
     private PostScrapFilterRepository scrapFilterRepository;
+
     @Mock
-    private GeneralPostRepository generalPostRepository;
+    private PostRepository postRepository;
+
     @Mock
-    private PostScrapFilterMapper scrapFilterMapper;
-    @Mock
-    private PostMapper postMapper;
+    private UserService userService;
+
     @InjectMocks
-    private PostScrapFilterServiceImpl scrapFilterService;
+    private PostScrapFilterServiceImpl postScrapFilterService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @Test
+    public void shouldAddNewScrapWhenNoneExists() {
+        // Given
+        Long postId = 1L;
+        String userId = "user1";
+        Post post = mock(Post.class); // Post 객체를 mock 객체로 변경
+        User user = mock(User.class); // User 객체도 mock 객체로 변경, 필요에 따라
+
+        given(postRepository.findById(postId)).willReturn(Optional.of(post));
+        given(userService.getUser(userId)).willReturn(user);
+        given(scrapFilterRepository.findByPostIdAndUserId(postId, userId)).willReturn(Optional.empty());
+
+        // When
+        postScrapFilterService.toggleScrap(postId, userId);
+
+        // Then
+        then(scrapFilterRepository).should().save(any(PostScrapFilter.class));
+        then(post).should().incrementScrapCount(); // 이제 verify 사용 가능
     }
 
     @Test
-    @DisplayName("사용자별 스크랩 목록 조회")
-    void getScrapsByUser() {
-        String userId = "1";
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-        User user = User.builder().id(userId).build();
-        GeneralPost post = GeneralPost.builder().postId(1L).title("Example Post").build();
-        PostScrapFilter scrap = PostScrapFilter.builder()
-                .post(post)
-                .user(user)
-                .createdAt(LocalDateTime.now())
-                .build();
-        List<PostScrapFilter> scraps = List.of(scrap);
-        Page<PostScrapFilter> scrapPage = new PageImpl<>(scraps, pageable, scraps.size());
-        GeneralPostDto postDto = GeneralPostDto.builder()
-                .postId(1L)
-                .title("Example Post")
-                .build();
+    public void shouldRemoveScrapWhenExists() {
+        // Given
+        Long postId = 1L;
+        String userId = "user1";
+        Post post = mock(Post.class);
+        User user = mock(User.class);
+        PostScrapFilter existingScrap = new PostScrapFilter();
 
-        when(scrapFilterRepository.findByUserId(userId, pageable)).thenReturn(scrapPage);
-        when(postMapper.toDto(any(GeneralPost.class))).thenReturn(postDto);
+        given(postRepository.findById(postId)).willReturn(Optional.of(post));
+        given(userService.getUser(userId)).willReturn(user);
+        given(scrapFilterRepository.findByPostIdAndUserId(postId, userId)).willReturn(Optional.of(existingScrap));
 
-        Page<GeneralPostDto> result = scrapFilterService.getScrapsByUser(userId, pageable, SortOption.NEWEST_FIRST);
+        // When
+        postScrapFilterService.toggleScrap(postId, userId);
 
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        verify(scrapFilterRepository).findByUserId(userId, pageable);
-        verify(postMapper).toDto(any(GeneralPost.class));
+        // Then
+        then(scrapFilterRepository).should().delete(existingScrap);
+        then(post).should().decrementScrapCount(); // 이제 verify 사용 가능
     }
 
-    @Test
-    @DisplayName("스크랩 생성")
-    void createScrap() {
-        PostScrapFilterDto expectedDto = PostScrapFilterDto.builder()
-                .userId("1")
-                .postId(1L)
-                .build();
-        PostScrapFilter scrap = PostScrapFilter.builder()
-                .user(User.builder().id("1").build())
-                .post(GeneralPost.builder().postId(1L).build())
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        when(scrapFilterMapper.toEntity(any(PostScrapFilterDto.class))).thenReturn(scrap);
-        when(scrapFilterRepository.save(any(PostScrapFilter.class))).thenReturn(scrap);
-        when(scrapFilterMapper.toDto(any(PostScrapFilter.class))).thenReturn(expectedDto);
-
-        PostScrapFilterDto result = scrapFilterService.createScrap(expectedDto);
-        // result에 값이 매핑되지 않음.
-
-        assertNotNull(result, "Result should not be null");
-        assertEquals(expectedDto, result);
-        verify(scrapFilterRepository).save(scrap);
-        verify(scrapFilterMapper).toDto(scrap);
-    }
-
-
-
-    @Test
-    @DisplayName("스크랩 삭제 - 스크랩 존재")
-    void deleteScrap_Exists() {
-        Long scrapId = 1L;
-        when(scrapFilterRepository.existsById(scrapId)).thenReturn(true);
-
-        scrapFilterService.deleteScrap(scrapId);
-
-        verify(scrapFilterRepository).deleteById(scrapId);
-    }
-
-    @Test
-    @DisplayName("스크랩 삭제 - 스크랩 없음")
-    void deleteScrap_NotExists() {
-        Long scrapId = 1L;
-        when(scrapFilterRepository.existsById(scrapId)).thenReturn(false);
-
-        assertThrows(ScrapNotFoundException.class, () -> scrapFilterService.deleteScrap(scrapId));
-    }
 }

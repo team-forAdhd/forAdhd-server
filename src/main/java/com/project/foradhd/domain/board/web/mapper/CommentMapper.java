@@ -2,23 +2,29 @@ package com.project.foradhd.domain.board.web.mapper;
 
 import com.project.foradhd.domain.board.persistence.entity.Comment;
 import com.project.foradhd.domain.board.persistence.entity.Post;
-import com.project.foradhd.domain.user.persistence.repository.UserRepository;
+import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
+import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
+import com.project.foradhd.domain.user.business.service.UserService;
+import com.project.foradhd.domain.user.persistence.entity.User;
 import org.mapstruct.*;
-import com.project.foradhd.domain.board.web.dto.CommentDto;
 
-@Mapper(componentModel = "spring", uses = {UserRepository.class, Post.class})
+@Mapper(componentModel = "spring", uses = {UserService.class})
 public interface CommentMapper {
-    @Mapping(source = "postId", target = "postId", qualifiedByName = "getPostId")
-    CommentDto toDto(Comment entity);
 
-    @Mapping(source = "postId", target = "postId", qualifiedByName = "postIdToPost")
-    Comment toEntity(CommentDto dto);
+    @Mapping(source = "post", target = "postId")
+    @Mapping(source = "user", target = "userId")
+    CommentResponseDto toDto(Comment comment);
 
-    @Mapping(source = "postId", target = "postId", qualifiedByName = "postIdToPost")
-    void updateCommentFromDto(CommentDto dto, @MappingTarget Comment entity);
+    @Mapping(source = "postId", target = "post")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "likeCount", ignore = true)
+    @Mapping(target = "childComments", ignore = true)
+    Comment toEntity(CreateCommentRequestDto requestDto);
+    default Long map(Post post) {
+        return post == null ? null : post.getId();
+    }
 
-    @Named("postIdToPost")
-    default Post postIdToPost(Long postId) {
+    default Post map(Long postId) {
         if (postId == null) {
             return null;
         }
@@ -27,8 +33,7 @@ public interface CommentMapper {
         return post;
     }
 
-    @Named("getPostId")
-    default Long getPostId(Post post) {
-        return post != null ? post.getId() : null;
+    default String map(User user) {
+        return user != null ? user.getId() : null;
     }
 }

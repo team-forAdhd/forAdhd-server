@@ -6,7 +6,6 @@ import com.project.foradhd.domain.board.persistence.entity.CommentLikeFilter;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
-import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.CommentNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,12 +36,19 @@ public class CommentServiceImpl implements CommentService {
         return repository.save(comment);
     }
 
-    @Override
+    @Transactional
     public void deleteComment(Long commentId) {
-        if (!repository.existsById(commentId)) {
-            throw new CommentNotFoundException("Comment not found with ID: " + commentId);
+        Comment comment = repository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + commentId));
+
+        // 원 댓글에 연결된 대댓글의 부모 ID를 null로 설정
+        for (Comment childComment : comment.getChildComments()) {
+            childComment.setParentComment(null);
+            repository.save(childComment);
         }
-        repository.deleteById(commentId);
+
+        // 원 댓글 삭제
+        repository.delete(comment);
     }
 
     @Override

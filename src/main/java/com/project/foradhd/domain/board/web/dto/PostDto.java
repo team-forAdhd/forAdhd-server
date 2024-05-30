@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class PostDto {
     private String title;
     private String content;
     private boolean anonymous;
-    private String images;
+    private List<String> images;
     private long likeCount;
     private long commentCount;
     private long scrapCount;

@@ -49,9 +49,7 @@ public class PostScrapFilterServiceImpl implements PostScrapFilterService {
     }
 
     public Page<PostScrapFilter> getScrapsByUser(String userId, Pageable pageable, SortOption sortOption) {
-        // 정렬 옵션을 기반으로 Pageable 객체 생성
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), getSortByOption(sortOption));
-        // 사용자 ID와 정렬된 Pageable 객체를 사용하여 데이터 조회
         return scrapFilterRepository.findByUserId(userId, sortedPageable);
     }
 

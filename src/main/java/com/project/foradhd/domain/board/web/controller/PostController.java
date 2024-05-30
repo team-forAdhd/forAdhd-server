@@ -4,9 +4,12 @@ import com.project.foradhd.domain.board.business.service.PostScrapFilterService;
 import com.project.foradhd.domain.board.business.service.PostService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
+import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.web.dto.PostDto;
 import com.project.foradhd.domain.board.web.dto.PostScrapFilterDto;
+import com.project.foradhd.domain.board.web.dto.request.PostRequestDto;
+import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.mapper.PostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapFilterMapper;
 import com.project.foradhd.global.AuthUserId;
@@ -34,18 +37,18 @@ public class PostController {
     }
 
     @PostMapping()
-    public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
-        Post post = postMapper.toEntity(postDto);
+    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto postRequestDto) {
+        Post post = postMapper.toEntity(postRequestDto);
         Post createdPost = postService.createPost(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(postMapper.toDto(createdPost));
+        return ResponseEntity.status(HttpStatus.CREATED).body(postMapper.responsetoDto(createdPost));
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<PostDto> updatePost(@PathVariable Long postId, @RequestBody PostDto postDto) {
-        Post post = postMapper.toEntity(postDto);
+    public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto postRequestDto) {
+        Post post = postMapper.toEntity(postRequestDto);
         post.setId(postId);
         Post updatedPost = postService.updatePost(post);
-        return ResponseEntity.ok(postMapper.toDto(updatedPost));
+        return ResponseEntity.ok(postMapper.responsetoDto(updatedPost));
     }
 
     @DeleteMapping("/{postId}")
@@ -61,11 +64,14 @@ public class PostController {
     }
 
     // 메인 홈 - 카테고리 별 글 조회
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<Page<PostDto>> listPostsByCategory(@PathVariable Long categoryId, Pageable pageable) {
-        Page<Post> posts = postService.listPosts(categoryId, pageable);
-        Page<PostDto> postsDto = posts.map(postMapper::toDto);
-        return ResponseEntity.ok(postsDto);
+    @GetMapping("/category")
+    public ResponseEntity<Page<PostResponseDto>> getPostsByCategory(
+            @RequestParam("category") CategoryName category,
+            Pageable pageable) {
+
+        Page<Post> posts = postService.listByCategory(category, pageable);
+        Page<PostResponseDto> response = posts.map(postMapper::responsetoDto);  // Post to PostResponse 변환
+        return ResponseEntity.ok(response);
     }
 
     // 마이페이지 - 나의 글
@@ -76,14 +82,14 @@ public class PostController {
         return ResponseEntity.ok(userPostsDto);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/scrap/{userId}")
     public ResponseEntity<Page<PostScrapFilterDto>> getScrapsByUser(@AuthUserId String userId, Pageable pageable, @RequestParam SortOption sortOption) {
         Page<PostScrapFilter> scraps = postScrapFilterService.getScrapsByUser(userId, pageable, sortOption);
         Page<PostScrapFilterDto> dtoPage = scraps.map(postScrapFilterMapper::toDto);
         return ResponseEntity.ok(dtoPage);
     }
 
-    @PutMapping("/{postId}/scrap")
+    @PutMapping("/scrap/{postId}/")
     public ResponseEntity<Void> toggleScrap(@PathVariable Long postId, @AuthUserId String userId) {
         postScrapFilterService.toggleScrap(postId, userId);
         return ResponseEntity.ok().build();
