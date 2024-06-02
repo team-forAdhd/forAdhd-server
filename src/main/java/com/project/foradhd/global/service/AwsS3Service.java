@@ -31,12 +31,21 @@ public class AwsS3Service {
                 .toList();
     }
 
+    public void deleteImages(List<String> imagePaths) {
+        imagePaths.forEach(this::deleteImage);
+    }
+
     private String uploadImage(ImagePathPrefix imagePathPrefix, MultipartFile image) {
         if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
             throw new RuntimeException();
         }
         validateImageFileExtension(image.getOriginalFilename());
         return uploadImageToS3(imagePathPrefix, image);
+    }
+
+    private void deleteImage(String imagePath) {
+        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, imagePath);
+        amazonS3.deleteObject(deleteObjectRequest);
     }
 
     private void validateImageFileExtension(String imageFilename) {
