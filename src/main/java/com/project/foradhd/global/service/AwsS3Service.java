@@ -70,7 +70,7 @@ public class AwsS3Service {
 
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, imagePath, inputStream, metadata);
             amazonS3.putObject(putObjectRequest);
-            return amazonS3.getUrl(bucket, imagePath).toString();
+            return imagePath;
         } catch (IOException e) {
             throw new BusinessException(ErrorCode.FILE_UPLOAD_ERROR);
         }
