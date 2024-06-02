@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.exception.ErrorCode;
 import com.project.foradhd.global.image.web.enums.ImagePathPrefix;
 import com.project.foradhd.global.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +40,7 @@ public class AwsS3Service {
 
     private String uploadImage(ImagePathPrefix imagePathPrefix, MultipartFile image) {
         if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
-            throw new RuntimeException();
+            throw new BusinessException(ErrorCode.EMPTY_FILE);
         }
         validateImageFileExtension(image.getOriginalFilename());
         return uploadImageToS3(imagePathPrefix, image);
@@ -54,7 +56,7 @@ public class AwsS3Service {
         boolean isAllowedExtension = ALLOWED_IMAGE_FILE_EXTENSION_LIST.stream()
                 .anyMatch(allowedImageFileExtension -> allowedImageFileExtension.equalsIgnoreCase(fileExtension));
         if (!isAllowedExtension) {
-            throw new RuntimeException();
+            throw new BusinessException(ErrorCode.INVALID_FILE_EXTENSION);
         }
     }
 
@@ -70,14 +72,14 @@ public class AwsS3Service {
             amazonS3.putObject(putObjectRequest);
             return amazonS3.getUrl(bucket, imagePath).toString();
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new BusinessException(ErrorCode.FILE_UPLOAD_ERROR);
         }
     }
 
     private String getFileExtension(String filename) {
         int fileExtensionIndex = filename.lastIndexOf(FILE_EXTENSION_SEPARATOR);
         if (fileExtensionIndex == -1) {
-            throw new RuntimeException();
+            throw new BusinessException(ErrorCode.NOT_FOUND_FILE_EXTENSION);
         }
         return filename.substring(fileExtensionIndex + 1);
     }
