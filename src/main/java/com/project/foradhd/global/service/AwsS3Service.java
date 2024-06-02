@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.project.foradhd.global.image.web.enums.ImagePathPrefix;
+import com.project.foradhd.global.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -58,14 +59,14 @@ public class AwsS3Service {
     }
 
     private String uploadImageToS3(ImagePathPrefix imagePathPrefix, MultipartFile image) {
-        String randomImageFilename = generateRandomImageFilename(image.getOriginalFilename());
+        String randomImageFilename = generateRandomImageFilename(image);
         String imagePath = imagePathPrefix.getPath() + randomImageFilename;
-        try (InputStream is = image.getInputStream()) {
+        try (InputStream inputStream = image.getInputStream()) {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(image.getContentType());
             metadata.setContentLength(image.getSize());
 
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, imagePath, is, metadata);
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, imagePath, inputStream, metadata);
             amazonS3.putObject(putObjectRequest);
             return amazonS3.getUrl(bucket, imagePath).toString();
         } catch (IOException e) {
@@ -81,9 +82,12 @@ public class AwsS3Service {
         return filename.substring(fileExtensionIndex + 1);
     }
 
-    private String generateRandomImageFilename(String originalImageFilename) {
+    private String generateRandomImageFilename(MultipartFile image) {
+        String originalImageFilename = image.getOriginalFilename();
         String fileExtension = getFileExtension(originalImageFilename);
+        int[] imageDimensions = ImageUtil.getImageDimensions(image);
         return UUID.randomUUID().toString().replace("-", "")
+                + "_" + imageDimensions[0] + "x" + imageDimensions[1]
                 + FILE_EXTENSION_SEPARATOR + fileExtension;
     }
 }
