@@ -34,6 +34,15 @@ aws:
   ses:
     from: ${AWS_SES_FROM}
 
+cloud:
+  aws:
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false #CloudFormation 스택 수동 관리 설정
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+
 ---
 spring:
   config:
