@@ -13,6 +13,11 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
+  servlet:
+    multipart:
+      max-file-size: 5MB #하나의 파일 용량 제한
+      max-request-size: 10MB #하나의 요청 내 전체 파일 용량 제한
+      resolve-lazily: true #실제 파일에 접근하는 시점에 파일 용량 체크 (스프링 MVC에서 예외 throw)
 
 jwt:
   expiry:
