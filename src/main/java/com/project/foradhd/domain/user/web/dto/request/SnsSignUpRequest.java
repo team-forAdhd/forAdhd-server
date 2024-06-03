@@ -2,6 +2,7 @@ package com.project.foradhd.domain.user.web.dto.request;
 
 import java.util.List;
 
+import com.project.foradhd.domain.user.persistence.enums.ForAdhdType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -16,8 +17,8 @@ public class SnsSignUpRequest {
 
     private String profileImage;
 
-    @NotNull(message = "{isAdhd.notNull}")
-    private Boolean isAdhd;
+    @NotNull(message = "{forAdhdType.notNull}")
+    private ForAdhdType forAdhdType;
 
     @NotEmpty(message = "{termsApprovals.notEmpty}")
     private List<@Valid TermsApprovalRequest> termsApprovals;

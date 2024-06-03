@@ -1,19 +1,13 @@
 package com.project.foradhd.domain.user.persistence.entity;
 
+import com.project.foradhd.domain.user.persistence.enums.ForAdhdType;
 import com.project.foradhd.global.audit.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
 @Getter
@@ -38,14 +32,13 @@ public class UserProfile extends BaseTimeEntity {
 
     private String profileImage;
 
-    @Builder.Default
-    @ColumnDefault(value = "0")
+    @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    private Boolean isAdhd = Boolean.FALSE;
+    private ForAdhdType forAdhdType;
 
     public void updateProfile(UserProfile newUserProfile) {
         this.nickname = newUserProfile.getNickname();
         this.profileImage = newUserProfile.getProfileImage();
-        this.isAdhd = newUserProfile.getIsAdhd();
+        this.forAdhdType = newUserProfile.getForAdhdType();
     }
 }
