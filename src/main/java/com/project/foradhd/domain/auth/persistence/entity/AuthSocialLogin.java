@@ -29,7 +29,7 @@ public class AuthSocialLogin extends BaseTimeEntity {
     @Id
     @GenericGenerator(name = "uuid-generator", type = com.project.foradhd.global.util.UUIDGenerator.class)
     @GeneratedValue(generator = "uuid-generator")
-    @Column(name = "auth_social_login_id")
+    @Column(name = "auth_social_login_id", columnDefinition = "varchar(32)")
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)

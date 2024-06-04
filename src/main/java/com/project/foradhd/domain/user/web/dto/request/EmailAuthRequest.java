@@ -4,7 +4,7 @@ import com.project.foradhd.global.validation.annotation.ValidEmail;
 import lombok.Getter;
 
 @Getter
-public class EmailUpdateRequest {
+public class EmailAuthRequest {
 
     @ValidEmail
     private String email;

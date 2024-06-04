@@ -1,5 +1,6 @@
 package com.project.foradhd.global.service;
 
+import com.project.foradhd.global.enums.RedisKeyType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -25,10 +26,19 @@ public class RedisService {
         return Optional.of(operations.get(key));
     }
 
+    public Optional<Object> getValue(RedisKeyType redisKeyType, String id) {
+        return getValue(redisKeyType.getKey(id));
+    }
+
     @Transactional
     public void setValue(String key, String value, long timeout, TimeUnit unit) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         operations.set(key, value, timeout, unit);
+    }
+
+    @Transactional
+    public void setValue(RedisKeyType redisKeyType, String id, String value, long timeout, TimeUnit unit) {
+        setValue(redisKeyType.getKey(id), value, timeout, unit);
     }
 
     @Transactional
@@ -38,8 +48,18 @@ public class RedisService {
     }
 
     @Transactional
+    public void setValue(RedisKeyType redisKeyType, String id, String value, Duration timeout) {
+        setValue(redisKeyType.getKey(id), value, timeout);
+    }
+
+    @Transactional
     public void deleteValue(String key) {
         redisTemplate.delete(key);
+    }
+
+    @Transactional
+    public void deleteValue(RedisKeyType redisKeyType, String id) {
+        deleteValue(redisKeyType.getKey(id));
     }
 
     @Transactional
@@ -48,7 +68,17 @@ public class RedisService {
     }
 
     @Transactional
+    public void expireValue(RedisKeyType redisKeyType, String id, long timeout, TimeUnit unit) {
+        expireValue(redisKeyType.getKey(id), timeout, unit);
+    }
+
+    @Transactional
     public void expireValue(String key, Duration timeout) {
         redisTemplate.expire(key, timeout);
+    }
+
+    @Transactional
+    public void expireValue(RedisKeyType redisKeyType, String id, Duration timeout) {
+        expireValue(redisKeyType.getKey(id), timeout);
     }
 }

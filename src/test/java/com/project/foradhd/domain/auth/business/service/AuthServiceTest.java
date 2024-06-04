@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.auth.business.service;
 
 import static com.project.foradhd.domain.user.fixtures.UserFixtures.toUser;
+import static com.project.foradhd.global.enums.RedisKeyType.USER_REFRESH_TOKEN;
 import static com.project.foradhd.global.exception.ErrorCode.INVALID_AUTH_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -70,7 +71,7 @@ class AuthServiceTest {
         String accessToken = jwtService.generateAccessToken(userId, email, createAuthorityList("ROLE_USER"));
         String refreshToken = jwtService.generateRefreshToken(userId);
         User user = toUser().build();
-        given(redisService.getValue(userId)).willReturn(Optional.of(refreshToken));
+        given(redisService.getValue(USER_REFRESH_TOKEN, userId)).willReturn(Optional.of(refreshToken));
         given(userService.getUser(userId)).willReturn(user);
 
         //when
@@ -80,7 +81,7 @@ class AuthServiceTest {
         //then
         assertThat(authTokenData.getAccessToken()).isNotEqualTo(accessToken);
         assertThat(authTokenData.getRefreshToken()).isNotEqualTo(refreshToken);
-        then(redisService).should(times(1)).getValue(userId);
+        then(redisService).should(times(1)).getValue(USER_REFRESH_TOKEN, userId);
         then(userService).should(times(1)).getUser(userId);
     }
 
@@ -127,14 +128,14 @@ class AuthServiceTest {
         String accessToken = jwtService.generateAccessToken(userId, email, createAuthorityList("ROLE_USER"));
         String refreshToken = jwtService.generateRefreshToken(userId);
         String savedRefreshToken = "savedRefreshToken";
-        given(redisService.getValue(userId)).willReturn(Optional.of(savedRefreshToken));
+        given(redisService.getValue(USER_REFRESH_TOKEN, userId)).willReturn(Optional.of(savedRefreshToken));
 
         //when, then
         assertThatThrownBy(() -> authService.reissue(accessToken, refreshToken))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(INVALID_AUTH_TOKEN);
-        then(redisService).should(times(1)).getValue(userId);
+        then(redisService).should(times(1)).getValue(USER_REFRESH_TOKEN, userId);
         then(userService).should(never()).getUser(userId);
     }
 }

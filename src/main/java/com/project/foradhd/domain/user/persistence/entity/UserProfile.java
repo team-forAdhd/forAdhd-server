@@ -26,7 +26,7 @@ public class UserProfile extends BaseTimeEntity {
     @Id
     @GenericGenerator(name = "uuid-generator", type = com.project.foradhd.global.util.UUIDGenerator.class)
     @GeneratedValue(generator = "uuid-generator")
-    @Column(name = "user_profile_id")
+    @Column(name = "user_profile_id", columnDefinition = "varchar(32)")
     private String id;
 
     @OneToOne(fetch = FetchType.LAZY)

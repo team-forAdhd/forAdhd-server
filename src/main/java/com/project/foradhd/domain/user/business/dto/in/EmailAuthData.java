@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class EmailUpdateData {
+public class EmailAuthData {
 
     private String email;
 }
