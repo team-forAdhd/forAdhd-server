@@ -7,10 +7,12 @@ import com.project.foradhd.domain.board.persistence.repository.PostLikeFilterRep
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.global.exception.BoardNotFoundException;
+import com.project.foradhd.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 
 
 @Service
@@ -25,7 +27,7 @@ public class PostLikeFilterServiceImpl implements PostLikeFilterService {
     @Override
     public void toggleLike(String userId, Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BoardNotFoundException("Post with ID " + postId + " not found"));
+                .orElseThrow(() -> new BusinessException(BOARD_NOT_FOUND));
 
         User user = userService.getUser(userId);
 

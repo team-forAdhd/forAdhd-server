@@ -6,7 +6,7 @@ import com.project.foradhd.domain.board.persistence.entity.CommentLikeFilter;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
-import com.project.foradhd.global.exception.CommentNotFoundException;
+import com.project.foradhd.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
+
+import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
 
 @Service
 @Transactional
@@ -27,7 +29,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Comment getComment(Long commentId) {
         return repository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException("Comment with ID " + commentId + " not found"));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
     }
 
     @Override
@@ -39,14 +41,13 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = repository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + commentId));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
 
         // 원 댓글에 연결된 대댓글의 부모 ID를 null로 설정
         for (Comment childComment : comment.getChildComments()) {
             childComment.setParentComment(null);
             repository.save(childComment);
         }
-
         // 원 댓글 삭제
         repository.delete(comment);
     }
@@ -55,7 +56,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public Comment updateComment(Comment comment) {
         Comment existingComment = repository.findById(comment.getId())
-                .orElseThrow(() -> new CommentNotFoundException("Comment not found with ID: " + comment.getId()));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
         existingComment.setContent(comment.getContent());
         return repository.save(existingComment);
     }

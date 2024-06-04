@@ -70,7 +70,7 @@ public class PostController {
             Pageable pageable) {
 
         Page<Post> posts = postService.listByCategory(category, pageable);
-        Page<PostResponseDto> response = posts.map(postMapper::responsetoDto);  // Post to PostResponse 변환
+        Page<PostResponseDto> response = posts.map(postMapper::responsetoDto);
         return ResponseEntity.ok(response);
     }
 

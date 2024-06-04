@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
+import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="medicine_details")
-public class MedicineDetails extends BaseEntity {
+public class MedicineDetails extends BaseTimeEntity {
 
     @jakarta.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
