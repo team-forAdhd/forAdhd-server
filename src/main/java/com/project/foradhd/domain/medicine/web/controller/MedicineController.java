@@ -2,6 +2,7 @@ package com.project.foradhd.domain.medicine.web.controller;
 
 import com.project.foradhd.domain.medicine.business.service.MedicineService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
+import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,25 +23,15 @@ public class MedicineController {
     private final MedicineService medicineService;
     private final MedicineMapper medicineMapper;
 
-    @GetMapping
-    public ResponseEntity<List<MedicineResponse>> getAllMedicines() {
-        List<Medicine> medicines = medicineService.findAllMedicines();
-        List<MedicineResponse> responseDTOs = medicines.stream()
-                .map(medicineMapper::medicineToMedicineResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(responseDTOs);
-    }
-
-    @PostMapping("/fetch")
-    public ResponseEntity<Void> fetchAndSaveMedicines() {
+    // 의약품 정보 조회 API
+    @GetMapping("/fetch")
+    public ResponseEntity<String> getMedicines(@RequestParam String itemName) {
         try {
-            List<Medicine> medicines = medicineService.fetchAndSaveMedicines();
-            if (medicines.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            String result = medicineService.fetchMedicineInfo(itemName);
+            return ResponseEntity.ok(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while fetching medicine information");
         }
     }
 }

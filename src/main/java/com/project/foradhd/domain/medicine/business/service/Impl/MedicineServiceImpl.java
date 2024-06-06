@@ -1,18 +1,21 @@
 package com.project.foradhd.domain.medicine.business.service.Impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.shaded.gson.*;
 import com.project.foradhd.domain.medicine.business.service.MedicineService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
-import com.project.foradhd.domain.medicine.persistence.enums.MedicineIngredient;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
+import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
+import com.project.foradhd.domain.medicine.web.dto.response.MedicineResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,39 +23,53 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MedicineServiceImpl implements MedicineService {
 
-    private final MedicineRepository medicineRepository;
-    private final RestTemplate restTemplate;
-    private final String API_URL = "http://apis.data.go.kr/1471000/MdcinGrnIdntfcInfoService01/getMdcinGrnIdntfcInfoList01";
-    private final String SERVICE_KEY = "rzJVpYr3DAwYcKr+SyRZ5K0lIxsMeO5OdiaJrlGZ2O8C+B7oqEGRd96NskmVrzYItbIwhSD/Z2Y+ifVDTPlFkQ==";
+    private static final String SERVICE_URL = "http://apis.data.go.kr/1471000/MdcinGrnIdntfcInfoService01/getMdcinGrnIdntfcInfoList01";
+    private static final String SERVICE_KEY = "rzJVpYr3DAwYcKr+SyRZ5K0lIxsMeO5OdiaJrlGZ2O8C+B7oqEGRd96NskmVrzYItbIwhSD/Z2Y+ifVDTPlFkQ==";
+
+    @Autowired
+    private MedicineRepository medicineRepository;
 
     @Override
-    public List<Medicine> fetchAndSaveMedicines() {
-        String urlWithParameters = API_URL + "?serviceKey=" + SERVICE_KEY + "&numOfRows=100";
-        ResponseEntity<String> response = restTemplate.getForEntity(urlWithParameters, String.class);
+    public String fetchMedicineInfo(String itemName) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder(SERVICE_URL);
+        urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + URLEncoder.encode(SERVICE_KEY, "UTF-8"));
+        urlBuilder.append("&" + URLEncoder.encode("item_name", "UTF-8") + "=" + URLEncoder.encode(itemName, "UTF-8")); // 품목명 지정
+        urlBuilder.append("&" + URLEncoder.encode("entp_name", "UTF-8") + "=" + URLEncoder.encode("", "UTF-8")); // 업체명
+        urlBuilder.append("&" + URLEncoder.encode("item_seq", "UTF-8") + "=" + URLEncoder.encode("", "UTF-8")); // 품목일련번호
+        urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=" + URLEncoder.encode("1", "UTF-8"));
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=" + URLEncoder.encode("10", "UTF-8"));
+        urlBuilder.append("&" + URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode("json", "UTF-8"));
 
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(response.getBody());
-            JsonNode items = root.path("items").path("item");
+        URL url = new URL(urlBuilder.toString());
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Content-type", "application/json");
 
-            List<Medicine> filteredMedicines = new ArrayList<>();
-
-            if (items.isArray()) {
-                for (JsonNode item : items) {
-                    String ingredient = item.path("ingredient").asText();
-                    if (MedicineIngredient.isRecognizedIngredient(ingredient)) {
-                        Medicine medicine = Medicine.builder()
-                                .itemName(item.path("itemName").asText())
-                                .build();
-                        medicineRepository.save(medicine);
-                        filteredMedicines.add(medicine);
-                    }
-                }
-            }
-            return filteredMedicines;
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error processing JSON data", e);
+        BufferedReader rd;
+        if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
+            rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        } else {
+            rd = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
         }
+
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = rd.readLine()) != null) {
+            sb.append(line);
+        }
+        rd.close();
+        conn.disconnect();
+
+        return sb.toString();
+    }
+
+    private List<MedicineDto> parseMedicines(String json) {
+        Gson gson = new Gson();
+        MedicineResponse response = gson.fromJson(json, MedicineResponse.class);
+        if (response != null && response.getBody() != null && response.getBody().getItems() != null) {
+            return response.getBody().getItems();
+        }
+        return new ArrayList<>();
     }
 
     @Override
