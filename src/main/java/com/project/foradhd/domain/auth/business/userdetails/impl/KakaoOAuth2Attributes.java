@@ -57,7 +57,7 @@ public class KakaoOAuth2Attributes extends OAuth2Attributes {
 
     private static String parseEmail(Map<String, Object> userInfo) {
         boolean hasEmail = (boolean) userInfo.get(HAS_EMAIL_KEY);
-        if (!hasEmail)return "";
+        if (!hasEmail) return "";
         return (String) userInfo.get(EMAIL_KEY);
     }
 
