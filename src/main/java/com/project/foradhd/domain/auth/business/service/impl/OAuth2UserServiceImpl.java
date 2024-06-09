@@ -31,11 +31,12 @@ public class OAuth2UserServiceImpl extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
+        String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();
         String nameAttributeKey = oAuth2UserRequest.getClientRegistration().getProviderDetails()
             .getUserInfoEndpoint().getUserNameAttributeName();
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        OAuth2Attributes oAuth2Attributes = OAuth2AttributesFactory.valueOf(oAuth2UserRequest, nameAttributeKey, attributes);
+        OAuth2Attributes oAuth2Attributes = OAuth2AttributesFactory.valueOf(registrationId, nameAttributeKey, attributes);
         User user = getSocialLoginedUser(oAuth2Attributes);
         return new OAuth2UserImpl(attributes, nameAttributeKey, user);
     }
