@@ -4,20 +4,19 @@ spring:
       client:
         registration:
           kakao:
-            client-id: ENC(yPa6ipA0+nlvFpE72iedbvxW8NvynFE/bEfbJFLTMZWxrhsBwQhwH0WDLDFPpzy2)
-            client-secret: ENC(HSBO2/bj2ClUaqv/HXwlmA2lnw9+9+Ju3CezbH5Hq4HGnsKXZa+K5o3THKxjTemX)
+            client-id: ENC(9Z6DKoVAi506YeSk/5sn+HjZ4zTtvbSciOFtWlKXSk1mmkvRZolPniTRNbGgDLz9)
+            client-secret: ENC(BBNo5ldktHfZhnmLejtKHCGjGWLHFu9iD7doNKrWz/2MNYjuNxFQe+9AB+FqA2XL)
             client-authentication-method: client_secret_post
             redirect-uri: http://localhost:8080/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             client-name: Kakao
             scope:
               - account_email
-            #비즈앱 등록 후 접근 가능
-#              - name
-#              - birthday
-#              - birthyear
-#              - age_range
-#              - gender
+              - name
+              - birthday
+              - birthyear
+              - age_range
+              - gender
           naver:
             client-id: ENC(FGYIfJlxdtT4NyOxnV80uuttXOM8NI1FUcsBqSyUmtk=)
             client-secret: ENC(9y68M+H96/5a0h6oX1zgAKCC27yBO5ll)
@@ -32,15 +31,15 @@ spring:
               - birthyear
               - age
               - gender
-          facebook:
-            client-id: ENC(N+8OKapW80anlr3JUxC5Hnsj79AsiOYJXU1LKYWHOkc=)
-            client-secret: ENC(ICCDO1J0O8sx31C2YYmuXzfV5Zhw2M+GVwjVNI9YGKi/mcu3AbHLdwN0ORrXoigN)
+          google:
+            client-id: ENC(xFTwpvTGxef+wwSfLB8qByEeI2TYMcU3iL29iKCBWBOB8f4ZIx8+c52XhlOeykD0d9MxI3ImOu5Rm39LUEORl/7eMfO6W/xXxuhHKwl2eJjQlUmcy0LNSg==)
+            client-secret: ENC(FsYy9X+Zw3EEL69+6b2q1tm+DBsZA2fbKWh2MCKM8PWPqD7Ri1rC7hyxGeZCuH+D)
             scope:
               - email
-              - public_profile
-              - user_birthday
-              - user_age_range
-              - user_gender
+              - profile
+              - https://www.googleapis.com/auth/user.birthday.read
+              - https://www.googleapis.com/auth/profile.agerange.read
+              - https://www.googleapis.com/auth/user.gender.read
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize

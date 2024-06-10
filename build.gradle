@@ -76,6 +76,9 @@ dependencies {
 	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 
+	//Feign Client
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'
+
 	//S3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }

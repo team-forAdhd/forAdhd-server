@@ -9,6 +9,7 @@ import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
+import com.project.foradhd.domain.user.persistence.enums.ForAdhdType;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.domain.user.web.dto.request.PasswordRequest;
 import com.project.foradhd.domain.user.web.dto.request.SignUpRequest;
@@ -57,7 +58,7 @@ class UserMapperTest {
             .password(new PasswordRequest("abc123!", "abc123!"))
             .nickname("단이")
             .profileImage("http://")
-            .isAdhd(false)
+            .forAdhdType(ForAdhdType.FOR_MY_ADHD)
             .termsApprovals(List.of(termsApprovalRequest1, termsApprovalRequest2, termsApprovalRequest3))
             .pushNotificationApprovals(List.of(pushNotificationApprovalRequest1, pushNotificationApprovalRequest2))
             .build();
@@ -79,7 +80,7 @@ class UserMapperTest {
         assertThat(password).isEqualTo(signUpRequest.getPassword().getPassword());
         assertThat(userProfile.getNickname()).isEqualTo(signUpRequest.getNickname());
         assertThat(userProfile.getProfileImage()).isEqualTo(signUpRequest.getProfileImage());
-        assertThat(userProfile.getIsAdhd()).isEqualTo(signUpRequest.getIsAdhd());
+        assertThat(userProfile.getForAdhdType()).isEqualTo(signUpRequest.getForAdhdType());
         assertThat(userTermsApprovals).extracting("id.user", "id.terms.id", "approved")
             .containsExactlyInAnyOrder(
                 tuple(user, termsApprovalRequest1.getTermsId(), termsApprovalRequest1.getApproved()),

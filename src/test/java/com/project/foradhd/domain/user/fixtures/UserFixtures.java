@@ -10,6 +10,7 @@ import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
 import com.project.foradhd.domain.user.persistence.entity.UserPrivacy.UserPrivacyBuilder;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile.UserProfileBuilder;
+import com.project.foradhd.domain.user.persistence.enums.ForAdhdType;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.domain.user.persistence.enums.PushNotificationType;
 import com.project.foradhd.domain.user.persistence.enums.Role;
@@ -41,7 +42,7 @@ public class UserFixtures {
             .user(toUser().build())
             .nickname("단이")
             .profileImage("https://image.png")
-            .isAdhd(false);
+            .forAdhdType(ForAdhdType.FOR_MY_ADHD);
     }
 
     public static TermsBuilder toPrivacyTerms() {
