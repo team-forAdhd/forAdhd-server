@@ -1,19 +1,22 @@
 package com.project.foradhd.domain.medicine.web.mapper;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
-import com.project.foradhd.domain.medicine.persistence.entity.MedicineBookmark;
-import com.project.foradhd.domain.medicine.web.dto.request.MedicineBookmarkRequest;
-import com.project.foradhd.domain.medicine.web.dto.request.MedicineRequest;
-import com.project.foradhd.domain.medicine.web.dto.response.MedicineBookmarkResponse;
-import com.project.foradhd.domain.medicine.web.dto.response.MedicineFilteringResponse;
+import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineResponse;
+import com.project.foradhd.domain.medicine.web.dto.response.MedicineSearchResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface MedicineMapper {
-    Medicine medicineRequestToMedicine(MedicineRequest dto);
-    MedicineResponse medicineToMedicineResponse(Medicine medicine);
+    Medicine toEntity(MedicineDto dto);
+
+    MedicineDto toDto(Medicine entity);
+
+    List<Medicine> toEntityList(List<MedicineDto> dtoList);
+
+    List<MedicineResponse> toDtoList(List<Medicine> entityList);
+    MedicineSearchResponse toResponseDto(Medicine entity);
+    List<MedicineSearchResponse> toResponseDtoList(List<Medicine> entityList);
 }

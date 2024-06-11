@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.util.List;
 
 public interface MedicineService {
-    List<Medicine> findAllMedicines();
-
-    String fetchMedicineInfo(String itemName) throws IOException;
+    void saveMedicine(String itemname) throws IOException;
+    String fetchMedicineInfo(String itemname) throws IOException;
+    MedicineDto parseMedicine(String json);
+    List<MedicineDto> getSortedMedicines(String sortOption);
+    List<Medicine> searchByFormCodeNameAndShapeAndColor(String formCodeName, String shape, String color1);
+    List<Medicine> searchByItemName(String itemName);
 }

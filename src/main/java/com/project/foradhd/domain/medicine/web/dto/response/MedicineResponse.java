@@ -2,62 +2,45 @@ package com.project.foradhd.domain.medicine.web.dto.response;
 
 import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
+@Getter
 public class MedicineResponse {
-    private ResponseHeader header;
-    private ResponseBody body;
+    private Header header;
+    private Body body;
 
-    public ResponseHeader getHeader() {
-        return header;
-    }
-
-    public void setHeader(ResponseHeader header) {
-        this.header = header;
-    }
-
-    public ResponseBody getBody() {
-        return body;
-    }
-
-    public void setBody(ResponseBody body) {
-        this.body = body;
-    }
-
-    // 내부 클래스로 ResponseHeader 정의
-    public static class ResponseHeader {
+    public static class Header {
         private String resultCode;
         private String resultMsg;
 
-        public String getResultCode() {
-            return resultCode;
-        }
-
-        public void setResultCode(String resultCode) {
-            this.resultCode = resultCode;
-        }
-
-        public String getResultMsg() {
-            return resultMsg;
-        }
-
-        public void setResultMsg(String resultMsg) {
-            this.resultMsg = resultMsg;
-        }
+        // Getters and setters
+        public String getResultCode() { return resultCode; }
+        public void setResultCode(String resultCode) { this.resultCode = resultCode; }
+        public String getResultMsg() { return resultMsg; }
+        public void setResultMsg(String resultMsg) { this.resultMsg = resultMsg; }
     }
 
-    // 내부 클래스로 ResponseBody 정의
-    public static class ResponseBody {
+    public static class Body {
+        private int pageNo;
+        private int totalCount;
+        private int numOfRows;
         private List<MedicineDto> items;
 
-        public List<MedicineDto> getItems() {
-            return items;
-        }
-
-        public void setItems(List<MedicineDto> items) {
-            this.items = items;
-        }
+        // Getters and setters
+        public int getPageNo() { return pageNo; }
+        public void setPageNo(int pageNo) { this.pageNo = pageNo; }
+        public int getTotalCount() { return totalCount; }
+        public void setTotalCount(int totalCount) { this.totalCount = totalCount; }
+        public int getNumOfRows() { return numOfRows; }
+        public void setNumOfRows(int numOfRows) { this.numOfRows = numOfRows; }
+        public List<MedicineDto> getItems() { return items; }
+        public void setItems(List<MedicineDto> items) { this.items = items; }
     }
+
+    // Getters and setters for header and body
+    public Header getHeader() { return header; }
+    public void setHeader(Header header) { this.header = header; }
+    public Body getBody() { return body; }
+    public void setBody(Body body) { this.body = body; }
 }
