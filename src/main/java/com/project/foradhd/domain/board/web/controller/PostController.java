@@ -1,8 +1,10 @@
 package com.project.foradhd.domain.board.web.controller;
 
+import com.project.foradhd.domain.board.business.service.PostLikeFilterService;
 import com.project.foradhd.domain.board.business.service.PostScrapFilterService;
 import com.project.foradhd.domain.board.business.service.PostService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
+import com.project.foradhd.domain.board.persistence.entity.PostLikeFilter;
 import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
@@ -13,6 +15,7 @@ import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.mapper.PostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapFilterMapper;
 import com.project.foradhd.global.AuthUserId;
+import com.project.foradhd.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,11 +32,13 @@ public class PostController {
     private final PostMapper postMapper;
     private final PostScrapFilterService postScrapFilterService;
     private final PostScrapFilterMapper postScrapFilterMapper;
+    private final PostLikeFilterService postLikeFilterService;
 
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDto> getPost(@PathVariable Long postId) {
-        Post post = postService.getPost(postId);
-        return ResponseEntity.ok(postMapper.toDto(post));
+    public ResponseEntity<PostResponseDto> getPost(@PathVariable Long postId) {
+        Post post = postService.getAndIncrementViewCount(postId);
+        PostResponseDto response = postMapper.responsetoDto(post);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping()
@@ -58,9 +63,9 @@ public class PostController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Page<PostDto>> getAllPosts(Pageable pageable) {
+    public ResponseEntity<Page<PostResponseDto>> getAllPosts(Pageable pageable) {
         Page<Post> posts = postService.getAllPosts(pageable);
-        return ResponseEntity.ok(posts.map(postMapper::toDto));
+        return ResponseEntity.ok(posts.map(postMapper::responsetoDto));
     }
 
     // 메인 홈 - 카테고리 별 글 조회
@@ -89,9 +94,34 @@ public class PostController {
         return ResponseEntity.ok(dtoPage);
     }
 
-    @PutMapping("/scrap/{postId}/")
-    public ResponseEntity<Void> toggleScrap(@PathVariable Long postId, @AuthUserId String userId) {
-        postScrapFilterService.toggleScrap(postId, userId);
-        return ResponseEntity.ok().build();
+    @PostMapping("/scrap/toggle")
+    public ResponseEntity<?> toggleScrap(@RequestBody PostScrapFilterDto requestDto) {
+        try {
+            postScrapFilterService.toggleScrap(requestDto.getPostId(), requestDto.getUserId());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    // 게시글 좋아요 토글
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<?> toggleLike(@AuthUserId String userId, @PathVariable Long postId) {
+        try {
+            postLikeFilterService.toggleLike(userId, postId);
+            return ResponseEntity.ok().build();
+        } catch (BusinessException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request.");
+        }
+    }
+
+    // 사용자가 좋아요한 게시글 목록을 조회합니다.
+    @GetMapping("/liked/{userId}")
+    public ResponseEntity<Page<PostResponseDto>> getLikedPostsByUser(@PathVariable String userId, Pageable pageable) {
+        Page<Post> likedPosts = postLikeFilterService.getLikedPostsByUser(userId, pageable);
+        Page<PostResponseDto> responseDtos = likedPosts.map(postMapper::responsetoDto);
+        return ResponseEntity.ok(responseDtos);
     }
 }

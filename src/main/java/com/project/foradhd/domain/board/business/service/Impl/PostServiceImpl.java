@@ -32,6 +32,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public Post createPost(Post post) {
         return postRepository.save(post);
     }
@@ -68,6 +69,15 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<Post> listByCategory(CategoryName category, Pageable pageable) {
         return postRepository.findByCategory(category, pageable);
+    }
+
+    // 글 조회수
+    @Transactional
+    public Post getAndIncrementViewCount(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        post.setViewCount(post.getViewCount() + 1);
+        return postRepository.save(post);
     }
 
     private Pageable applySorting(Pageable pageable, SortOption sortOption) {

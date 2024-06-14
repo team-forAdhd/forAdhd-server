@@ -1,7 +1,9 @@
 package com.project.foradhd.domain.medicine.business.service.Impl;
 
 import com.project.foradhd.domain.medicine.business.service.MedicineReviewService;
+import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
+import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewRepository;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
 import com.project.foradhd.domain.user.business.service.UserService;
@@ -9,29 +11,50 @@ import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_USER;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+
+import static com.project.foradhd.global.exception.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
 public class MedicineReviewServiceImpl implements MedicineReviewService {
     private final MedicineReviewRepository reviewRepository;
+    private final MedicineRepository medicineRepository;
     private final UserService userService;
-    
+
     @Override
+    @Transactional
     public MedicineReview createReview(MedicineReviewRequest request) {
-        // UserService를 사용하여 사용자가 유효한지 확인
         User user = userService.getUser(request.getUserId());
         if (user == null) {
             throw new BusinessException(NOT_FOUND_USER);
         }
 
+        Medicine medicine = medicineRepository.findById(request.getMedicineId())
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_MEDICINE));
+
+        List<Medicine> coMedications = medicineRepository.findAllById(request.getCoMedicationIds());
+
         MedicineReview review = MedicineReview.builder()
-                .user(userService.getUser(request.getUserId()))
-                .medicineId(request.getMedicineId())
+                .user(user)
+                .medicine(medicine)
+                .coMedications(coMedications)
                 .content(request.getContent())
-                .images(request.getImagesAsJson())
+                .images(request.getImages())
                 .grade(request.getGrade())
                 .helpCount(0)
                 .build();
@@ -39,21 +62,63 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     }
 
     @Override
+    @Transactional
     public void incrementHelpCount(Long reviewId) {
         MedicineReview review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new EntityNotFoundException("Review not found"));
-        review.setHelpCount(review.getHelpCount() + 1);
-        reviewRepository.save(review);
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_MEDICINE_REVIEW));
+        int newHelpCount = review.getHelpCount() + 1;
+        MedicineReview updatedReview = MedicineReview.builder()
+                .user(review.getUser())
+                .medicine(review.getMedicine())
+                .coMedications(review.getCoMedications())
+                .content(review.getContent())
+                .images(review.getImages())
+                .grade(review.getGrade())
+                .helpCount(newHelpCount)
+                .id(review.getId())
+                .build();
+        reviewRepository.save(updatedReview);
     }
 
     @Override
+    @Transactional
     public MedicineReview updateReview(Long reviewId, MedicineReviewRequest request) {
-        MedicineReview review = reviewRepository.findById(reviewId)
+        MedicineReview existingReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new EntityNotFoundException("Review not found"));
 
-        review.setContent(request.getContent());
-        review.setImages(request.getImagesAsJson());
-        review.setGrade(request.getGrade());
-        return reviewRepository.save(review);
+        Medicine medicine = medicineRepository.findById(request.getMedicineId())
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_MEDICINE));
+
+        List<Medicine> coMedications = medicineRepository.findAllById(request.getCoMedicationIds());
+
+        MedicineReview updatedReview = MedicineReview.builder()
+                .user(existingReview.getUser())
+                .medicine(medicine)
+                .coMedications(coMedications)
+                .content(request.getContent())
+                .images(request.getImages())
+                .grade(request.getGrade())
+                .helpCount(existingReview.getHelpCount())
+                .id(existingReview.getId()) // Use the existing ID
+                .build();
+        return reviewRepository.save(updatedReview);
+    }
+
+    @Override
+    public void deleteReview(Long id) {
+        if (!reviewRepository.existsById(id)) {
+            throw new BusinessException(NOT_FOUND_MEDICINE_REVIEW);
+        }
+        reviewRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<MedicineReview> findReviews(Pageable pageable) {
+        return reviewRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable) {
+        return reviewRepository.findByUserId(userId, pageable);
     }
 }

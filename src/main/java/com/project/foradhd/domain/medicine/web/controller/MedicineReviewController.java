@@ -7,12 +7,19 @@ import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewRespon
 import com.project.foradhd.domain.medicine.web.mapper.MedicineReviewMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/medicine/reviews")
+@RequestMapping("/api/v1/medicines/reviews")
 public class MedicineReviewController {
     private final MedicineReviewService reviewService;
     private final MedicineReviewMapper reviewMapper;
@@ -33,5 +40,32 @@ public class MedicineReviewController {
     public ResponseEntity<MedicineReviewResponse> updateReview(@PathVariable Long id, @RequestBody MedicineReviewRequest request) {
         MedicineReview review = reviewService.updateReview(id, request);
         return ResponseEntity.ok(reviewMapper.toResponseDto(review));
+    }
+
+    //최신 순: /reviews?sort=createdAt,desc
+    //오래된 순: /reviews?sort=createdAt,asc
+    //추천 순: /reviews?sort=helpCount,desc
+    //별점 높은 순: /reviews?sort=grade,desc
+    //별점 낮은 순: /reviews?sort=grade,asc
+    @GetMapping("")
+    public Page<MedicineReview> getReviews(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return reviewService.findReviews(pageable);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
+        reviewService.deleteReview(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<MedicineReviewResponse>> getUserReviews(
+            @PathVariable String userId,
+            Pageable pageable
+    ) {
+        Page<MedicineReview> reviews = reviewService.findReviewsByUserId(userId, pageable);
+        Page<MedicineReviewResponse> reviewDtos = reviews.map(reviewMapper::toResponseDto);
+        return ResponseEntity.ok(reviewDtos);
     }
 }

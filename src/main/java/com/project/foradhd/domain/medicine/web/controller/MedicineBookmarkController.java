@@ -2,6 +2,7 @@ package com.project.foradhd.domain.medicine.web.controller;
 
 import com.project.foradhd.domain.medicine.business.service.MedicineBookmarkService;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineBookmark;
+import com.project.foradhd.domain.medicine.web.dto.request.MedicineBookmarkRequest;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineBookmarkResponse;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,14 +24,25 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/medicine/bookmarks")
 public class MedicineBookmarkController {
     @Autowired
-    private MedicineBookmarkService bookmarkService;
+    private MedicineBookmarkService medicineBookmarkService;
 
     @Autowired
     private MedicineMapper medicineMapper;
 
+    // 약품 북마크 토글 (추가/제거)
+    @PostMapping("/toggle")
+    public ResponseEntity<?> toggleBookmark(@RequestBody MedicineBookmarkRequest request) {
+        try {
+            medicineBookmarkService.toggleBookmark(request.getUserId(), request.getMedicineId());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/my")
     public ResponseEntity<Page<MedicineBookmarkResponse>> getMyBookmarks(
-            @AuthUserId Long userId,
+            @AuthUserId String userId,
             @RequestParam(defaultValue = "newest") String sort,
             @PageableDefault(size = 10) Pageable pageable
     ) {

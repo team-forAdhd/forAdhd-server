@@ -9,6 +9,8 @@ import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,5 +45,10 @@ public class PostLikeFilterServiceImpl implements PostLikeFilterService {
             post.incrementLikeCount();
         }
         postRepository.save(post);
+    }
+
+    @Override
+    public Page<Post> getLikedPostsByUser(String userId, Pageable pageable) {
+        return postLikeFilterRepository.findPostsLikedByUser(userId, pageable);
     }
 }

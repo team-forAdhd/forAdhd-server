@@ -24,7 +24,7 @@ public class MedicineDetails extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "medicine_id")
+    @JoinColumn(name = "id") // Medicine 엔티티의 PK (id)를 참조
     private Medicine medicine;
 
     private String content;

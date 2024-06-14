@@ -35,6 +35,12 @@ public enum ErrorCode {
     ALREADY_EXISTS_HOSPITAL_RECEIPT_REVIEW(CONFLICT, "이미 작성한 영수증 리뷰가 있습니다."),
     ALREADY_EXISTS_HOSPITAL_BRIEF_REVIEW(CONFLICT, "이미 작성한 간단 리뷰가 있습니다."),
 
+    //medicine
+    NOT_FOUND_MEDICINE(NOT_FOUND, "존재하지 않는 약입니다."),
+
+    //medicine_review
+    NOT_FOUND_MEDICINE_REVIEW(NOT_FOUND, "존재하지 않는 약 리뷰입니다."),
+
     //validation
     INVALID_REQUEST(BAD_REQUEST, "잘못된 요청입니다."),
 

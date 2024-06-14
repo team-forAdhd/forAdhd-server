@@ -9,14 +9,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 public class PostDto {
-    private Long Id;
+    private Long id;
     private Long writerId;
     private String writerName;
-    private Long categoryId;
     private String categoryName;
     private String title;
     private String content;
@@ -26,5 +24,4 @@ public class PostDto {
     private long commentCount;
     private long scrapCount;
     private long viewCount;
-    private String tags;
 }

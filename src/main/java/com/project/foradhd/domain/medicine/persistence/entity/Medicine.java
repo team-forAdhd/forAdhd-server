@@ -9,7 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "medicines")
+@Table(name = "medicine")
 public class Medicine {
 
     @Id

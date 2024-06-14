@@ -60,8 +60,6 @@ public class Post extends BaseTimeEntity {
 
     private long viewCount;
 
-    private String tags;
-
     public void incrementLikeCount() {
         this.likeCount++;
     }

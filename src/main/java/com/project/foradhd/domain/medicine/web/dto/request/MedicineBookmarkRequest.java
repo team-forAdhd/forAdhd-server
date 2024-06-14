@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MedicineBookmarkRequest {
-    private Long userId;
+    private String userId;
     private Long medicineId;
 }
