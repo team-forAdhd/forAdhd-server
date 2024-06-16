@@ -63,5 +63,12 @@ spring:
             user-info-authentication-method: header
             user-name-attribute: response
           apple:
-            authorizationUri: https://appleid.apple.com/auth/oauth2/v2/authorize
+            authorizationUri: https://appleid.apple.com/auth/oauth2/v2/authorize?response_mode=form_post
             tokenUri: https://appleid.apple.com/auth/oauth2/v2/token
+
+apple:
+  url: ${APPLE_URL}
+  key-path: ${APPLE_KEY_PATH}
+  client-id: ${APPLE_CLIENT_ID}
+  team-id: ${APPLE_TEAM_ID}
+  key-id: ${APPLE_KEY_ID}
