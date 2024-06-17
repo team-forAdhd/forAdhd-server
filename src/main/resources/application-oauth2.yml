@@ -63,8 +63,9 @@ spring:
             user-info-authentication-method: header
             user-name-attribute: response
           apple:
-            authorizationUri: https://appleid.apple.com/auth/oauth2/v2/authorize?response_mode=form_post
-            tokenUri: https://appleid.apple.com/auth/oauth2/v2/token
+            authorizationUri: https://appleid.apple.com/auth/authorize?response_mode=form_post
+            tokenUri: https://appleid.apple.com/auth/token
+            user-name-attribute: sub
 
 apple:
   url: ${APPLE_URL}
