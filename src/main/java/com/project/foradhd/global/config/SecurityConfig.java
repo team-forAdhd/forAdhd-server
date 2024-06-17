@@ -34,6 +34,8 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResp
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -68,6 +70,7 @@ public class SecurityConfig {
     private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
     private final CustomOAuth2AuthorizationCodeGrantRequestEntityConverter customOAuth2AuthorizationCodeGrantRequestEntityConverter;
 
     @Bean
@@ -87,6 +90,8 @@ public class SecurityConfig {
             .oauth2Login(config -> config
                 .successHandler(oAuth2AuthenticationSuccessHandler)
                 .failureHandler(oAuth2AuthenticationFailureHandler)
+                .authorizationEndpoint(endPointConfig -> endPointConfig
+                    .authorizationRequestRepository(authorizationRequestRepository))
                 .tokenEndpoint(endPointConfig -> endPointConfig
                     .accessTokenResponseClient(accessTokenResponseClient()))
                 .userInfoEndpoint(endPointConfig -> endPointConfig
