@@ -11,7 +11,9 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import static com.project.foradhd.global.exception.ErrorCode.NOT_SUPPORTED_SNS_TYPE;
 
@@ -24,11 +26,12 @@ public class OAuth2UserInfoService {
     private final GoogleOAuth2UserAttributesServiceImpl googleOAuth2UserAttributesService;
     private final AppleOAuth2UserAttributesServiceImpl appleOAuth2UserAttributesService;
 
-    public final Map<String, Object> getAttributes(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
+    public final Map<String, Object> getAttributes(OAuth2UserRequest oAuth2UserRequest,
+                                                Function<OAuth2UserRequest, OAuth2User> defaultOAuth2UserFunction) {
         String registrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();
         Provider provider = Provider.from(registrationId)
                 .orElseThrow(() -> new BusinessException(NOT_SUPPORTED_SNS_TYPE));
-        Map<String, Object> attributes = oAuth2User.getAttributes();
+        Map<String, Object> attributes = getDefaultAttributes(provider, defaultOAuth2UserFunction, oAuth2UserRequest);
         switch (provider) {
             case NAVER -> {
                 return naverOAuth2UserAttributesService.getAttributes(oAuth2UserRequest, attributes);
@@ -44,5 +47,12 @@ public class OAuth2UserInfoService {
             }
             default -> throw new BusinessException(NOT_SUPPORTED_SNS_TYPE);
         }
+    }
+
+    private Map<String, Object> getDefaultAttributes(Provider provider,
+                                                    Function<OAuth2UserRequest, OAuth2User> defaultOAuth2UserFunction,
+                                                    OAuth2UserRequest oAuth2UserRequest) {
+        if (provider == Provider.APPLE) return new HashMap<>();
+        return defaultOAuth2UserFunction.apply(oAuth2UserRequest).getAttributes();
     }
 }
