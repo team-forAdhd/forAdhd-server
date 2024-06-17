@@ -37,7 +37,7 @@ import java.util.Optional;
 public class CustomOAuth2AuthorizationCodeGrantRequestEntityConverter
         implements Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>> {
 
-    private static final int CLIENT_SECRET_EXPIRY_MONTH = 6;
+    private static final int CLIENT_SECRET_EXPIRY_MONTH = 3;
 
     @Value("${apple.url}")
     private String APPLE_URL;
