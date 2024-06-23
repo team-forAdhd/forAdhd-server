@@ -27,6 +27,7 @@ public class AppleIdTokenValidator {
     @Value("${apple.client-id}")
     private String APPLE_CLIENT_ID;
 
+    //참고: https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api/verifying_a_user/
     public void validate(String idToken) {
         Map<String, Object> decodedHeader = jwtService.decodeHeader(idToken);
         DefaultJwsHeader jwtHeader = new DefaultJwsHeader(decodedHeader);
@@ -57,6 +58,7 @@ public class AppleIdTokenValidator {
         }
     }
 
+    //참고: https://developer.apple.com/documentation/sign_in_with_apple/fetch_apple_s_public_key_for_verifying_token_signature
     private PublicKey getApplePublicKey(Map<String, Object> headers) {
         ApplePublicKeyListResponse applePublicKeyListResponse = applePublicKeyClient.getApplePublicKeyList();
         return applePublicKeyGenerator.generatePublicKey(headers, applePublicKeyListResponse);

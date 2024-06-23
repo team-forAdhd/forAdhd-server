@@ -7,7 +7,7 @@ spring:
             client-id: ENC(9Z6DKoVAi506YeSk/5sn+HjZ4zTtvbSciOFtWlKXSk1mmkvRZolPniTRNbGgDLz9)
             client-secret: ENC(BBNo5ldktHfZhnmLejtKHCGjGWLHFu9iD7doNKrWz/2MNYjuNxFQe+9AB+FqA2XL)
             client-authentication-method: client_secret_post
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            redirect-uri: ${KAKAO_REDIRECT_URI}
             authorization-grant-type: authorization_code
             client-name: Kakao
             scope:
@@ -21,7 +21,7 @@ spring:
             client-id: ENC(FGYIfJlxdtT4NyOxnV80uuttXOM8NI1FUcsBqSyUmtk=)
             client-secret: ENC(9y68M+H96/5a0h6oX1zgAKCC27yBO5ll)
             client-authentication-method: client_secret_post
-            redirect-uri: http://localhost:8080/login/oauth2/code/naver
+            redirect-uri: ${NAVER_REDIRECT_URI}
             authorization-grant-type: authorization_code
             client-name: Naver
             scope:
@@ -43,7 +43,7 @@ spring:
           apple:
             client-id: ENC(VS8LFA0hL4ni+mPBHg78TtsQF4B6wB62JEbo7NMT3k8=)
             client-authentication-method: client_secret_post
-            redirect-uri: https://0924-222-121-219-187.ngrok-free.app/login/oauth2/code/apple
+            redirect-uri: ${APPLE_REDIRECT_URI}
             authorization-grant-type: authorization_code
             client-name: Apple
             scope:
