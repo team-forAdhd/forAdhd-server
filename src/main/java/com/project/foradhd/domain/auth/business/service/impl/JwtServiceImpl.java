@@ -5,6 +5,7 @@ import static org.springframework.util.StringUtils.collectionToCommaDelimitedStr
 
 import com.project.foradhd.domain.auth.business.service.JwtService;
 import com.project.foradhd.global.service.RedisService;
+import com.project.foradhd.global.util.JsonUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -15,8 +16,11 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -34,6 +38,7 @@ public class JwtServiceImpl implements JwtService {
 
     private static final String EMAIL_CLAIM_NAME = "email";
     private static final String AUTHORITIES_CLAIM_NAME = "authorities";
+    private static final String JWT_SEPARATOR = "\\.";
     private final RedisService redisService;
     private final Long accessTokenExpiry;
     private final Long refreshTokenExpiry;
@@ -76,8 +81,13 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public void validateTokenExpiry(String token) {
+        validateTokenExpiry(token, key);
+    }
+
+    @Override
+    public void validateTokenExpiry(String token, Key key) {
         try {
-            parseToken(token);
+            parseToken(token, key);
         } catch (UnsupportedJwtException e) {
             log.error("The claimsJws argument does not represent an Claims JWS");
             throw e;
@@ -99,7 +109,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public void validateTokenForm(String token) {
         try {
-            parseToken(token);
+            parseToken(token, key);
         }  catch (UnsupportedJwtException e) {
             log.error("The claimsJws argument does not represent an Claims JWS");
             throw e;
@@ -137,15 +147,54 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String getSubject(String token) {
-        Claims claims = parseExpiredToken(token);
+        Claims claims = parseExpiredToken(token, key);
         return claims.getSubject();
     }
 
     @Override
     public Collection<GrantedAuthority> getAuthorities(String token) {
-        Claims claims = parseExpiredToken(token);
+        Claims claims = parseExpiredToken(token, key);
         String authorityString = claims.get(AUTHORITIES_CLAIM_NAME, String.class);
         return AuthorityUtils.commaSeparatedStringToAuthorityList(authorityString);
+    }
+
+    @Override
+    public Map<String, Object> decodeHeader(String token) {
+        String encodedHeader = token.split(JWT_SEPARATOR)[0];
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+
+        byte[] decodedHeaderBytes = decoder.decode(encodedHeader.getBytes(StandardCharsets.UTF_8));
+        String decodedHeader = new String(decodedHeaderBytes, StandardCharsets.UTF_8);
+        return JsonUtil.readValue(decodedHeader, Map.class);
+    }
+
+    @Override
+    public Map<String, Object> decodePayload(String token) {
+        String encodedPayload = token.split(JWT_SEPARATOR)[1];
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+
+        byte[] decodedPayloadBytes = decoder.decode(encodedPayload.getBytes(StandardCharsets.UTF_8));
+        String decodedPayload = new String(decodedPayloadBytes, StandardCharsets.UTF_8);
+        return JsonUtil.readValue(decodedPayload, Map.class);
+    }
+
+    @Override
+    public Claims parseToken(String token, Key key) {
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    @Override
+    public Claims parseExpiredToken(String token, Key key) {
+        try {
+            return parseToken(token, key);
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
     }
 
     @Override
@@ -168,22 +217,5 @@ public class JwtServiceImpl implements JwtService {
     private Date calculateExpiration(Date now, Long expiry) {
         Instant expirationInstant = now.toInstant().plusMillis(expiry);
         return Date.from(expirationInstant);
-    }
-
-    private Claims parseToken(String token) {
-        return Jwts
-            .parserBuilder()
-            .setSigningKey(key)
-            .build()
-            .parseClaimsJws(token)
-            .getBody();
-    }
-
-    private Claims parseExpiredToken(String token) {
-        try {
-            return parseToken(token);
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
     }
 }
