@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -47,7 +48,10 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_MEDICINE));
 
-        List<Medicine> coMedications = medicineRepository.findAllById(request.getCoMedicationIds());
+        List<Medicine> coMedications = Collections.emptyList(); // 빈 리스트로 초기화
+        if (request.getCoMedications() != null && !request.getCoMedications().isEmpty()) {
+            coMedications = medicineRepository.findAllById(request.getCoMedications());
+        }
 
         MedicineReview review = MedicineReview.builder()
                 .user(user)
@@ -58,6 +62,7 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
                 .grade(request.getGrade())
                 .helpCount(0)
                 .build();
+
         return reviewRepository.save(review);
     }
 
@@ -89,7 +94,7 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_MEDICINE));
 
-        List<Medicine> coMedications = medicineRepository.findAllById(request.getCoMedicationIds());
+        List<Medicine> coMedications = medicineRepository.findAllById(request.getCoMedications());
 
         MedicineReview updatedReview = MedicineReview.builder()
                 .user(existingReview.getUser())
