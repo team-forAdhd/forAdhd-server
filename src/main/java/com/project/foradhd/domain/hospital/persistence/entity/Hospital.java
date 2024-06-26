@@ -35,5 +35,15 @@ public class Hospital extends BaseTimeEntity {
     @Builder.Default
     @ColumnDefault("0")
     @Column(nullable = false)
+    private Integer totalReceiptReviewCount = 0;
+
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Integer totalEvaluationReviewCount = 0;
+
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
 }

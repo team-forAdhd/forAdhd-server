@@ -31,14 +31,11 @@ public class HospitalReceiptReview extends BaseTimeEntity {
     @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
-    @Column(nullable = false)
-    private Integer kindness;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hospital_id", nullable = false)
+    private Hospital hospital;
 
-    @Column(nullable = false)
-    private Integer adhdUnderstanding;
-
-    @Column(nullable = false)
-    private Integer enoughMedicalTime;
+    private String receiptId;
 
     @Column(nullable = false, columnDefinition = "longtext")
     private String content;
@@ -47,6 +44,8 @@ public class HospitalReceiptReview extends BaseTimeEntity {
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = "varchar(1000)")
     private List<String> images = List.of();
+
+    private Long medicalExpense;
 
     @Builder.Default
     @ColumnDefault("0")
@@ -58,8 +57,9 @@ public class HospitalReceiptReview extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
 
+    //TODO: 아래 메소드 모두 수정
     public Integer calculateTotalGradeSum() {
-        return kindness + adhdUnderstanding + enoughMedicalTime;
+        return null;
     }
 
     public void updateHelpCount(Integer helpCount) {
