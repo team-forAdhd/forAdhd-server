@@ -31,6 +31,7 @@ import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationAp
 import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval.UserPushNotificationApprovalId;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval.UserTermsApprovalId;
+import com.project.foradhd.domain.user.persistence.enums.ForAdhdType;
 import com.project.foradhd.domain.user.persistence.enums.Role;
 import com.project.foradhd.domain.user.persistence.repository.PushNotificationApprovalRepository;
 import com.project.foradhd.domain.user.persistence.repository.TermsRepository;
@@ -224,12 +225,12 @@ class UserServiceTest {
         UserProfile originUserProfile = UserProfile.builder()
             .nickname("단이")
             .profileImage("https://image.png")
-            .isAdhd(false)
+            .forAdhdType(ForAdhdType.FOR_AROUND_ADHD)
             .build();
         UserProfile newUserProfile = UserProfile.builder()
             .nickname("김다")
             .profileImage("https://image.jpg")
-            .isAdhd(true)
+            .forAdhdType(ForAdhdType.FOR_MY_ADHD)
             .build();
         ProfileUpdateData profileUpdateData = ProfileUpdateData.builder()
             .userProfile(newUserProfile)
@@ -244,7 +245,7 @@ class UserServiceTest {
         //then
         assertThat(originUserProfile.getNickname()).isEqualTo(newUserProfile.getNickname());
         assertThat(originUserProfile.getProfileImage()).isEqualTo(newUserProfile.getProfileImage());
-        assertThat(originUserProfile.getIsAdhd()).isEqualTo(newUserProfile.getIsAdhd());
+        assertThat(originUserProfile.getForAdhdType()).isEqualTo(newUserProfile.getForAdhdType());
         then(userProfileRepository).should(times(1))
             .findByNicknameAndUserIdNot(newUserProfile.getNickname(), userId);
         then(userProfileRepository).should(times(1)).findByUserId(userId);
@@ -255,20 +256,15 @@ class UserServiceTest {
     void update_profile_test_fail_duplicated_nickname() {
         //given
         String userId = "userId";
-        UserProfile originUserProfile = UserProfile.builder()
-            .nickname("단이")
-            .profileImage("https://image.png")
-            .isAdhd(false)
-            .build();
         UserProfile anotherUser = UserProfile.builder()
             .nickname("김다")
             .profileImage("https://image.jpeg")
-            .isAdhd(true)
+            .forAdhdType(ForAdhdType.FOR_MY_ADHD)
             .build();
         UserProfile newUserProfile = UserProfile.builder()
             .nickname("김다")
             .profileImage("https://image.jpg")
-            .isAdhd(true)
+            .forAdhdType(ForAdhdType.FOR_MY_ADHD)
             .build();
         ProfileUpdateData profileUpdateData = ProfileUpdateData.builder()
             .userProfile(newUserProfile)

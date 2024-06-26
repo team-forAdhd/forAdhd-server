@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
@@ -77,6 +78,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleServletRequestBindingException(ServletRequestBindingException e) {
         log.error("Invalid request", e);
         return ErrorResponse.toResponseEntity(ErrorCode.INVALID_REQUEST);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        log.error("Uploaded file exceeded maximum size", e);
+        return ErrorResponse.toResponseEntity(ErrorCode.INVALID_FILE_SIZE);
     }
 
     private String generateValidationMessage(Object value, Class<?> targetType, Throwable throwable) {

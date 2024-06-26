@@ -40,6 +40,12 @@ public enum ErrorCode {
 
     //medicine_review
     NOT_FOUND_MEDICINE_REVIEW(NOT_FOUND, "존재하지 않는 약 리뷰입니다."),
+    //S3
+    EMPTY_FILE(BAD_REQUEST, "유효한 파일이어야 합니다."),
+    NOT_FOUND_FILE_EXTENSION(BAD_REQUEST, "파일 확장자가 존재하지 않습니다."),
+    INVALID_FILE_EXTENSION(BAD_REQUEST, "지원하지 않는 파일 확장자입니다."),
+    INVALID_FILE_SIZE(BAD_REQUEST, "최대 허용 파일 용량을 초과하였습니다."),
+    FILE_UPLOAD_ERROR(INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다."),
 
     //validation
     INVALID_REQUEST(BAD_REQUEST, "잘못된 요청입니다."),

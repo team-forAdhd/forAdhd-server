@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.user.web.dto.request;
 
+import com.project.foradhd.domain.user.persistence.enums.ForAdhdType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -12,6 +13,6 @@ public class ProfileUpdateRequest {
 
     private String profileImage;
 
-    @NotNull(message = "{isAdhd.notNull}")
-    private Boolean isAdhd;
+    @NotNull(message = "{forAdhdType.notNull}")
+    private ForAdhdType forAdhdType;
 }

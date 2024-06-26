@@ -38,3 +38,5 @@ out/
 
 *.pem
 *.ppk
+
+src/main/resources/static/keys/**

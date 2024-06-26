@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.user.web.dto.response;
 
+import com.project.foradhd.domain.user.persistence.enums.ForAdhdType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,5 +14,5 @@ public class UserProfileDetailsResponse {
 
     private String profileImage;
 
-    private Boolean isAdhd;
+    private ForAdhdType forAdhdType;
 }

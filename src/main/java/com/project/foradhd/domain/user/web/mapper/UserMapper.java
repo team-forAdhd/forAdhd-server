@@ -32,7 +32,7 @@ public interface UserMapper {
         @Mapping(target = "email", source = "userProfile.user.email"),
         @Mapping(target = "nickname", source = "userProfile.nickname"),
         @Mapping(target = "profileImage", source = "userProfile.profileImage"),
-        @Mapping(target = "isAdhd", source = "userProfile.isAdhd")
+        @Mapping(target = "forAdhdType", source = "userProfile.forAdhdType")
     })
     UserProfileDetailsResponse toUserProfileDetailsResponse(UserProfileDetailsData userProfileDetailsData);
 
@@ -52,7 +52,7 @@ public interface UserMapper {
             .user(user)
             .nickname(request.getNickname())
             .profileImage(request.getProfileImage())
-            .isAdhd(request.getIsAdhd())
+            .forAdhdType(request.getForAdhdType())
             .build();
         List<UserTermsApproval> userTermsApprovals = request.getTermsApprovals().stream()
             .map(termsApproval ->
@@ -107,7 +107,7 @@ public interface UserMapper {
             .user(user)
             .nickname(request.getNickname())
             .profileImage(request.getProfileImage())
-            .isAdhd(request.getIsAdhd())
+            .forAdhdType(request.getForAdhdType())
             .build();
         List<UserTermsApproval> userTermsApprovals = request.getTermsApprovals().stream()
             .map(termsApproval ->
@@ -155,7 +155,7 @@ public interface UserMapper {
     @Mappings({
         @Mapping(target = "userProfile.nickname", source = "nickname"),
         @Mapping(target = "userProfile.profileImage", source = "profileImage"),
-        @Mapping(target = "userProfile.isAdhd", source = "isAdhd")
+        @Mapping(target = "userProfile.forAdhdType", source = "forAdhdType")
     })
     ProfileUpdateData toProfileUpdateData(ProfileUpdateRequest request);
 

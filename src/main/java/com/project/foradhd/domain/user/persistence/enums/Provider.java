@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public enum Provider {
 
-    NAVER, KAKAO, FACEBOOK, APPLE;
+    NAVER, KAKAO, GOOGLE, APPLE;
 
     public static Optional<Provider> from(String value) {
         try {

@@ -9,6 +9,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
+import com.project.foradhd.domain.auth.business.service.OAuth2UserInfoService;
 import com.project.foradhd.domain.auth.business.userdetails.OAuth2Attributes;
 import com.project.foradhd.domain.auth.persistence.entity.AuthSocialLogin;
 import com.project.foradhd.domain.auth.persistence.repository.AuthSocialLoginRepository;
@@ -36,6 +37,9 @@ class OAuth2UserServiceTest {
 
     @Mock
     UserService userService;
+
+    @Mock
+    OAuth2UserInfoService oAuth2UserInfoService;
 
     @Mock
     AuthSocialLoginRepository authSocialLoginRepository;

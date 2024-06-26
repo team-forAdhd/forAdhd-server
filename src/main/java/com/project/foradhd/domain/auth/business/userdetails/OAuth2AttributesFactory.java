@@ -1,9 +1,6 @@
 package com.project.foradhd.domain.auth.business.userdetails;
 
-import com.project.foradhd.domain.auth.business.userdetails.impl.AppleOAuth2Attributes;
-import com.project.foradhd.domain.auth.business.userdetails.impl.FacebookOAuth2Attributes;
-import com.project.foradhd.domain.auth.business.userdetails.impl.KakaoOAuth2Attributes;
-import com.project.foradhd.domain.auth.business.userdetails.impl.NaverOAuth2Attributes;
+import com.project.foradhd.domain.auth.business.userdetails.impl.*;
 import com.project.foradhd.domain.user.persistence.enums.Provider;
 import com.project.foradhd.global.exception.BusinessException;
 
@@ -14,7 +11,7 @@ import static com.project.foradhd.global.exception.ErrorCode.NOT_SUPPORTED_SNS_T
 public abstract class OAuth2AttributesFactory {
 
     public static OAuth2Attributes valueOf(String registrationId, String nameAttributesKey,
-        Map<String, Object> attributes) {
+                                        Map<String, Object> attributes) {
         Provider provider = Provider.from(registrationId)
             .orElseThrow(() -> new BusinessException(NOT_SUPPORTED_SNS_TYPE));
         switch (provider) {
@@ -24,8 +21,8 @@ public abstract class OAuth2AttributesFactory {
             case KAKAO -> {
                 return KakaoOAuth2Attributes.of(nameAttributesKey, attributes);
             }
-            case FACEBOOK -> {
-                return FacebookOAuth2Attributes.of(nameAttributesKey, attributes);
+            case GOOGLE -> {
+                return GoogleOAuth2Attributes.of(nameAttributesKey, attributes);
             }
             case APPLE -> {
                 return AppleOAuth2Attributes.of(nameAttributesKey, attributes);

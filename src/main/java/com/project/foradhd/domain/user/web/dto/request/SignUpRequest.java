@@ -2,6 +2,7 @@ package com.project.foradhd.domain.user.web.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.project.foradhd.domain.user.persistence.enums.ForAdhdType;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.global.validation.annotation.ValidEmail;
 import jakarta.validation.Valid;
@@ -43,8 +44,8 @@ public class SignUpRequest {
 
     private String profileImage;
 
-    @NotNull(message = "{isAdhd.notNull}")
-    private Boolean isAdhd;
+    @NotNull(message = "{forAdhdType.notNull}")
+    private ForAdhdType forAdhdType;
 
     @NotEmpty(message = "{termsApprovals.notEmpty}")
     private List<@Valid TermsApprovalRequest> termsApprovals;
