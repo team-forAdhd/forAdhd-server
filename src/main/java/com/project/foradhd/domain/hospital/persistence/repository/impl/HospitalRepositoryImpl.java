@@ -6,6 +6,7 @@ import com.project.foradhd.domain.hospital.persistence.dto.out.QHospitalNearbyDt
 import com.project.foradhd.domain.hospital.persistence.repository.custom.HospitalRepositoryCustom;
 import com.project.foradhd.global.nativesql.repository.support.NativeSqlSupportRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -30,8 +31,8 @@ public class HospitalRepositoryImpl implements HospitalRepositoryCustom {
     public Page<HospitalNearbyDto> findAllNearby(String userId, HospitalListNearbySearchCond searchCond, Pageable pageable) {
         List<HospitalNearbyDto> content = queryFactory
                 .select(new QHospitalNearbyDto(hospital,
-                        doctor.totalGradeSum.sum().coalesce(0L),
-                        doctor.totalBriefReviewCount.sum().coalesce(0),
+                        Expressions.asNumber(0L),
+                        Expressions.asNumber(0),
                         doctor.totalReceiptReviewCount.sum().coalesce(0),
                         getDistanceSQL(searchCond),
                         hospitalBookmark.deleted.isFalse())

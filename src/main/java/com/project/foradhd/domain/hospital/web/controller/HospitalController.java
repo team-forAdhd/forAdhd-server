@@ -77,22 +77,6 @@ public class HospitalController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{hospitalId}/doctors/{doctorId}/brief-reviews")
-    public ResponseEntity<Void> createBriefReview(@AuthUserId String userId,
-                                                @PathVariable String hospitalId, @PathVariable String doctorId,
-                                                @RequestBody @Valid HospitalBriefReviewCreateRequest request) {
-        HospitalBriefReviewCreateData hospitalBriefReviewCreateData = hospitalMapper.toHospitalBriefReviewCreateData(request);
-        hospitalService.createBriefReview(userId, hospitalId, doctorId, hospitalBriefReviewCreateData);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("/doctors/brief-reviews/{hospitalBriefReviewId}")
-    public ResponseEntity<Void> deleteBriefReview(@AuthUserId String userId,
-                                                @PathVariable String hospitalBriefReviewId) {
-        hospitalService.deleteBriefReview(userId, hospitalBriefReviewId);
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("/{hospitalId}/doctors/{doctorId}/receipt-reviews")
     public ResponseEntity<Void> createReceiptReview(@AuthUserId String userId,
                                                     @PathVariable String hospitalId, @PathVariable String doctorId,

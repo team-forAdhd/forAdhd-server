@@ -1,6 +1,5 @@
 package com.project.foradhd.domain.hospital.web.mapper;
 
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalBriefReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
@@ -9,7 +8,6 @@ import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalBriefReviewCreateRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewUpdateRequest;
@@ -67,8 +65,6 @@ public interface HospitalMapper {
     @Named("mapToReceiptReview")
     HospitalReceiptReviewListResponse.ReceiptReviewResponse
         mapToReceiptReview(HospitalReceiptReviewListData.ReceiptReviewData receiptReview);
-
-    HospitalBriefReviewCreateData toHospitalBriefReviewCreateData(HospitalBriefReviewCreateRequest request);
 
     HospitalReceiptReviewCreateData toHospitalReceiptReviewCreateData(HospitalReceiptReviewCreateRequest request);
 
