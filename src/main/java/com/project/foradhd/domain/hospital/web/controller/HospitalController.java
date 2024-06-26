@@ -1,6 +1,5 @@
 package com.project.foradhd.domain.hospital.web.controller;
 
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalBriefReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
@@ -9,7 +8,6 @@ import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalBriefReviewCreateRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewUpdateRequest;
@@ -86,7 +84,7 @@ public class HospitalController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/doctors/receipt-reviews/{hospitalReceiptReviewId}/help")
+    @PostMapping("/receipt-reviews/{hospitalReceiptReviewId}/help")
     public ResponseEntity<Void> markReceiptReviewAsHelpful(@AuthUserId String userId,
                                                         @PathVariable String hospitalReceiptReviewId,
                                                         @RequestParam Boolean help) {
