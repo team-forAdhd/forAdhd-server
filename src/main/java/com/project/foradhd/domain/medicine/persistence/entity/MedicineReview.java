@@ -13,7 +13,19 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "medicine_review")
@@ -32,7 +44,6 @@ public class MedicineReview extends BaseTimeEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
-    // UserPrivacy의 ageRange를 저장하기 위한 필드 추가
     @Column(name = "age_range", length = 50)
     private String ageRange;
 
@@ -40,14 +51,10 @@ public class MedicineReview extends BaseTimeEntity {
     @Column(name = "gender")
     private Gender gender;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "medicine_co_medications",
-            joinColumns = @JoinColumn(name = "review_id"),  // MedicineReview 엔티티의 PK를 참조
-            inverseJoinColumns = @JoinColumn(name = "id")   // Medicine 엔티티의 PK (id)를 참조
-    )
-    private List<Medicine> coMedications;
-
+    @ElementCollection
+    @CollectionTable(name = "medicine_co_medications", joinColumns = @JoinColumn(name = "review_id"))
+    @Column(name = "medicine_id")
+    private List<Long> coMedications;
 
     @Column(length = 1500, nullable = false)
     private String content;
@@ -66,5 +73,4 @@ public class MedicineReview extends BaseTimeEntity {
 
     @Column(nullable = false)
     private int helpCount;
-
 }

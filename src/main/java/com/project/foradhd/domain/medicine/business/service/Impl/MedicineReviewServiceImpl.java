@@ -48,9 +48,9 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_MEDICINE));
 
-        List<Medicine> coMedications = Collections.emptyList(); // 빈 리스트로 초기화
+        List<Long> coMedications = Collections.emptyList(); // 빈 리스트로 초기화
         if (request.getCoMedications() != null && !request.getCoMedications().isEmpty()) {
-            coMedications = medicineRepository.findAllById(request.getCoMedications());
+            coMedications = request.getCoMedications();
         }
 
         MedicineReview review = MedicineReview.builder()
@@ -72,7 +72,9 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         MedicineReview review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_MEDICINE_REVIEW));
         int newHelpCount = review.getHelpCount() + 1;
+
         MedicineReview updatedReview = MedicineReview.builder()
+                .id(review.getId())
                 .user(review.getUser())
                 .medicine(review.getMedicine())
                 .coMedications(review.getCoMedications())
@@ -80,8 +82,8 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
                 .images(review.getImages())
                 .grade(review.getGrade())
                 .helpCount(newHelpCount)
-                .id(review.getId())
                 .build();
+
         reviewRepository.save(updatedReview);
     }
 
@@ -94,9 +96,10 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_MEDICINE));
 
-        List<Medicine> coMedications = medicineRepository.findAllById(request.getCoMedications());
+        List<Long> coMedications = request.getCoMedications();
 
         MedicineReview updatedReview = MedicineReview.builder()
+                .id(existingReview.getId())
                 .user(existingReview.getUser())
                 .medicine(medicine)
                 .coMedications(coMedications)
@@ -104,8 +107,8 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
                 .images(request.getImages())
                 .grade(request.getGrade())
                 .helpCount(existingReview.getHelpCount())
-                .id(existingReview.getId()) // Use the existing ID
                 .build();
+
         return reviewRepository.save(updatedReview);
     }
 

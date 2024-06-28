@@ -7,6 +7,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
+
+import java.util.List;
+
 @Repository
 public interface MedicineRepository extends JpaRepository<Medicine, Long> {
     List<Medicine> findAllByOrderByItemNameAsc();
@@ -15,6 +20,4 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
     List<Medicine> findByItemNameContainingOrderByItemNameAsc(String ingredient);
     List<Medicine> findAllByFormCodeNameOrDrugShapeOrColorClass1(String formCodeName, String drugShape, String color1);
     List<Medicine> findByItemNameContaining(String itemName);
-
-    List<Medicine> findAllById(List<Medicine> coMedications);
 }

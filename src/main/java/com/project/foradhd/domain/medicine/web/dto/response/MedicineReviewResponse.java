@@ -23,7 +23,7 @@ public class MedicineReviewResponse {
     private List<String> images;
     private float grade;
     private int helpCount;
-    private List<Medicine> coMedications;
+    private List<Long> coMedications;
     private String nickname;
     private String profileImage;
     private String ageRange;

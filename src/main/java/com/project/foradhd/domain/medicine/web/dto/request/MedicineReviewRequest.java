@@ -15,7 +15,7 @@ import java.util.List;
 public class MedicineReviewRequest {
     private String userId; // 사용자 ID
     private Long medicineId; // 리뷰 대상 의약품 ID
-    private List<Medicine> coMedications; // 함께 복용하는 의약품 ID 목록
+    private List<Long> coMedications; // 함께 복용하는 의약품 ID 목록
     private String content; // 리뷰 내용
     private List<String> images; // 이미지 URL 목록
     private float grade; // 평점
