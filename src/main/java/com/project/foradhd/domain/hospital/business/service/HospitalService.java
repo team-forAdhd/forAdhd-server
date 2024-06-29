@@ -3,11 +3,8 @@ package com.project.foradhd.domain.hospital.business.service;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
-import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
+import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData.ReceiptReviewData;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalNearbyDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalReceiptReviewDto;
@@ -40,6 +37,7 @@ public class HospitalService {
     private final HospitalBookmarkRepository hospitalBookmarkRepository;
     private final HospitalReceiptReviewRepository hospitalReceiptReviewRepository;
     private final HospitalReceiptReviewHelpRepository hospitalReceiptReviewHelpRepository;
+    private final HospitalEvaluationQuestionRepository hospitalEvaluationQuestionRepository;
 
     public HospitalListNearbyData getHospitalListNearby(String userId, HospitalListNearbySearchCond searchCond,
                                                         Pageable pageable) {
@@ -163,6 +161,11 @@ public class HospitalService {
                 .receiptReviewList(receiptReviewList)
                 .paging(paging)
                 .build();
+    }
+
+    public HospitalEvaluationQuestionListData getEvaluationQuestionList() {
+        List<HospitalEvaluationQuestion> hospitalEvaluationQuestionList = hospitalEvaluationQuestionRepository.findAll();
+        return new HospitalEvaluationQuestionListData(hospitalEvaluationQuestionList);
     }
 
     @Transactional

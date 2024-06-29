@@ -3,19 +3,14 @@ package com.project.foradhd.domain.hospital.web.mapper;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
-import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
+import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData;
+import com.project.foradhd.domain.hospital.persistence.entity.HospitalEvaluationQuestion;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewUpdateRequest;
-import com.project.foradhd.domain.hospital.web.dto.response.DoctorDetailsResponse;
-import com.project.foradhd.domain.hospital.web.dto.response.HospitalDetailsResponse;
-import com.project.foradhd.domain.hospital.web.dto.response.HospitalListNearbyResponse;
+import com.project.foradhd.domain.hospital.web.dto.response.*;
 import com.project.foradhd.domain.hospital.web.dto.response.HospitalListNearbyResponse.HospitalNearbyResponse;
-import com.project.foradhd.domain.hospital.web.dto.response.HospitalReceiptReviewListResponse;
 import org.mapstruct.*;
 import org.mapstruct.MappingConstants.ComponentModel;
 
@@ -69,4 +64,20 @@ public interface HospitalMapper {
     HospitalReceiptReviewCreateData toHospitalReceiptReviewCreateData(HospitalReceiptReviewCreateRequest request);
 
     HospitalReceiptReviewUpdateData toHospitalReceiptReviewUpdateData(HospitalReceiptReviewUpdateRequest request);
+
+    @Mappings({
+            @Mapping(target = "hospitalEvaluationQuestionList", source = "hospitalEvaluationQuestionList",
+                    qualifiedByName = "mapToEvaluationQuestionList")
+    })
+    HospitalEvaluationQuestionListResponse toEvaluationQuestionListResponse(HospitalEvaluationQuestionListData hospitalEvaluationQuestionList);
+
+    @Named("mapToEvaluationQuestionList")
+    @IterableMapping(qualifiedByName = "mapToEvaluationQuestion")
+    List<HospitalEvaluationQuestionListResponse.HospitalEvaluationQuestionResponse>
+        mapToEvaluationQuestionList(List<HospitalEvaluationQuestion> evaluationQuestionList);
+
+    @Named("mapToEvaluationQuestion")
+    @Mapping(target = "hospitalEvaluationQuestionId", source = "id")
+    HospitalEvaluationQuestionListResponse.HospitalEvaluationQuestionResponse
+        mapToEvaluationQuestion(HospitalEvaluationQuestion evaluationQuestion);
 }

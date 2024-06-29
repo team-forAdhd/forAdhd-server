@@ -3,18 +3,12 @@ package com.project.foradhd.domain.hospital.web.controller;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
-import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData;
+import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewUpdateRequest;
-import com.project.foradhd.domain.hospital.web.dto.response.DoctorDetailsResponse;
-import com.project.foradhd.domain.hospital.web.dto.response.HospitalDetailsResponse;
-import com.project.foradhd.domain.hospital.web.dto.response.HospitalListNearbyResponse;
-import com.project.foradhd.domain.hospital.web.dto.response.HospitalReceiptReviewListResponse;
+import com.project.foradhd.domain.hospital.web.dto.response.*;
 import com.project.foradhd.domain.hospital.web.mapper.HospitalMapper;
 import com.project.foradhd.global.AuthUserId;
 import jakarta.validation.Valid;
@@ -65,6 +59,14 @@ public class HospitalController {
         HospitalReceiptReviewListResponse hospitalReceiptReviewListResponse =
                 hospitalMapper.toReceiptReviewListResponse(hospitalReceiptReviewListData);
         return ResponseEntity.ok(hospitalReceiptReviewListResponse);
+    }
+
+    @GetMapping("/evaluation-questions")
+    public ResponseEntity<HospitalEvaluationQuestionListResponse> getEvaluationQuestionList() {
+        HospitalEvaluationQuestionListData hospitalEvaluationQuestionListData = hospitalService.getEvaluationQuestionList();
+        HospitalEvaluationQuestionListResponse hospitalEvaluationQuestionListResponse =
+                hospitalMapper.toEvaluationQuestionListResponse(hospitalEvaluationQuestionListData);
+        return ResponseEntity.ok(hospitalEvaluationQuestionListResponse);
     }
 
     @PostMapping("/{hospitalId}/bookmark")
