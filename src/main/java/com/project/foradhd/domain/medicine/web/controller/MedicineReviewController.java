@@ -42,15 +42,12 @@ public class MedicineReviewController {
         return ResponseEntity.ok(reviewMapper.toResponseDto(review));
     }
 
-    //최신 순: /reviews?sort=createdAt,desc
-    //오래된 순: /reviews?sort=createdAt,asc
-    //추천 순: /reviews?sort=helpCount,desc
-    //별점 높은 순: /reviews?sort=grade,desc
-    //별점 낮은 순: /reviews?sort=grade,asc
     @GetMapping("")
-    public Page<MedicineReview> getReviews(
+    public ResponseEntity<Page<MedicineReviewResponse>> getReviews(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return reviewService.findReviews(pageable);
+        Page<MedicineReview> reviews = reviewService.findReviews(pageable);
+        Page<MedicineReviewResponse> reviewDtos = reviews.map(reviewMapper::toResponseDto);
+        return ResponseEntity.ok(reviewDtos);
     }
 
     @DeleteMapping("/{id}")

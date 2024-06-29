@@ -2,12 +2,7 @@ package com.project.foradhd.domain.user.persistence.entity;
 
 import com.project.foradhd.domain.user.persistence.enums.Role;
 import com.project.foradhd.global.audit.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,6 +44,12 @@ public class User extends BaseTimeEntity {
     public void updateEmail(String email) {
         this.email = email;
     }
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private UserProfile userProfile;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private UserPrivacy userPrivacy;
 
     public void updateAsUserRole(boolean hasProfile) {
         if (hasProfile && isVerifiedEmail) {
