@@ -31,22 +31,29 @@ public class MedicineBookmarkServiceImpl implements MedicineBookmarkService {
     @Transactional
     public void toggleBookmark(String userId, Long medicineId) {
         User user = userService.getUser(userId);
-        Optional<Medicine> medicine = medicineRepository.findById(medicineId);
+        Optional<Medicine> optionalMedicine = medicineRepository.findById(medicineId);
 
-        boolean exists = bookmarkRepository.existsByUserIdAndMedicineId(userId, medicineId);
-        if (exists) {
-            bookmarkRepository.deleteByUserIdAndMedicineId(userId, medicineId);
+        if (optionalMedicine.isPresent()) {
+            Medicine medicine = optionalMedicine.get();
+
+            boolean exists = bookmarkRepository.existsByUserIdAndMedicineId(userId, medicineId);
+            if (exists) {
+                bookmarkRepository.deleteByUserIdAndMedicineId(userId, medicineId);
+            } else {
+                MedicineBookmark bookmark = MedicineBookmark.builder()
+                        .user(user)
+                        .medicine(medicine)
+                        .deleted(false)
+                        .build();
+                bookmarkRepository.save(bookmark);
+            }
         } else {
-            MedicineBookmark bookmark = MedicineBookmark.builder()
-                    .user(user)
-                    .deleted(false)
-                    .build();
-            bookmarkRepository.save(bookmark);
+            throw new IllegalArgumentException("Invalid medicineId: " + medicineId);
         }
     }
 
     @Override
-    public List<MedicineBookmark> getBookmarksByUser(String userId) {
-        return bookmarkRepository.findByUserIdAndDeletedIsFalse(userId);
+    public Page<MedicineBookmark> getBookmarksByUser(String userId, Pageable pageable) {
+        return bookmarkRepository.findByUserIdAndDeletedIsFalse(userId, pageable);
     }
 }

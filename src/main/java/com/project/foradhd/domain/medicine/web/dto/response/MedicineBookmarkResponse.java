@@ -15,5 +15,4 @@ public class MedicineBookmarkResponse {
     private String engName;
     private String manufacturer;
     private String images;
-    private Date bookmarkedAt;
 }

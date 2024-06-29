@@ -13,8 +13,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+
 public interface MedicineBookmarkRepository extends JpaRepository<MedicineBookmark, Long> {
     boolean existsByUserIdAndMedicineId(String userId, Long medicineId);
     void deleteByUserIdAndMedicineId(String userId, Long medicineId);
-    List<MedicineBookmark> findByUserIdAndDeletedIsFalse(String userId);
+    Page<MedicineBookmark> findByUserIdAndDeletedIsFalse(String userId, Pageable pageable);
 }

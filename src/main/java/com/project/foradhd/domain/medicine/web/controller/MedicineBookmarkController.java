@@ -31,25 +31,30 @@ public class MedicineBookmarkController {
 
     // 약품 북마크 토글 (추가/제거)
     @PostMapping("/toggle")
-    public ResponseEntity<?> toggleBookmark(@RequestBody MedicineBookmarkRequest request) {
+    public ResponseEntity<?> toggleBookmark(
+            @RequestParam("userId") String userId,
+            @RequestParam("medicineId") Long medicineId) {
         try {
-            medicineBookmarkService.toggleBookmark(request.getUserId(), request.getMedicineId());
+            medicineBookmarkService.toggleBookmark(userId, medicineId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
+    // 내가 북마크한 약 목록 조회
     @GetMapping("/my")
     public ResponseEntity<Page<MedicineBookmarkResponse>> getMyBookmarks(
-            @AuthUserId String userId,
+            @RequestParam("userId") String userId,
             @RequestParam(defaultValue = "newest") String sort,
             @PageableDefault(size = 10) Pageable pageable
     ) {
         Sort.Direction direction = sort.equals("oldest") ? Sort.Direction.ASC : Sort.Direction.DESC;
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(direction, "createdAt"));
 
-        return null;
-    }
+        Page<MedicineBookmark> bookmarks = medicineBookmarkService.getBookmarksByUser(userId, sortedPageable);
+        Page<MedicineBookmarkResponse> bookmarkResponses = bookmarks.map(medicineMapper::toResponseDto);
 
+        return ResponseEntity.ok(bookmarkResponses);
+    }
 }

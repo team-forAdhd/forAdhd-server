@@ -4,7 +4,10 @@ import com.project.foradhd.domain.medicine.persistence.entity.MedicineBookmark;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface MedicineBookmarkService {
     void toggleBookmark(String userId, Long medicineId);
-    List<MedicineBookmark> getBookmarksByUser(String userId);
+    Page<MedicineBookmark> getBookmarksByUser(String userId, Pageable pageable);
 }
