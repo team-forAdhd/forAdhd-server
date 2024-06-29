@@ -1,10 +1,12 @@
 package com.project.foradhd.domain.hospital.web.controller;
 
+import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
+import com.project.foradhd.domain.hospital.web.dto.request.HospitalEvaluationReviewCreateRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewUpdateRequest;
@@ -76,6 +78,15 @@ public class HospitalController {
         HospitalEvaluationReviewResponse hospitalEvaluationReviewResponse =
                 hospitalMapper.toEvaluationReviewResponse(hospitalEvaluationReviewData);
         return ResponseEntity.ok(hospitalEvaluationReviewResponse);
+    }
+
+    @PostMapping("/{hospitalId}/evaluation-reviews")
+    public ResponseEntity<Void> createEvaluationReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalId,
+                                                    @RequestBody @Valid HospitalEvaluationReviewCreateRequest request) {
+        HospitalEvaluationReviewCreateData hospitalEvaluationReviewCreateData = hospitalMapper.toHospitalEvaluationReviewCreateData(request);
+        hospitalService.createEvaluationReview(userId, hospitalId, hospitalEvaluationReviewCreateData);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping("/{hospitalId}/bookmark")

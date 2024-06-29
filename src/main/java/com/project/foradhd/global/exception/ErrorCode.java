@@ -29,9 +29,11 @@ public enum ErrorCode {
     NOT_FOUND_HOSPITAL(NOT_FOUND, "존재하지 않는 병원입니다."),
     NOT_FOUND_DOCTOR(NOT_FOUND, "존재하지 않는 의사입니다."),
     NOT_FOUND_HOSPITAL_RECEIPT_REVIEW(NOT_FOUND, "존재하지 않는 영수증 리뷰입니다."),
+    NOT_FOUND_HOSPITAL_EVALUATION_QUESTION(NOT_FOUND, "존재하지 않는 포에이리본 병원 평가 질문입니다."),
     FORBIDDEN_HOSPITAL_RECEIPT_REVIEW(FORBIDDEN, "영수증 리뷰에 접근할 수 있는 권한이 없습니다."),
     FORBIDDEN_HOSPITAL_EVALUATION_REVIEW(FORBIDDEN, "포에이리본 병원 평가 리뷰에 접근할 수 있는 권한이 없습니다."),
     ALREADY_EXISTS_HOSPITAL_RECEIPT_REVIEW(CONFLICT, "이미 작성한 영수증 리뷰가 있습니다."),
+    ALREADY_EXISTS_HOSPITAL_EVALUATION_REVIEW(CONFLICT, "이미 작성한 포에이리본 병원 평가 리뷰가 있습니다."),
 
     //S3
     EMPTY_FILE(BAD_REQUEST, "유효한 파일이어야 합니다."),

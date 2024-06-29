@@ -50,4 +50,8 @@ public class Hospital extends BaseTimeEntity {
     public void updateTotalReceiptReviewCount(int totalReceiptReviewCount) {
         this.totalReceiptReviewCount = totalReceiptReviewCount;
     }
+
+    public void updateTotalEvaluationReviewCount(int totalEvaluationReviewCount) {
+        this.totalEvaluationReviewCount = totalEvaluationReviewCount;
+    }
 }

@@ -1,5 +1,7 @@
 package com.project.foradhd.domain.hospital.business.service;
 
+import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationReviewCreateData;
+import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationReviewCreateData.HospitalEvaluationAnswerCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
@@ -23,9 +25,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.project.foradhd.global.util.AverageCalculator.calculateAverage;
+import static java.util.function.Function.identity;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -37,6 +42,7 @@ public class HospitalService {
     private final HospitalBookmarkRepository hospitalBookmarkRepository;
     private final HospitalReceiptReviewRepository hospitalReceiptReviewRepository;
     private final HospitalReceiptReviewHelpRepository hospitalReceiptReviewHelpRepository;
+    private final HospitalEvaluationReviewRepository hospitalEvaluationReviewRepository;
     private final HospitalEvaluationQuestionRepository hospitalEvaluationQuestionRepository;
     private final HospitalEvaluationAnswerRepository hospitalEvaluationAnswerRepository;
 
@@ -170,9 +176,42 @@ public class HospitalService {
     }
 
     public HospitalEvaluationReviewData getEvaluationReview(String userId, String hospitalEvaluationReviewId) {
-        List<HospitalEvaluationAnswer> hospitalEvaluationAnswerList = hospitalEvaluationAnswerRepository.findAllByUserIdAndReviewId(hospitalEvaluationReviewId);
+        List<HospitalEvaluationAnswer> hospitalEvaluationAnswerList = hospitalEvaluationAnswerRepository.findAllByUserIdAndReviewIdFetch(hospitalEvaluationReviewId);
         validateEvaluationReviewer(userId, hospitalEvaluationAnswerList);
         return new HospitalEvaluationReviewData(hospitalEvaluationAnswerList);
+    }
+
+    @Transactional
+    public void createEvaluationReview(String userId, String hospitalId,
+                                    HospitalEvaluationReviewCreateData hospitalEvaluationReviewCreateData) {
+        validateDuplicatedHospitalEvaluationReview(userId, hospitalId);
+        List<Long> hospitalEvaluationQuestionIds = hospitalEvaluationReviewCreateData.getHospitalEvaluationAnswerList().stream()
+                .map(HospitalEvaluationAnswerCreateData::getHospitalEvaluationQuestionId)
+                .toList();
+        List<HospitalEvaluationQuestion> hospitalEvaluationQuestionList = hospitalEvaluationQuestionRepository.findAllIn(hospitalEvaluationQuestionIds);
+        Map<Long, HospitalEvaluationQuestion> hospitalEvaluationQuestionById = hospitalEvaluationQuestionList.stream()
+                .collect(Collectors.toMap(HospitalEvaluationQuestion::getId, identity()));
+        validateEvaluationQuestion(hospitalEvaluationQuestionIds, hospitalEvaluationQuestionById);
+
+        User user = User.builder().id(userId).build();
+        Hospital hospital = getHospital(hospitalId);
+        HospitalEvaluationReview hospitalEvaluationReview = HospitalEvaluationReview.builder()
+                .user(user)
+                .hospital(hospital)
+                .build();
+        List<HospitalEvaluationAnswer> hospitalEvaluationAnswerList = hospitalEvaluationReviewCreateData.getHospitalEvaluationAnswerList()
+                .stream()
+                .map(evaluationAnswer -> HospitalEvaluationAnswer.builder()
+                        .hospitalEvaluationReview(hospitalEvaluationReview)
+                        .hospitalEvaluationQuestion(hospitalEvaluationQuestionById.get(evaluationAnswer.getHospitalEvaluationQuestionId()))
+                        .answer(evaluationAnswer.getAnswer())
+                        .build())
+                .toList();
+
+        hospitalEvaluationReviewRepository.save(hospitalEvaluationReview);
+        hospitalEvaluationAnswerRepository.saveAll(hospitalEvaluationAnswerList);
+        int totalEvaluationReviewCount = hospitalEvaluationReviewRepository.countByHospitalId(hospitalId);
+        hospital.updateTotalEvaluationReviewCount(totalEvaluationReviewCount);
     }
 
     @Transactional
@@ -270,6 +309,21 @@ public class HospitalService {
         if (existsHospitalReceiptReview) {
             throw new BusinessException(ErrorCode.ALREADY_EXISTS_HOSPITAL_RECEIPT_REVIEW);
         }
+    }
+
+    public void validateDuplicatedHospitalEvaluationReview(String userId, String hospitalId) {
+        boolean existsHospitalEvaluationReview = hospitalEvaluationReviewRepository.findByUserIdAndHospitalId(userId, hospitalId).isPresent();
+        if (existsHospitalEvaluationReview) {
+            throw new BusinessException(ErrorCode.ALREADY_EXISTS_HOSPITAL_EVALUATION_REVIEW);
+        }
+    }
+
+    public void validateEvaluationQuestion(List<Long> hospitalEvaluationQuestionIds, Map<Long, HospitalEvaluationQuestion> hospitalEvaluationQuestionById) {
+        hospitalEvaluationQuestionIds.forEach(hospitalEvaluationQuestionId -> {
+            if (!hospitalEvaluationQuestionById.containsKey(hospitalEvaluationQuestionId)) {
+                throw new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL_EVALUATION_QUESTION);
+            }
+        });
     }
 
     public void validateReceiptReviewer(HospitalReceiptReview hospitalReceiptReview, String userId) {

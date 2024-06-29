@@ -16,5 +16,5 @@ public interface HospitalEvaluationAnswerRepository extends JpaRepository<Hospit
         join fetch hea.hospitalEvaluationReview
         where hea.hospitalEvaluationReview.id = :hospitalEvaluationReviewId
     """)
-    List<HospitalEvaluationAnswer> findAllByUserIdAndReviewId(@Param("hospitalEvaluationReviewId") String hospitalEvaluationReviewId);
+    List<HospitalEvaluationAnswer> findAllByUserIdAndReviewIdFetch(@Param("hospitalEvaluationReviewId") String hospitalEvaluationReviewId);
 }
