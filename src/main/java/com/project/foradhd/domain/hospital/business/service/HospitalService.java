@@ -177,22 +177,43 @@ public class HospitalService {
     }
 
     @Transactional
-    public void createReceiptReview(String userId, String hospitalId, String doctorId,
+    public void createReceiptReview(String userId, String hospitalId,
                                     HospitalReceiptReviewCreateData hospitalReceiptReviewCreateData) {
-        Doctor doctor = getDoctor(hospitalId, doctorId);
-        validateDuplicatedHospitalReceiptReview(userId, doctorId);
+        validateDuplicatedHospitalReceiptReview(userId, null); //TODO: 영수증 ID로 중복 검증 로직 구현
+        Hospital hospital = getHospital(hospitalId);
         HospitalReceiptReview hospitalReceiptReview = HospitalReceiptReview.builder()
                 .user(User.builder().id(userId).build())
-                .doctor(doctor)
-//                .kindness(hospitalReceiptReviewCreateData.getKindness())
-//                .adhdUnderstanding(hospitalReceiptReviewCreateData.getAdhdUnderstanding())
-//                .enoughMedicalTime(hospitalReceiptReviewCreateData.getEnoughMedicalTime())
+                .hospital(hospital)
                 .content(hospitalReceiptReviewCreateData.getContent())
                 .images(hospitalReceiptReviewCreateData.getImageList())
+                .medicalExpense(hospitalReceiptReviewCreateData.getMedicalExpense())
                 .build();
 
-        doctor.updateByCreatedReceiptReview();
         hospitalReceiptReviewRepository.save(hospitalReceiptReview);
+        int totalHospitalReceiptReviewCount = hospitalReceiptReviewRepository.countByHospitalId(hospitalId);
+        hospital.updateTotalReceiptReviewCount(totalHospitalReceiptReviewCount);
+    }
+
+    @Transactional
+    public void createReceiptReview(String userId, String hospitalId, String doctorId,
+                                    HospitalReceiptReviewCreateData hospitalReceiptReviewCreateData) {
+        validateDuplicatedHospitalReceiptReview(userId, null); //TODO: 영수증 ID로 중복 검증 로직 구현
+        Hospital hospital = getHospital(hospitalId);
+        Doctor doctor = getDoctor(hospitalId, doctorId);
+        HospitalReceiptReview hospitalReceiptReview = HospitalReceiptReview.builder()
+                .user(User.builder().id(userId).build())
+                .hospital(hospital)
+                .doctor(doctor)
+                .content(hospitalReceiptReviewCreateData.getContent())
+                .images(hospitalReceiptReviewCreateData.getImageList())
+                .medicalExpense(hospitalReceiptReviewCreateData.getMedicalExpense())
+                .build();
+
+        hospitalReceiptReviewRepository.save(hospitalReceiptReview);
+        int totalHospitalReceiptReviewCount = hospitalReceiptReviewRepository.countByHospitalId(hospitalId);
+        int totalDoctorReceiptReviewCount = hospitalReceiptReviewRepository.countByDoctorId(doctorId);
+        hospital.updateTotalReceiptReviewCount(totalHospitalReceiptReviewCount);
+        doctor.updateTotalReceiptReviewCount(totalDoctorReceiptReviewCount);
     }
 
     @Transactional
@@ -234,8 +255,8 @@ public class HospitalService {
                 .ifPresent(doctor -> doctor.updateTotalReceiptReviewCount(totalDoctorReceiptReviewCount));
     }
 
-    private void validateDuplicatedHospitalReceiptReview(String userId, String doctorId) {
-        boolean existsHospitalReceiptReview = hospitalReceiptReviewRepository.findByUserIdAndDoctorId(userId, doctorId).isPresent();
+    private void validateDuplicatedHospitalReceiptReview(String userId, String receiptId) {
+        boolean existsHospitalReceiptReview = hospitalReceiptReviewRepository.findByUserIdAndReceiptId(userId, receiptId).isPresent();
         if (existsHospitalReceiptReview) {
             throw new BusinessException(ErrorCode.ALREADY_EXISTS_HOSPITAL_RECEIPT_REVIEW);
         }

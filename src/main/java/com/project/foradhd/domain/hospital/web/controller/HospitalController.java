@@ -75,8 +75,17 @@ public class HospitalController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{hospitalId}/receipt-reviews")
+    public ResponseEntity<Void> createHospitalReceiptReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalId,
+                                                    @RequestBody @Valid HospitalReceiptReviewCreateRequest request) {
+        HospitalReceiptReviewCreateData hospitalReceiptReviewCreateData = hospitalMapper.toHospitalReceiptReviewCreateData(request);
+        hospitalService.createReceiptReview(userId, hospitalId, hospitalReceiptReviewCreateData);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
     @PostMapping("/{hospitalId}/doctors/{doctorId}/receipt-reviews")
-    public ResponseEntity<Void> createReceiptReview(@AuthUserId String userId,
+    public ResponseEntity<Void> createDoctorReceiptReview(@AuthUserId String userId,
                                                     @PathVariable String hospitalId, @PathVariable String doctorId,
                                                     @RequestBody @Valid HospitalReceiptReviewCreateRequest request) {
         HospitalReceiptReviewCreateData hospitalReceiptReviewCreateData = hospitalMapper.toHospitalReceiptReviewCreateData(request);

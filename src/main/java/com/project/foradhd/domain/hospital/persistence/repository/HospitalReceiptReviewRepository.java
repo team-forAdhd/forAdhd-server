@@ -21,9 +21,9 @@ public interface HospitalReceiptReviewRepository extends JpaRepository<HospitalR
     @Query("""
         select hrr
         from HospitalReceiptReview hrr
-        where hrr.user.id = :userId and hrr.doctor.id = :doctorId and hrr.deleted = false
+        where hrr.user.id = :userId and hrr.receiptId = :receiptId and hrr.deleted = false
     """)
-    Optional<HospitalReceiptReview> findByUserIdAndDoctorId(@Param("userId") String userId, @Param("doctorId") String doctorId);
+    Optional<HospitalReceiptReview> findByUserIdAndReceiptId(@Param("userId") String userId, @Param("receiptId") String receiptId);
 
     @Modifying
     @Query("""

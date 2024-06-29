@@ -41,10 +41,6 @@ public class Doctor extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
 
-    public void updateByCreatedReceiptReview() {
-        totalReceiptReviewCount++;
-    }
-
     public void updateTotalReceiptReviewCount(int totalReceiptReviewCount) {
         this.totalReceiptReviewCount = totalReceiptReviewCount;
     }

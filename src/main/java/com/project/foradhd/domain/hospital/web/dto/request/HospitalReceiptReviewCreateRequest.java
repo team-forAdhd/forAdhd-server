@@ -7,9 +7,7 @@ import java.util.List;
 @Getter
 public class HospitalReceiptReviewCreateRequest {
 
-    private Integer kindness;
-    private Integer adhdUnderstanding;
-    private Integer enoughMedicalTime;
     private String content;
     private List<String> imageList;
+    private Long medicalExpense;
 }
