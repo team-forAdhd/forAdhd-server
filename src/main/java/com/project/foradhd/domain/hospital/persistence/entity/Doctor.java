@@ -41,26 +41,11 @@ public class Doctor extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
 
-    //TODO: 아래 메소드 모두 수정
-    public Double calculateTotalGrade() {
-        return null;
-    }
-
-    public Long calculateTotalReviewCount() {
-        return (long) totalReceiptReviewCount;
-    }
-
-    public void updateByCreatedReceiptReview(Integer receiptReviewTotalGradeSum) {
+    public void updateByCreatedReceiptReview() {
         totalReceiptReviewCount++;
     }
 
-    public void updateByDeletedReceiptReview(Integer receiptReviewTotalGradeSum) {
-        totalReceiptReviewCount--;
-    }
-
-    public void updateByCreatedBriefReview(Integer briefReviewTotalGradeSum) {
-    }
-
-    public void updateByDeletedBriefReview(Integer briefReviewTotalGradeSum) {
+    public void updateTotalReceiptReviewCount(int totalReceiptReviewCount) {
+        this.totalReceiptReviewCount = totalReceiptReviewCount;
     }
 }

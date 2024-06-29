@@ -46,4 +46,8 @@ public class Hospital extends BaseTimeEntity {
     @ColumnDefault("0")
     @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
+
+    public void updateTotalReceiptReviewCount(int totalReceiptReviewCount) {
+        this.totalReceiptReviewCount = totalReceiptReviewCount;
+    }
 }

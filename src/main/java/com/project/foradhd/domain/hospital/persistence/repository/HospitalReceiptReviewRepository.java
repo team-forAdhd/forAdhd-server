@@ -32,4 +32,18 @@ public interface HospitalReceiptReviewRepository extends JpaRepository<HospitalR
         where hrr.id = :hospitalReceiptReviewId
     """)
     void deleteSoftly(@Param("hospitalReceiptReviewId") String hospitalReceiptReviewId);
+
+    @Query("""
+        select count(*)
+        from HospitalReceiptReview hrr
+        where hrr.hospital.id = :hospitalId and hrr.deleted = false
+    """)
+    int countByHospitalId(String hospitalId);
+
+    @Query("""
+        select count(*)
+        from HospitalReceiptReview hrr
+        where hrr.doctor.id = :doctorId and hrr.deleted = false
+    """)
+    int countByDoctorId(String doctorId);
 }

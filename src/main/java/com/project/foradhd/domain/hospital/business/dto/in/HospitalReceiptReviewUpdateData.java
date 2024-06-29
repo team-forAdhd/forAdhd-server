@@ -11,4 +11,5 @@ public class HospitalReceiptReviewUpdateData {
 
     private String content;
     private List<String> imageList;
+    private Long medicalExpense;
 }

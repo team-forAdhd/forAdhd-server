@@ -81,8 +81,8 @@ public class HospitalService {
                         .doctorId(doctor.getId())
                         .name(doctor.getName())
                         .image(doctor.getImage())
-                        .totalGrade(doctor.calculateTotalGrade())
-                        .totalReviewCount(doctor.calculateTotalReviewCount())
+                        .totalGrade(0D)
+                        .totalReviewCount(0L)
                         .profile(doctor.getProfile())
                         .build())
                 .toList();
@@ -114,8 +114,8 @@ public class HospitalService {
                 .build();
         return DoctorDetailsData.builder()
                 .name(doctor.getName())
-                .totalGrade(doctor.calculateTotalGrade())
-                .totalReviewCount(doctor.calculateTotalReviewCount())
+                .totalGrade(0D)
+                .totalReviewCount(0L)
                 .profile(doctor.getProfile())
                 .briefReview(briefReviewData)
                 .build();
@@ -191,8 +191,7 @@ public class HospitalService {
                 .images(hospitalReceiptReviewCreateData.getImageList())
                 .build();
 
-        Integer receiptReviewTotalGradeSum = hospitalReceiptReview.calculateTotalGradeSum();
-        doctor.updateByCreatedReceiptReview(receiptReviewTotalGradeSum);
+        doctor.updateByCreatedReceiptReview();
         hospitalReceiptReviewRepository.save(hospitalReceiptReview);
     }
 
@@ -215,18 +214,24 @@ public class HospitalService {
         HospitalReceiptReview hospitalReceiptReview = getHospitalReceiptReview(hospitalReceiptReviewId);
         validateReceiptReviewer(hospitalReceiptReview, userId);
         hospitalReceiptReview.update(hospitalReceiptReviewUpdateData.getContent(),
-                hospitalReceiptReviewUpdateData.getImageList());
+                hospitalReceiptReviewUpdateData.getImageList(), hospitalReceiptReviewUpdateData.getMedicalExpense());
     }
 
     @Transactional
     public void deleteReceiptReview(String userId, String hospitalReceiptReviewId) {
         HospitalReceiptReview hospitalReceiptReview = getHospitalReceiptReview(hospitalReceiptReviewId);
         validateReceiptReviewer(hospitalReceiptReview, userId);
-        Doctor doctor = getDoctor(hospitalReceiptReview.getDoctor().getId());
-
-        Integer receiptReviewTotalGradeSum = hospitalReceiptReview.calculateTotalGradeSum();
-        doctor.updateByDeletedReceiptReview(receiptReviewTotalGradeSum);
         hospitalReceiptReviewRepository.deleteSoftly(hospitalReceiptReviewId);
+
+        String hospitalId = hospitalReceiptReview.getHospital().getId();
+        String doctorId = hospitalReceiptReview.getDoctor().getId();
+        int totalHospitalReceiptReviewCount = hospitalReceiptReviewRepository.countByHospitalId(hospitalId);
+        int totalDoctorReceiptReviewCount = hospitalReceiptReviewRepository.countByDoctorId(doctorId);
+
+        Hospital hospital = getHospital(hospitalId);
+        hospital.updateTotalReceiptReviewCount(totalHospitalReceiptReviewCount);
+        doctorRepository.findById(doctorId)
+                .ifPresent(doctor -> doctor.updateTotalReceiptReviewCount(totalDoctorReceiptReviewCount));
     }
 
     private void validateDuplicatedHospitalReceiptReview(String userId, String doctorId) {

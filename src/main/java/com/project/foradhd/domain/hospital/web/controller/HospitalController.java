@@ -92,7 +92,7 @@ public class HospitalController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/doctors/receipt-reviews/{hospitalReceiptReviewId}")
+    @PutMapping("/receipt-reviews/{hospitalReceiptReviewId}")
     public ResponseEntity<Void> updateReceiptReview(@AuthUserId String userId,
                                                     @PathVariable String hospitalReceiptReviewId,
                                                     @RequestBody @Valid HospitalReceiptReviewUpdateRequest request) {
@@ -101,7 +101,7 @@ public class HospitalController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/doctors/receipt-reviews/{hospitalReceiptReviewId}")
+    @DeleteMapping("/receipt-reviews/{hospitalReceiptReviewId}")
     public ResponseEntity<Void> deleteReceiptReview(@AuthUserId String userId,
                                                     @PathVariable String hospitalReceiptReviewId) {
         hospitalService.deleteReceiptReview(userId, hospitalReceiptReviewId);

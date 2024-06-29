@@ -28,12 +28,12 @@ public class HospitalReceiptReview extends BaseTimeEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "doctor_id", nullable = false)
-    private Doctor doctor;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id", nullable = false)
     private Hospital hospital;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "doctor_id")
+    private Doctor doctor;
 
     private String receiptId;
 
@@ -57,17 +57,13 @@ public class HospitalReceiptReview extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
 
-    //TODO: 아래 메소드 모두 수정
-    public Integer calculateTotalGradeSum() {
-        return null;
-    }
-
     public void updateHelpCount(Integer helpCount) {
         this.helpCount = helpCount;
     }
 
-    public void update(String content, List<String> images) {
+    public void update(String content, List<String> images, Long medicalExpense) {
         this.content = content;
         this.images = images;
+        this.medicalExpense = medicalExpense;
     }
 }
