@@ -69,6 +69,15 @@ public class HospitalController {
         return ResponseEntity.ok(hospitalEvaluationQuestionListResponse);
     }
 
+    @GetMapping("/evaluation-reviews/{hospitalEvaluationReviewId}")
+    public ResponseEntity<HospitalEvaluationReviewResponse> getEvaluationReview(@AuthUserId String userId,
+                                                                                @PathVariable String hospitalEvaluationReviewId) {
+        HospitalEvaluationReviewData hospitalEvaluationReviewData = hospitalService.getEvaluationReview(userId, hospitalEvaluationReviewId);
+        HospitalEvaluationReviewResponse hospitalEvaluationReviewResponse =
+                hospitalMapper.toEvaluationReviewResponse(hospitalEvaluationReviewData);
+        return ResponseEntity.ok(hospitalEvaluationReviewResponse);
+    }
+
     @PostMapping("/{hospitalId}/bookmark")
     public ResponseEntity<Void> bookmarkHospital(@AuthUserId String userId,
                                                 @PathVariable String hospitalId,

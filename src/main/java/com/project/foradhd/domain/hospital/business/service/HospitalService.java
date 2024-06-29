@@ -38,6 +38,7 @@ public class HospitalService {
     private final HospitalReceiptReviewRepository hospitalReceiptReviewRepository;
     private final HospitalReceiptReviewHelpRepository hospitalReceiptReviewHelpRepository;
     private final HospitalEvaluationQuestionRepository hospitalEvaluationQuestionRepository;
+    private final HospitalEvaluationAnswerRepository hospitalEvaluationAnswerRepository;
 
     public HospitalListNearbyData getHospitalListNearby(String userId, HospitalListNearbySearchCond searchCond,
                                                         Pageable pageable) {
@@ -168,6 +169,12 @@ public class HospitalService {
         return new HospitalEvaluationQuestionListData(hospitalEvaluationQuestionList);
     }
 
+    public HospitalEvaluationReviewData getEvaluationReview(String userId, String hospitalEvaluationReviewId) {
+        List<HospitalEvaluationAnswer> hospitalEvaluationAnswerList = hospitalEvaluationAnswerRepository.findAllByUserIdAndReviewId(hospitalEvaluationReviewId);
+        validateEvaluationReviewer(userId, hospitalEvaluationAnswerList);
+        return new HospitalEvaluationReviewData(hospitalEvaluationAnswerList);
+    }
+
     @Transactional
     public void saveHospitalBookmark(String userId, String hospitalId, boolean bookmark) {
         Hospital hospital = getHospital(hospitalId);
@@ -258,7 +265,7 @@ public class HospitalService {
                 .ifPresent(doctor -> doctor.updateTotalReceiptReviewCount(totalDoctorReceiptReviewCount));
     }
 
-    private void validateDuplicatedHospitalReceiptReview(String userId, String receiptId) {
+    public void validateDuplicatedHospitalReceiptReview(String userId, String receiptId) {
         boolean existsHospitalReceiptReview = hospitalReceiptReviewRepository.findByUserIdAndReceiptId(userId, receiptId).isPresent();
         if (existsHospitalReceiptReview) {
             throw new BusinessException(ErrorCode.ALREADY_EXISTS_HOSPITAL_RECEIPT_REVIEW);
@@ -270,5 +277,14 @@ public class HospitalService {
         if (!Objects.equals(reviewerId, userId)) {
             throw new BusinessException(ErrorCode.FORBIDDEN_HOSPITAL_RECEIPT_REVIEW);
         }
+    }
+
+    public void validateEvaluationReviewer(String userId, List<HospitalEvaluationAnswer> hospitalEvaluationAnswerList) {
+        hospitalEvaluationAnswerList.forEach(evaluationAnswer -> {
+            String reviewerId = evaluationAnswer.getHospitalEvaluationReview().getUser().getId();
+            if (!Objects.equals(reviewerId, userId)) {
+                throw new BusinessException(ErrorCode.FORBIDDEN_HOSPITAL_EVALUATION_REVIEW);
+            }
+        });
     }
 }

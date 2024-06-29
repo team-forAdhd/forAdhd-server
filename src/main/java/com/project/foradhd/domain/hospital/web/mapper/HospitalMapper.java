@@ -5,6 +5,7 @@ import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReview
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
+import com.project.foradhd.domain.hospital.persistence.entity.HospitalEvaluationAnswer;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalEvaluationQuestion;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
 import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
@@ -80,4 +81,24 @@ public interface HospitalMapper {
     @Mapping(target = "hospitalEvaluationQuestionId", source = "id")
     HospitalEvaluationQuestionListResponse.HospitalEvaluationQuestionResponse
         mapToEvaluationQuestion(HospitalEvaluationQuestion evaluationQuestion);
+
+    @Mappings({
+            @Mapping(target = "hospitalEvaluationAnswerList", source = "hospitalEvaluationAnswerList",
+                    qualifiedByName = "mapToEvaluationAnswerList")
+    })
+    HospitalEvaluationReviewResponse toEvaluationReviewResponse(HospitalEvaluationReviewData hospitalEvaluationReview);
+
+    @Named("mapToEvaluationAnswerList")
+    @IterableMapping(qualifiedByName = "mapToEvaluationAnswer")
+    List<HospitalEvaluationReviewResponse.HospitalEvaluationAnswerResponse>
+        mapToEvaluationAnswerList(List<HospitalEvaluationAnswer> evaluationAnswerList);
+
+    @Named("mapToEvaluationAnswer")
+    @Mappings({
+            @Mapping(target = "hospitalEvaluationQuestionId", source = "hospitalEvaluationQuestion.id"),
+            @Mapping(target = "seq", source = "hospitalEvaluationQuestion.seq"),
+            @Mapping(target = "question", source = "hospitalEvaluationQuestion.question")
+    })
+    HospitalEvaluationReviewResponse.HospitalEvaluationAnswerResponse
+        mapToEvaluationAnswer(HospitalEvaluationAnswer evaluationAnswer);
 }
