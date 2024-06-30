@@ -1,31 +1,28 @@
 package com.project.foradhd.domain.hospital.business.dto.out;
 
+import com.project.foradhd.domain.hospital.persistence.entity.HospitalReceiptReview;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Builder
 public class HospitalReceiptReviewListData {
 
-    private List<ReceiptReviewData> receiptReviewList;
+    private List<HospitalReceiptReviewData> hospitalReceiptReviewList;
     private PagingResponse paging;
 
     @Getter
     @Builder
-    public static class ReceiptReviewData {
+    public static class HospitalReceiptReviewData {
 
+        private HospitalReceiptReview hospitalReceiptReview;
         private String writerId;
-        private String name;
-        private String image;
-        private Double totalGrade;
-        private LocalDateTime createdAt;
-        private List<String> reviewImageList;
-        private String content;
-        private Integer helpCount;
+        private String writerName;
+        private String writerImage;
+        private String doctorName;
         private Boolean isHelped;
         private Boolean isMine;
     }

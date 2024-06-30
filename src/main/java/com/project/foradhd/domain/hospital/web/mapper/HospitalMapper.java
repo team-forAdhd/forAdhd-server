@@ -72,18 +72,27 @@ public interface HospitalMapper {
     HospitalDetailsResponse.DoctorResponse mapToDoctor(Doctor doctor);
 
     @Mappings({
-            @Mapping(target = "receiptReviewList", source = "receiptReviewList", qualifiedByName = "mapToReceiptReviewList")
+            @Mapping(target = "hospitalReceiptReviewList", source = "hospitalReceiptReviewList",
+                    qualifiedByName = "mapToHospitalReceiptReviewList")
     })
     HospitalReceiptReviewListResponse toReceiptReviewListResponse(HospitalReceiptReviewListData hospitalReceiptReviewListData);
 
-    @Named("mapToReceiptReviewList")
-    @IterableMapping(qualifiedByName = "mapToReceiptReview")
-    List<HospitalReceiptReviewListResponse.ReceiptReviewResponse>
-        mapToReceiptReviewList(List<HospitalReceiptReviewListData.ReceiptReviewData> receiptreviewList);
+    @Named("mapToHospitalReceiptReviewList")
+    @IterableMapping(qualifiedByName = "mapToHospitalReceiptReview")
+    List<HospitalReceiptReviewListResponse.HospitalReceiptReviewResponse>
+        mapToHospitalReceiptReviewList(List<HospitalReceiptReviewListData.HospitalReceiptReviewData> receiptreviewList);
 
-    @Named("mapToReceiptReview")
-    HospitalReceiptReviewListResponse.ReceiptReviewResponse
-        mapToReceiptReview(HospitalReceiptReviewListData.ReceiptReviewData receiptReview);
+    @Mappings({
+            @Mapping(target = "hospitalReceiptReviewId", source = "hospitalReceiptReview.id"),
+            @Mapping(target = "createdAt", source = "hospitalReceiptReview.createdAt"),
+            @Mapping(target = "content", source = "hospitalReceiptReview.content"),
+            @Mapping(target = "imageList", source = "hospitalReceiptReview.images"),
+            @Mapping(target = "medicalExpense", source = "hospitalReceiptReview.medicalExpense"),
+            @Mapping(target = "helpCount", source = "hospitalReceiptReview.helpCount")
+    })
+    @Named("mapToHospitalReceiptReview")
+    HospitalReceiptReviewListResponse.HospitalReceiptReviewResponse
+        mapToHospitalReceiptReview(HospitalReceiptReviewListData.HospitalReceiptReviewData receiptReview);
 
     HospitalReceiptReviewCreateData toHospitalReceiptReviewCreateData(HospitalReceiptReviewCreateRequest request);
 

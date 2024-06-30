@@ -4,7 +4,6 @@ import com.project.foradhd.domain.hospital.business.dto.in.*;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationReviewCreateData.HospitalEvaluationAnswerCreateData;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData.ReceiptReviewData;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalNearbyDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalReceiptReviewDto;
 import com.project.foradhd.domain.hospital.persistence.entity.*;
@@ -26,7 +25,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.project.foradhd.global.util.AverageCalculator.calculateAverage;
 import static java.util.function.Function.identity;
 
 @RequiredArgsConstructor
@@ -55,6 +53,33 @@ public class HospitalService {
         PagingResponse paging = PagingResponse.from(hospitalPaging);
         return HospitalListNearbyData.builder()
                 .hospitalList(hospitalList)
+                .paging(paging)
+                .build();
+    }
+
+    public HospitalReceiptReviewListData getReceiptReviewList(String userId, String hospitalId, String doctorId, Pageable pageable) {
+        Page<HospitalReceiptReviewDto> hospitalReceiptReviewPaging = hospitalReceiptReviewRepository
+                .findAll(userId, hospitalId, doctorId, pageable);
+        List<HospitalReceiptReviewListData.HospitalReceiptReviewData> hospitalReceiptReviewList = hospitalReceiptReviewPaging.getContent()
+                .stream()
+                .map(dto -> {
+                    HospitalReceiptReview hospitalReceiptReview = dto.getHospitalReceiptReview();
+                    UserProfile writerProfile = dto.getUserProfile();
+                    Doctor doctor = dto.getDoctor();
+                    return HospitalReceiptReviewListData.HospitalReceiptReviewData.builder()
+                            .hospitalReceiptReview(hospitalReceiptReview)
+                            .writerId(writerProfile.getUser().getId())
+                            .writerName(writerProfile.getNickname())
+                            .writerImage(writerProfile.getProfileImage())
+                            .doctorName(doctor == null ? null : doctor.getName())
+                            .isHelped(dto.isHelped())
+                            .isMine(dto.isMine())
+                            .build();
+                }).toList();
+        PagingResponse paging = PagingResponse.from(hospitalReceiptReviewPaging);
+
+        return HospitalReceiptReviewListData.builder()
+                .hospitalReceiptReviewList(hospitalReceiptReviewList)
                 .paging(paging)
                 .build();
     }
@@ -112,35 +137,6 @@ public class HospitalService {
     public HospitalEvaluationReview getHospitalEvaluationReviewFetchAll(String hospitalEvaluationReviewId) {
         return hospitalEvaluationReviewRepository.findByIdFetchAll(hospitalEvaluationReviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL_EVALUATION_REVIEW));
-    }
-
-    public HospitalReceiptReviewListData getReceiptReviewList(String userId, String hospitalId, String doctorId, Pageable pageable) {
-        Page<HospitalReceiptReviewDto> hospitalReceiptReviewPaging = hospitalReceiptReviewRepository
-                .findAll(userId, hospitalId, doctorId, pageable);
-        List<ReceiptReviewData> receiptReviewList = hospitalReceiptReviewPaging.getContent()
-                .stream()
-                .map(dto -> {
-                    HospitalReceiptReview receiptReview = dto.getHospitalReceiptReview();
-                    UserProfile writerProfile = dto.getUserProfile();
-                    return ReceiptReviewData.builder()
-                            .writerId(writerProfile.getUser().getId())
-                            .name(writerProfile.getNickname())
-                            .image(writerProfile.getProfileImage())
-                            .totalGrade(null)
-                            .createdAt(receiptReview.getCreatedAt())
-                            .reviewImageList(receiptReview.getImages())
-                            .content(receiptReview.getContent())
-                            .helpCount(receiptReview.getHelpCount())
-                            .isHelped(dto.isHelped())
-                            .isMine(dto.isMine())
-                            .build();
-                }).toList();
-        PagingResponse paging = PagingResponse.from(hospitalReceiptReviewPaging);
-
-        return HospitalReceiptReviewListData.builder()
-                .receiptReviewList(receiptReviewList)
-                .paging(paging)
-                .build();
     }
 
     public HospitalEvaluationQuestionListData getEvaluationQuestionList() {

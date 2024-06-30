@@ -32,6 +32,17 @@ public class HospitalController {
         return ResponseEntity.ok(hospitalListNearbyResponse);
     }
 
+    @GetMapping("/{hospitalId}/receipt-reviews")
+    public ResponseEntity<HospitalReceiptReviewListResponse> getReceiptReviewList(@AuthUserId String userId,
+                                                                                @PathVariable String hospitalId,
+                                                                                @RequestParam(required = false) String doctorId,
+                                                                                Pageable pageable) {
+        HospitalReceiptReviewListData hospitalReceiptReviewListData = hospitalService.getReceiptReviewList(userId, hospitalId, doctorId, pageable);
+        HospitalReceiptReviewListResponse hospitalReceiptReviewListResponse =
+                hospitalMapper.toReceiptReviewListResponse(hospitalReceiptReviewListData);
+        return ResponseEntity.ok(hospitalReceiptReviewListResponse);
+    }
+
     @GetMapping("/{hospitalId}/doctors/brief")
     public ResponseEntity<DoctorBriefListResponse> getDoctorBriefList(@PathVariable String hospitalId) {
         DoctorBriefListData doctorBriefListData = hospitalService.getDoctorBriefList(hospitalId);
@@ -45,16 +56,6 @@ public class HospitalController {
         HospitalDetailsData hospitalDetailsData = hospitalService.getHospitalDetails(userId, hospitalId);
         HospitalDetailsResponse hospitalDetailsResponse = hospitalMapper.toHospitalDetailsResponse(hospitalDetailsData);
         return ResponseEntity.ok(hospitalDetailsResponse);
-    }
-
-    @GetMapping("/{hospitalId}/doctors/{doctorId}/receipt-reviews")
-    public ResponseEntity<HospitalReceiptReviewListResponse> getReceiptReviewList(@AuthUserId String userId,
-                                                                                @PathVariable String hospitalId, @PathVariable String doctorId,
-                                                                                Pageable pageable) {
-        HospitalReceiptReviewListData hospitalReceiptReviewListData = hospitalService.getReceiptReviewList(userId, hospitalId, doctorId, pageable);
-        HospitalReceiptReviewListResponse hospitalReceiptReviewListResponse =
-                hospitalMapper.toReceiptReviewListResponse(hospitalReceiptReviewListData);
-        return ResponseEntity.ok(hospitalReceiptReviewListResponse);
     }
 
     @GetMapping("/evaluation-questions")
