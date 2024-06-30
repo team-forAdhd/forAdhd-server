@@ -28,6 +28,14 @@ public interface HospitalMapper {
     @IterableMapping(qualifiedByName = "mapToHospital")
     List<HospitalNearbyResponse> mapToHospitalList(List<HospitalNearbyData> hospitalList);
 
+    @Mappings({
+            @Mapping(target = "hospitalId", source = "hospital.id"),
+            @Mapping(target = "name", source = "hospital.name"),
+            @Mapping(target = "totalReceiptReviewCount", source = "hospital.totalReceiptReviewCount"),
+            @Mapping(target = "totalEvaluationReviewCount", source = "hospital.totalEvaluationReviewCount"),
+            @Mapping(target = "latitude", source = "hospital.location.y"),
+            @Mapping(target = "longitude", source = "hospital.location.x")
+    })
     @Named("mapToHospital")
     HospitalNearbyResponse mapToHospital(HospitalNearbyData hospital);
 

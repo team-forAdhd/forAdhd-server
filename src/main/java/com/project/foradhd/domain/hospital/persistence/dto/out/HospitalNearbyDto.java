@@ -8,18 +8,12 @@ import lombok.Getter;
 public class HospitalNearbyDto {
 
     private Hospital hospital;
-    private long totalGradeSum;
-    private int totalBriefReviewCount;
-    private int totalReceiptReviewCount;
     private double distance;
     private boolean isBookmarked;
 
     @QueryProjection
-    public HospitalNearbyDto(Hospital hospital, long totalGradeSum, int totalBriefReviewCount, int totalReceiptReviewCount, double distance, boolean isBookmarked) {
+    public HospitalNearbyDto(Hospital hospital, double distance, boolean isBookmarked) {
         this.hospital = hospital;
-        this.totalGradeSum = totalGradeSum;
-        this.totalBriefReviewCount = totalBriefReviewCount;
-        this.totalReceiptReviewCount = totalReceiptReviewCount;
         this.distance = distance;
         this.isBookmarked = isBookmarked;
     }

@@ -46,24 +46,13 @@ public class HospitalService {
                                                         Pageable pageable) {
         Page<HospitalNearbyDto> hospitalPaging = hospitalRepository.findAllNearby(userId, searchCond, pageable);
         List<HospitalNearbyData> hospitalList = hospitalPaging.getContent().stream()
-                .map(dto -> {
-                    Hospital hospital = dto.getHospital();
-                    long totalGradeSum = dto.getTotalGradeSum();
-                    int totalReviewCount = dto.getTotalBriefReviewCount() + dto.getTotalReceiptReviewCount();
-                    return HospitalNearbyData.builder()
-                            .hospitalId(hospital.getId())
-                            .name(hospital.getName())
-                            .totalGrade(calculateAverage(totalGradeSum, totalReviewCount * 3L))
-                            .totalReviewCount(totalReviewCount)
-                            .latitude(hospital.getLocation().getY())
-                            .longitude(hospital.getLocation().getX())
-                            .distance(dto.getDistance())
-                            .isBookmarked(dto.isBookmarked())
-                            .build();
-                })
+                .map(dto -> HospitalNearbyData.builder()
+                        .hospital(dto.getHospital())
+                        .distance(dto.getDistance())
+                        .isBookmarked(dto.isBookmarked())
+                        .build())
                 .toList();
         PagingResponse paging = PagingResponse.from(hospitalPaging);
-
         return HospitalListNearbyData.builder()
                 .hospitalList(hospitalList)
                 .paging(paging)
