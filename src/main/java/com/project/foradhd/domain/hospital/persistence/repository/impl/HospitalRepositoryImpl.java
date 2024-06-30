@@ -1,9 +1,13 @@
 package com.project.foradhd.domain.hospital.persistence.repository.impl;
 
+import com.project.foradhd.domain.hospital.business.dto.in.HospitalListBookmarkSearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
+import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalBookmarkDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalNearbyDto;
+import com.project.foradhd.domain.hospital.persistence.dto.out.QHospitalBookmarkDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.QHospitalNearbyDto;
 import com.project.foradhd.domain.hospital.persistence.repository.custom.HospitalRepositoryCustom;
+import com.project.foradhd.domain.hospital.persistence.repository.enums.HospitalBookmarkSoringOrder;
 import com.project.foradhd.domain.hospital.persistence.repository.enums.HospitalSortingOrder;
 import com.project.foradhd.domain.hospital.web.enums.HospitalFilter;
 import com.project.foradhd.global.nativesql.repository.support.NativeSqlSupportRepository;
@@ -32,19 +36,22 @@ public class HospitalRepositoryImpl implements HospitalRepositoryCustom {
 
     @Override
     public Page<HospitalNearbyDto> findAllNearby(String userId, HospitalListNearbySearchCond searchCond, Pageable pageable) {
-        HospitalSortingOrder.updateDefaultOrderExpression(getDistanceSQL(searchCond));
+        Double longitude = searchCond.getLongitude();
+        Double latitude = searchCond.getLatitude();
+        Integer radius = searchCond.getRadius();
+        HospitalSortingOrder.updateDefaultOrderExpression(getDistanceSQL(longitude, latitude));
         OrderSpecifier<?>[] orderSpecifiers = querydslPagingSupportRepository.getOrderSpecifiers(pageable.getSort(),
                 HospitalSortingOrder::valueOf);
 
         List<HospitalNearbyDto> content = queryFactory
                 .select(new QHospitalNearbyDto(hospital,
-                        getDistanceSQL(searchCond),
+                        getDistanceSQL(longitude, latitude),
                         hospitalBookmark.deleted.isFalse()))
                 .from(hospital)
                 .leftJoin(hospitalBookmark).on(hospitalBookmark.id.hospital.id.eq(hospital.id),
                         hospitalBookmark.id.user.id.eq(userId),
                         hospitalBookmark.deleted.isFalse())
-                .where(hospital.deleted.isFalse(), locationInRadius(searchCond), filtering(searchCond.getFilter()))
+                .where(hospital.deleted.isFalse(), locationInRadius(longitude, latitude, radius), filtering(searchCond.getFilter()))
                 .orderBy(orderSpecifiers)
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
@@ -53,22 +60,52 @@ public class HospitalRepositoryImpl implements HospitalRepositoryCustom {
         JPAQuery<Long> countQuery = queryFactory
                 .select(hospital.count())
                 .from(hospital)
-                .where(hospital.deleted.isFalse(), locationInRadius(searchCond));
+                .where(hospital.deleted.isFalse(), locationInRadius(longitude, latitude, radius));
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    private BooleanExpression locationInRadius(HospitalListNearbySearchCond searchCond) {
-        return searchCond.getRadius() == null ? null : getDistanceSQL(searchCond).loe(searchCond.getRadius());
+    @Override
+    public Page<HospitalBookmarkDto> findAllBookmark(String userId, HospitalListBookmarkSearchCond searchCond, Pageable pageable) {
+        Double longitude = searchCond.getLongitude();
+        Double latitude = searchCond.getLatitude();
+        HospitalBookmarkSoringOrder.updateDefaultOrderExpression(getDistanceSQL(longitude, latitude));
+        OrderSpecifier<?>[] orderSpecifiers = querydslPagingSupportRepository.getOrderSpecifiers(pageable.getSort(),
+                HospitalBookmarkSoringOrder::valueOf);
+
+        List<HospitalBookmarkDto> content = queryFactory.select(new QHospitalBookmarkDto(
+                        hospital, getDistanceSQL(longitude, latitude)))
+                .from(hospital)
+                .innerJoin(hospitalBookmark).on(hospitalBookmark.id.hospital.id.eq(hospital.id),
+                        hospitalBookmark.id.user.id.eq(userId),
+                        hospitalBookmark.deleted.isFalse())
+                .where(hospital.deleted.isFalse())
+                .orderBy(orderSpecifiers)
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory.select(hospital.count())
+                .from(hospital)
+                .innerJoin(hospitalBookmark).on(hospitalBookmark.id.hospital.id.eq(hospital.id),
+                        hospitalBookmark.id.user.id.eq(userId),
+                        hospitalBookmark.deleted.isFalse())
+                .where(hospital.deleted.isFalse());
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    private BooleanExpression locationInRadius(Double longitude, Double latitude, Integer radius) {
+        return radius == null ? null : getDistanceSQL(longitude, latitude).loe(radius);
     }
 
     private BooleanExpression filtering(HospitalFilter hospitalFilter) {
-        return hospitalFilter == null || hospitalFilter == HospitalFilter.ALL
-                ? null : hospital.totalEvaluationReviewCount.gt(0);
+        if (hospitalFilter == null || hospitalFilter == HospitalFilter.ALL) return null;
+        if (hospitalFilter == HospitalFilter.EVALUATION_REVIEW) return hospital.totalEvaluationReviewCount.gt(0);
+        return null;
     }
 
-    private NumberExpression<Double> getDistanceSQL(HospitalListNearbySearchCond searchCond) {
-        return nativeSqlSupportRepository.getDistanceSQL(searchCond.getLongitude(), searchCond.getLatitude(),
-                hospital.location);
+    private NumberExpression<Double> getDistanceSQL(Double longitude, Double latitude) {
+        return nativeSqlSupportRepository.getDistanceSQL(longitude, latitude, hospital.location);
     }
 }

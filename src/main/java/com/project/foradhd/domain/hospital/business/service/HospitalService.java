@@ -3,12 +3,16 @@ package com.project.foradhd.domain.hospital.business.service;
 import com.project.foradhd.domain.hospital.business.dto.in.*;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationReviewCreateData.HospitalEvaluationAnswerCreateData;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
+import com.project.foradhd.domain.hospital.business.dto.out.HospitalListBookmarkData.HospitalBookmarkData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
+import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalBookmarkDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalNearbyDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalReceiptReviewDto;
+import com.project.foradhd.domain.hospital.persistence.dto.out.MyHospitalReviewDto;
 import com.project.foradhd.domain.hospital.persistence.entity.*;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalBookmark.HospitalBookmarkId;
 import com.project.foradhd.domain.hospital.persistence.repository.*;
+import com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.global.exception.BusinessException;
@@ -39,6 +43,7 @@ public class HospitalService {
     private final HospitalReceiptReviewHelpRepository hospitalReceiptReviewHelpRepository;
     private final HospitalEvaluationReviewRepository hospitalEvaluationReviewRepository;
     private final HospitalEvaluationQuestionRepository hospitalEvaluationQuestionRepository;
+    private final HospitalReviewRepository hospitalReviewRepository;
 
     public HospitalListNearbyData getHospitalListNearby(String userId, HospitalListNearbySearchCond searchCond,
                                                         Pageable pageable) {
@@ -82,6 +87,28 @@ public class HospitalService {
                 .hospitalReceiptReviewList(hospitalReceiptReviewList)
                 .paging(paging)
                 .build();
+    }
+
+    public HospitalListBookmarkData getHospitalListBookmark(String userId, HospitalListBookmarkSearchCond searchCond, Pageable pageable) {
+        Page<HospitalBookmarkDto> hospitalPaging = hospitalRepository.findAllBookmark(userId, searchCond, pageable);
+        List<HospitalBookmarkData> hospitalList = hospitalPaging.getContent().stream()
+                .map(dto -> HospitalBookmarkData.builder()
+                        .hospital(dto.getHospital())
+                        .distance(dto.getDistance())
+                        .build())
+                .toList();
+        PagingResponse paging = PagingResponse.from(hospitalPaging);
+        return HospitalListBookmarkData.builder()
+                .hospitalList(hospitalList)
+                .paging(paging)
+                .build();
+    }
+
+    //TODO
+    public MyHospitalReviewListData getMyHospitalReviewList(String userId, HospitalReviewFilter filter, Pageable pageable) {
+        Page<MyHospitalReviewDto> hospitalReviewPaging = hospitalReviewRepository.findAll(userId, filter, pageable);
+
+        return null;
     }
 
     public DoctorBriefListData getDoctorBriefList(String hospitalId) {

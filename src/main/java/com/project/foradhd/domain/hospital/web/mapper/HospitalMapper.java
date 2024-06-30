@@ -19,14 +19,16 @@ public interface HospitalMapper {
 
     HospitalListNearbySearchCond mapToSearchCond(HospitalListNearbyRequest request);
 
+    HospitalListBookmarkSearchCond mapToSearchCond(HospitalListBookmarkRequest request);
+
     @Mappings({
-            @Mapping(target = "hospitalList", source = "hospitalList", qualifiedByName = "mapToHospitalList")
+            @Mapping(target = "hospitalList", source = "hospitalList", qualifiedByName = "mapToHospitalListNearby")
     })
     HospitalListNearbyResponse toHospitalListNearbyResponse(HospitalListNearbyData hospitalListNearbyData);
 
-    @Named("mapToHospitalList")
-    @IterableMapping(qualifiedByName = "mapToHospital")
-    List<HospitalNearbyResponse> mapToHospitalList(List<HospitalNearbyData> hospitalList);
+    @Named("mapToHospitalListNearby")
+    @IterableMapping(qualifiedByName = "mapToHospitalNearby")
+    List<HospitalNearbyResponse> mapToHospitalListNearby(List<HospitalNearbyData> hospitalList);
 
     @Mappings({
             @Mapping(target = "hospitalId", source = "hospital.id"),
@@ -36,8 +38,8 @@ public interface HospitalMapper {
             @Mapping(target = "latitude", source = "hospital.location.y"),
             @Mapping(target = "longitude", source = "hospital.location.x")
     })
-    @Named("mapToHospital")
-    HospitalNearbyResponse mapToHospital(HospitalNearbyData hospital);
+    @Named("mapToHospitalNearby")
+    HospitalNearbyResponse mapToHospitalNearby(HospitalNearbyData hospital);
 
     @Mapping(target = "doctorList", source = "doctorList", qualifiedByName = "mapToDoctorBriefList")
     DoctorBriefListResponse toDoctorBriefListResponse(DoctorBriefListData doctorBriefListData);
@@ -93,6 +95,25 @@ public interface HospitalMapper {
     @Named("mapToHospitalReceiptReview")
     HospitalReceiptReviewListResponse.HospitalReceiptReviewResponse
         mapToHospitalReceiptReview(HospitalReceiptReviewListData.HospitalReceiptReviewData receiptReview);
+
+    @Mapping(target = "hospitalList", source = "hospitalList", qualifiedByName = "mapToHospitalListBookmark")
+    HospitalListBookmarkResponse toHospitalListBookmarkResponse(HospitalListBookmarkData hospitalListBookmarkData);
+
+    @Named("mapToHospitalListBookmark")
+    @IterableMapping(qualifiedByName = "mapToHospitalBookmark")
+    List<HospitalListBookmarkResponse.HospitalBookmarkResponse>
+        mapToHospitalListBookmark(List<HospitalListBookmarkData.HospitalBookmarkData> hospitalList);
+
+    @Mappings({
+            @Mapping(target = "hospitalId", source = "hospital.id"),
+            @Mapping(target = "name", source = "hospital.name"),
+            @Mapping(target = "totalReceiptReviewCount", source = "hospital.totalReceiptReviewCount"),
+            @Mapping(target = "totalEvaluationReviewCount", source = "hospital.totalEvaluationReviewCount")
+    })
+    @Named("mapToHospitalBookmark")
+    HospitalListBookmarkResponse.HospitalBookmarkResponse mapToHospitalBookmark(HospitalListBookmarkData.HospitalBookmarkData hospital);
+
+    MyHospitalReviewListResponse toMyHospitalReviewListResponse(MyHospitalReviewListData myHospitalReviewListData);
 
     HospitalReceiptReviewCreateData toHospitalReceiptReviewCreateData(HospitalReceiptReviewCreateRequest request);
 

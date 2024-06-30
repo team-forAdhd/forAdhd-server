@@ -5,6 +5,7 @@ import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
 import com.project.foradhd.domain.hospital.web.dto.request.*;
 import com.project.foradhd.domain.hospital.web.dto.response.*;
+import com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter;
 import com.project.foradhd.domain.hospital.web.mapper.HospitalMapper;
 import com.project.foradhd.global.AuthUserId;
 import jakarta.validation.Valid;
@@ -41,6 +42,25 @@ public class HospitalController {
         HospitalReceiptReviewListResponse hospitalReceiptReviewListResponse =
                 hospitalMapper.toReceiptReviewListResponse(hospitalReceiptReviewListData);
         return ResponseEntity.ok(hospitalReceiptReviewListResponse);
+    }
+
+    @GetMapping("/bookmark")
+    public ResponseEntity<HospitalListBookmarkResponse> getHospitalListBookmark(@AuthUserId String userId,
+                                                                                @ModelAttribute HospitalListBookmarkRequest request,
+                                                                                Pageable pageable) {
+        HospitalListBookmarkSearchCond searchCond = hospitalMapper.mapToSearchCond(request);
+        HospitalListBookmarkData hospitalListBookmarkData = hospitalService.getHospitalListBookmark(userId, searchCond, pageable);
+        HospitalListBookmarkResponse hospitalListBookmarkResponse = hospitalMapper.toHospitalListBookmarkResponse(hospitalListBookmarkData);
+        return ResponseEntity.ok(hospitalListBookmarkResponse);
+    }
+
+    @GetMapping("/{hospitalId}/my-reviews")
+    public ResponseEntity<MyHospitalReviewListResponse> getMyHospitalReviewList(@AuthUserId String userId,
+                                                                                @RequestParam HospitalReviewFilter filter,
+                                                                                Pageable pageable) {
+        MyHospitalReviewListData myHospitalReviewListData = hospitalService.getMyHospitalReviewList(userId, filter, pageable);
+        MyHospitalReviewListResponse myHospitalReviewListResponse = hospitalMapper.toMyHospitalReviewListResponse(myHospitalReviewListData);
+        return ResponseEntity.ok(myHospitalReviewListResponse);
     }
 
     @GetMapping("/{hospitalId}/doctors/brief")
