@@ -16,7 +16,7 @@ public class PushNotificationApprovalUpdateRequest {
     @Getter
     public static class PushNotificationApprovalRequest {
 
-        @NotNull(message = "{pushNotificationApprovalId.notNull}")
+        @NotNull(message = "{pushNotificationApproval.id.notNull}")
         private Long pushNotificationApprovalId;
 
         @NotNull(message = "{pushNotificationApproval.approved.notNull}")

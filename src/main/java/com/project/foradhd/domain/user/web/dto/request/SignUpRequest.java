@@ -59,7 +59,7 @@ public class SignUpRequest {
     @AllArgsConstructor
     public static class TermsApprovalRequest {
 
-        @NotNull(message = "{termsId.notNull}")
+        @NotNull(message = "{terms.id.notNull}")
         private Long termsId;
 
         @NotNull(message = "{terms.approved.notNull}")
@@ -72,7 +72,7 @@ public class SignUpRequest {
     @AllArgsConstructor
     public static class PushNotificationApprovalRequest {
 
-        @NotNull(message = "{pushNotificationApprovalId.notNull}")
+        @NotNull(message = "{pushNotificationApproval.id.notNull}")
         private Long pushNotificationApprovalId;
 
         @NotNull(message = "{pushNotificationApproval.approved.notNull}")

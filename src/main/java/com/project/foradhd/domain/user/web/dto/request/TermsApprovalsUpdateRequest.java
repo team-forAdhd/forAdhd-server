@@ -16,7 +16,7 @@ public class TermsApprovalsUpdateRequest {
     @Getter
     public static class TermsApprovalRequest {
 
-        @NotNull(message = "{termsId.notNull}")
+        @NotNull(message = "{terms.id.notNull}")
         private Long termsId;
 
         @NotNull(message = "{terms.approved.notNull}")
