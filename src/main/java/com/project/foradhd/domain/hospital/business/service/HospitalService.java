@@ -41,7 +41,6 @@ public class HospitalService {
     private final HospitalReceiptReviewHelpRepository hospitalReceiptReviewHelpRepository;
     private final HospitalEvaluationReviewRepository hospitalEvaluationReviewRepository;
     private final HospitalEvaluationQuestionRepository hospitalEvaluationQuestionRepository;
-    private final HospitalEvaluationAnswerRepository hospitalEvaluationAnswerRepository;
 
     public HospitalListNearbyData getHospitalListNearby(String userId, HospitalListNearbySearchCond searchCond,
                                                         Pageable pageable) {
@@ -183,7 +182,7 @@ public class HospitalService {
     }
 
     public HospitalEvaluationQuestionListData getEvaluationQuestionList() {
-        List<HospitalEvaluationQuestion> hospitalEvaluationQuestionList = hospitalEvaluationQuestionRepository.findAll();
+        List<HospitalEvaluationQuestion> hospitalEvaluationQuestionList = hospitalEvaluationQuestionRepository.findAllOrderBySeq();
         return new HospitalEvaluationQuestionListData(hospitalEvaluationQuestionList);
     }
 
@@ -200,8 +199,7 @@ public class HospitalService {
         List<Long> hospitalEvaluationQuestionIds = hospitalEvaluationReviewCreateData.getHospitalEvaluationAnswerList().stream()
                 .map(HospitalEvaluationAnswerCreateData::getHospitalEvaluationQuestionId)
                 .toList();
-        List<HospitalEvaluationQuestion> hospitalEvaluationQuestionList = hospitalEvaluationQuestionRepository.findAllIn(hospitalEvaluationQuestionIds);
-        Map<Long, HospitalEvaluationQuestion> hospitalEvaluationQuestionById = hospitalEvaluationQuestionList.stream()
+        Map<Long, HospitalEvaluationQuestion> hospitalEvaluationQuestionById = hospitalEvaluationQuestionRepository.findAll().stream()
                 .collect(Collectors.toMap(HospitalEvaluationQuestion::getId, identity()));
         validateEvaluationQuestion(hospitalEvaluationQuestionIds, hospitalEvaluationQuestionById);
 
@@ -360,9 +358,16 @@ public class HospitalService {
     }
 
     public void validateEvaluationQuestion(List<Long> hospitalEvaluationQuestionIds, Map<Long, HospitalEvaluationQuestion> hospitalEvaluationQuestionById) {
+        //답변의 평가 질문이 유효한지 검증
         hospitalEvaluationQuestionIds.forEach(hospitalEvaluationQuestionId -> {
             if (!hospitalEvaluationQuestionById.containsKey(hospitalEvaluationQuestionId)) {
                 throw new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL_EVALUATION_QUESTION);
+            }
+        });
+        //유효한 평가 질문에 대한 답변 존재 여부 검증
+        hospitalEvaluationQuestionById.keySet().forEach(hospitalEvaluationQuestionId -> {
+            if (!hospitalEvaluationQuestionIds.contains(hospitalEvaluationQuestionId)) {
+                throw new BusinessException(ErrorCode.REQUIRED_HOSPITAL_EVALUATION_ANSWER);
             }
         });
     }
