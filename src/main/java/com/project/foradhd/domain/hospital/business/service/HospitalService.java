@@ -70,6 +70,11 @@ public class HospitalService {
                 .build();
     }
 
+    public DoctorBriefListData getDoctorBriefList(String hospitalId) {
+        List<Doctor> doctorList = doctorRepository.findAllByHospitalIdOrderByName(hospitalId);
+        return new DoctorBriefListData(doctorList);
+    }
+
     public HospitalDetailsData getHospitalDetails(String userId, String hospitalId) {
         Hospital hospital = getHospital(hospitalId);
         List<Doctor> doctorList = doctorRepository.findAllByHospitalId(hospitalId);

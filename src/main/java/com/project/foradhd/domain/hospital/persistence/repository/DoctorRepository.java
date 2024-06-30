@@ -31,5 +31,5 @@ public interface DoctorRepository extends JpaRepository<Doctor, String> {
         where d.hospital.id = :hospitalId and d.deleted = false
         order by d.name asc
     """)
-    List<Doctor> findAllByHospitalId(String hospitalId);
+    List<Doctor> findAllByHospitalIdOrderByName(String hospitalId);
 }

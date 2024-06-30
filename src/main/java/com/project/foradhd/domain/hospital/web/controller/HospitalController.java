@@ -32,6 +32,13 @@ public class HospitalController {
         return ResponseEntity.ok(hospitalListNearbyResponse);
     }
 
+    @GetMapping("/{hospitalId}/doctors/brief")
+    public ResponseEntity<DoctorBriefListResponse> getDoctorBriefList(@PathVariable String hospitalId) {
+        DoctorBriefListData doctorBriefListData = hospitalService.getDoctorBriefList(hospitalId);
+        DoctorBriefListResponse doctorBriefListResponse = hospitalMapper.toDoctorBriefListResponse(doctorBriefListData);
+        return ResponseEntity.ok(doctorBriefListResponse);
+    }
+
     @GetMapping("/{hospitalId}")
     public ResponseEntity<HospitalDetailsResponse> getHospitalDetails(@AuthUserId String userId,
                                                                     @PathVariable String hospitalId) {

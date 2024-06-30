@@ -3,6 +3,7 @@ package com.project.foradhd.domain.hospital.web.mapper;
 import com.project.foradhd.domain.hospital.business.dto.in.*;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
+import com.project.foradhd.domain.hospital.persistence.entity.Doctor;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalEvaluationAnswer;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalEvaluationQuestion;
 import com.project.foradhd.domain.hospital.web.dto.request.*;
@@ -29,6 +30,17 @@ public interface HospitalMapper {
 
     @Named("mapToHospital")
     HospitalNearbyResponse mapToHospital(HospitalNearbyData hospital);
+
+    @Mapping(target = "doctorList", source = "doctorList", qualifiedByName = "mapToDoctorBriefList")
+    DoctorBriefListResponse toDoctorBriefListResponse(DoctorBriefListData doctorBriefListData);
+
+    @Named("mapToDoctorBriefList")
+    @IterableMapping(qualifiedByName = "mapToDoctorBrief")
+    List<DoctorBriefListResponse.DoctorBriefResponse> mapToDoctorBriefList(List<Doctor> doctorList);
+
+    @Mapping(target = "doctorId", source = "id")
+    @Named("mapToDoctorBrief")
+    DoctorBriefListResponse.DoctorBriefResponse mapToDoctorBrief(Doctor doctor);
 
     @Mappings({
             @Mapping(target = "doctorList", source = "doctorList", qualifiedByName = "mapToDoctorList")
