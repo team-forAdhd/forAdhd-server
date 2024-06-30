@@ -43,16 +43,25 @@ public interface HospitalMapper {
     DoctorBriefListResponse.DoctorBriefResponse mapToDoctorBrief(Doctor doctor);
 
     @Mappings({
+            @Mapping(target = "hospitalId", source = "hospital.id"),
+            @Mapping(target = "name", source = "hospital.name"),
+            @Mapping(target = "address", source = "hospital.address"),
+            @Mapping(target = "phone", source = "hospital.phone"),
+            @Mapping(target = "latitude", source = "hospital.location.y"),
+            @Mapping(target = "longitude", source = "hospital.location.x"),
+            @Mapping(target = "totalReceiptReviewCount", source = "hospital.totalReceiptReviewCount"),
+            @Mapping(target = "totalEvaluationReviewCount", source = "hospital.totalEvaluationReviewCount"),
             @Mapping(target = "doctorList", source = "doctorList", qualifiedByName = "mapToDoctorList")
     })
     HospitalDetailsResponse toHospitalDetailsResponse(HospitalDetailsData hospitalDetailsData);
 
     @Named("mapToDoctorList")
     @IterableMapping(qualifiedByName = "mapToDoctor")
-    List<HospitalDetailsResponse.DoctorResponse> mapToDoctorList(List<HospitalDetailsData.DoctorData> doctorList);
+    List<HospitalDetailsResponse.DoctorResponse> mapToDoctorList(List<Doctor> doctorList);
 
+    @Mapping(target = "doctorId", source = "id")
     @Named("mapToDoctor")
-    HospitalDetailsResponse.DoctorResponse mapToDoctor(HospitalDetailsData.DoctorData doctor);
+    HospitalDetailsResponse.DoctorResponse mapToDoctor(Doctor doctor);
 
     DoctorDetailsResponse toDoctorDetailsResponse(DoctorDetailsData doctorDetailsData);
 

@@ -77,29 +77,16 @@ public class HospitalService {
 
     public HospitalDetailsData getHospitalDetails(String userId, String hospitalId) {
         Hospital hospital = getHospital(hospitalId);
-        List<Doctor> doctorList = doctorRepository.findAllByHospitalId(hospitalId);
+        List<Doctor> doctorList = doctorRepository.findAllByHospitalIdOrderByName(hospitalId);
         HospitalBookmark notHospitalBookmark = HospitalBookmark.builder().deleted(true).build();
         HospitalBookmark hospitalBookmark = hospitalBookmarkRepository.findById(userId, hospitalId)
                 .orElse(notHospitalBookmark);
-
-        List<HospitalDetailsData.DoctorData> doctorDataList = doctorList.stream()
-                .map(doctor -> HospitalDetailsData.DoctorData.builder()
-                        .doctorId(doctor.getId())
-                        .name(doctor.getName())
-                        .image(doctor.getImage())
-                        .totalGrade(0D)
-                        .totalReviewCount(0L)
-                        .profile(doctor.getProfile())
-                        .build())
-                .toList();
+        boolean isEvaluationReviewed = hospitalEvaluationReviewRepository.findByUserIdAndHospitalId(userId, hospitalId).isPresent();
         return HospitalDetailsData.builder()
-                .name(hospital.getName())
-                .address(hospital.getAddress())
-                .phone(hospital.getPhone())
-                .latitude(hospital.getLocation().getY())
-                .longitude(hospital.getLocation().getX())
+                .hospital(hospital)
                 .isBookmarked(!hospitalBookmark.getDeleted())
-                .doctorList(doctorDataList)
+                .isEvaluationReviewed(isEvaluationReviewed)
+                .doctorList(doctorList)
                 .build();
     }
 
