@@ -30,4 +30,8 @@ public class HospitalEvaluationAnswer extends BaseTimeEntity {
     public void updateHospitalEvaluationReview(HospitalEvaluationReview hospitalEvaluationReview) {
         this.hospitalEvaluationReview = hospitalEvaluationReview;
     }
+
+    public void updateAnswer(Boolean answer) {
+        this.answer = answer;
+    }
 }

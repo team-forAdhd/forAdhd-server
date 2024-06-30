@@ -1,10 +1,7 @@
 package com.project.foradhd.domain.hospital.business.service;
 
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationReviewCreateData;
+import com.project.foradhd.domain.hospital.business.dto.in.*;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationReviewCreateData.HospitalEvaluationAnswerCreateData;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData.ReceiptReviewData;
@@ -141,6 +138,21 @@ public class HospitalService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL_RECEIPT_REVIEW));
     }
 
+    public HospitalEvaluationReview getHospitalEvaluationReview(String hospitalEvaluationReviewId) {
+        return hospitalEvaluationReviewRepository.findById(hospitalEvaluationReviewId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL_EVALUATION_REVIEW));
+    }
+
+    public HospitalEvaluationReview getHospitalEvaluationReviewFetch(String hospitalEvaluationReviewId) {
+        return hospitalEvaluationReviewRepository.findByIdFetch(hospitalEvaluationReviewId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL_EVALUATION_REVIEW));
+    }
+
+    public HospitalEvaluationReview getHospitalEvaluationReviewFetchAll(String hospitalEvaluationReviewId) {
+        return hospitalEvaluationReviewRepository.findByIdFetchAll(hospitalEvaluationReviewId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL_EVALUATION_REVIEW));
+    }
+
     public HospitalReceiptReviewListData getReceiptReviewList(String userId, String hospitalId, String doctorId, Pageable pageable) {
         Page<HospitalReceiptReviewDto> hospitalReceiptReviewPaging = hospitalReceiptReviewRepository
                 .findAll(userId, hospitalId, doctorId, pageable);
@@ -176,9 +188,9 @@ public class HospitalService {
     }
 
     public HospitalEvaluationReviewData getEvaluationReview(String userId, String hospitalEvaluationReviewId) {
-        List<HospitalEvaluationAnswer> hospitalEvaluationAnswerList = hospitalEvaluationAnswerRepository.findAllByUserIdAndReviewIdFetch(hospitalEvaluationReviewId);
-        validateEvaluationReviewer(userId, hospitalEvaluationAnswerList);
-        return new HospitalEvaluationReviewData(hospitalEvaluationAnswerList);
+        HospitalEvaluationReview hospitalEvaluationReview = getHospitalEvaluationReviewFetchAll(hospitalEvaluationReviewId);
+        validateEvaluationReviewer(hospitalEvaluationReview, userId);
+        return new HospitalEvaluationReviewData(hospitalEvaluationReview.getHospitalEvaluationAnswerList());
     }
 
     @Transactional
@@ -202,14 +214,43 @@ public class HospitalService {
         List<HospitalEvaluationAnswer> hospitalEvaluationAnswerList = hospitalEvaluationReviewCreateData.getHospitalEvaluationAnswerList()
                 .stream()
                 .map(evaluationAnswer -> HospitalEvaluationAnswer.builder()
-                        .hospitalEvaluationReview(hospitalEvaluationReview)
                         .hospitalEvaluationQuestion(hospitalEvaluationQuestionById.get(evaluationAnswer.getHospitalEvaluationQuestionId()))
                         .answer(evaluationAnswer.getAnswer())
                         .build())
                 .toList();
+        hospitalEvaluationReview.updateHospitalEvaluationAnswerList(hospitalEvaluationAnswerList);
 
         hospitalEvaluationReviewRepository.save(hospitalEvaluationReview);
-        hospitalEvaluationAnswerRepository.saveAll(hospitalEvaluationAnswerList);
+        int totalEvaluationReviewCount = hospitalEvaluationReviewRepository.countByHospitalId(hospitalId);
+        hospital.updateTotalEvaluationReviewCount(totalEvaluationReviewCount);
+    }
+
+    @Transactional
+    public void updateEvaluationReview(String userId, String hospitalEvaluationReviewId, HospitalEvaluationReviewUpdateData hospitalEvaluationReviewUpdateData) {
+        HospitalEvaluationReview hospitalEvaluationReview = getHospitalEvaluationReviewFetch(hospitalEvaluationReviewId);
+        validateEvaluationReviewer(hospitalEvaluationReview, userId);
+        Map<Long, HospitalEvaluationAnswer> hospitalEvaluationAnswerByQuestionId =
+                hospitalEvaluationReview.getHospitalEvaluationAnswerList().stream()
+                        .collect(Collectors.toMap(evaluationAnswer -> evaluationAnswer.getHospitalEvaluationQuestion().getId(), identity()));
+
+        hospitalEvaluationReviewUpdateData.getHospitalEvaluationAnswerList().forEach(evaluationAnswer -> {
+            Long questionId = evaluationAnswer.getHospitalEvaluationQuestionId();
+            Boolean answer = evaluationAnswer.getAnswer();
+            if (hospitalEvaluationAnswerByQuestionId.containsKey(questionId)) {
+                HospitalEvaluationAnswer hospitalEvaluationAnswer = hospitalEvaluationAnswerByQuestionId.get(questionId);
+                hospitalEvaluationAnswer.updateAnswer(answer);
+            }
+        });
+    }
+
+    @Transactional
+    public void deleteEvaluationReview(String userId, String hospitalEvaluationReviewId) {
+        HospitalEvaluationReview hospitalEvaluationReview = getHospitalEvaluationReviewFetch(hospitalEvaluationReviewId);
+        validateEvaluationReviewer(hospitalEvaluationReview, userId);
+        String hospitalId = hospitalEvaluationReview.getHospital().getId();
+        Hospital hospital = getHospital(hospitalId);
+
+        hospitalEvaluationReviewRepository.delete(hospitalEvaluationReview);
         int totalEvaluationReviewCount = hospitalEvaluationReviewRepository.countByHospitalId(hospitalId);
         hospital.updateTotalEvaluationReviewCount(totalEvaluationReviewCount);
     }
@@ -333,12 +374,10 @@ public class HospitalService {
         }
     }
 
-    public void validateEvaluationReviewer(String userId, List<HospitalEvaluationAnswer> hospitalEvaluationAnswerList) {
-        hospitalEvaluationAnswerList.forEach(evaluationAnswer -> {
-            String reviewerId = evaluationAnswer.getHospitalEvaluationReview().getUser().getId();
-            if (!Objects.equals(reviewerId, userId)) {
-                throw new BusinessException(ErrorCode.FORBIDDEN_HOSPITAL_EVALUATION_REVIEW);
-            }
-        });
+    public void validateEvaluationReviewer(HospitalEvaluationReview hospitalEvaluationReview, String userId) {
+        String reviewerId = hospitalEvaluationReview.getUser().getId();
+        if (!Objects.equals(reviewerId, userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_HOSPITAL_EVALUATION_REVIEW);
+        }
     }
 }

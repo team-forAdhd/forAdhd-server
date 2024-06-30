@@ -1,15 +1,9 @@
 package com.project.foradhd.domain.hospital.web.controller;
 
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationReviewCreateData;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
+import com.project.foradhd.domain.hospital.business.dto.in.*;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalEvaluationReviewCreateRequest;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewUpdateRequest;
+import com.project.foradhd.domain.hospital.web.dto.request.*;
 import com.project.foradhd.domain.hospital.web.dto.response.*;
 import com.project.foradhd.domain.hospital.web.mapper.HospitalMapper;
 import com.project.foradhd.global.AuthUserId;
@@ -87,6 +81,22 @@ public class HospitalController {
         HospitalEvaluationReviewCreateData hospitalEvaluationReviewCreateData = hospitalMapper.toHospitalEvaluationReviewCreateData(request);
         hospitalService.createEvaluationReview(userId, hospitalId, hospitalEvaluationReviewCreateData);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/evaluation-reviews/{hospitalEvaluationReviewId}")
+    public ResponseEntity<Void> updateEvaluationReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalEvaluationReviewId,
+                                                    @RequestBody @Valid HospitalEvaluationReviewUpdateRequest request) {
+        HospitalEvaluationReviewUpdateData hospitalEvaluationReviewUpdateData = hospitalMapper.toHospitalEvaluationReviewUpdateData(request);
+        hospitalService.updateEvaluationReview(userId, hospitalEvaluationReviewId, hospitalEvaluationReviewUpdateData);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/evaluation-reviews/{hospitalEvaluationReviewId}")
+    public ResponseEntity<Void> deleteEvaluationReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalEvaluationReviewId) {
+        hospitalService.deleteEvaluationReview(userId, hospitalEvaluationReviewId);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{hospitalId}/bookmark")

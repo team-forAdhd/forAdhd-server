@@ -1,17 +1,11 @@
 package com.project.foradhd.domain.hospital.web.mapper;
 
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationReviewCreateData;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
+import com.project.foradhd.domain.hospital.business.dto.in.*;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData.HospitalNearbyData;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalEvaluationAnswer;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalEvaluationQuestion;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalEvaluationReviewCreateRequest;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewUpdateRequest;
+import com.project.foradhd.domain.hospital.web.dto.request.*;
 import com.project.foradhd.domain.hospital.web.dto.response.*;
 import com.project.foradhd.domain.hospital.web.dto.response.HospitalListNearbyResponse.HospitalNearbyResponse;
 import org.mapstruct.*;
@@ -105,4 +99,6 @@ public interface HospitalMapper {
         mapToEvaluationAnswer(HospitalEvaluationAnswer evaluationAnswer);
 
     HospitalEvaluationReviewCreateData toHospitalEvaluationReviewCreateData(HospitalEvaluationReviewCreateRequest request);
+
+    HospitalEvaluationReviewUpdateData toHospitalEvaluationReviewUpdateData(HospitalEvaluationReviewUpdateRequest request);
 }
