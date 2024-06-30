@@ -26,4 +26,8 @@ public class HospitalEvaluationAnswer extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Boolean answer;
+
+    public void updateHospitalEvaluationReview(HospitalEvaluationReview hospitalEvaluationReview) {
+        this.hospitalEvaluationReview = hospitalEvaluationReview;
+    }
 }

@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.util.List;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -27,4 +29,14 @@ public class HospitalEvaluationReview extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hospital_id", nullable = false)
     private Hospital hospital;
+
+    @OneToMany(mappedBy = "hospitalEvaluationReview",
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<HospitalEvaluationAnswer> hospitalEvaluationAnswerList;
+
+    //연관관계 매핑 편의 메소드
+    public void updateHospitalEvaluationAnswerList(List<HospitalEvaluationAnswer> hospitalEvaluationAnswerList) {
+        this.hospitalEvaluationAnswerList = hospitalEvaluationAnswerList;
+        hospitalEvaluationAnswerList.forEach(hospitalEvaluationAnswer -> hospitalEvaluationAnswer.updateHospitalEvaluationReview(this));
+    }
 }
