@@ -13,6 +13,9 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "hospital_id"})
+})
 @Entity
 public class HospitalEvaluationReview extends BaseTimeEntity {
 
