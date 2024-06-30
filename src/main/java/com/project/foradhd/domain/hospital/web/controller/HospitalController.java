@@ -47,13 +47,6 @@ public class HospitalController {
         return ResponseEntity.ok(hospitalDetailsResponse);
     }
 
-    @GetMapping("/{hospitalId}/doctors/{doctorId}")
-    public ResponseEntity<DoctorDetailsResponse> getDoctorDetails(@PathVariable String hospitalId, @PathVariable String doctorId) {
-        DoctorDetailsData doctorDetailsData = hospitalService.getDoctorDetails(hospitalId, doctorId);
-        DoctorDetailsResponse doctorDetailsResponse = hospitalMapper.toDoctorDetailsResponse(doctorDetailsData);
-        return ResponseEntity.ok(doctorDetailsResponse);
-    }
-
     @GetMapping("/{hospitalId}/doctors/{doctorId}/receipt-reviews")
     public ResponseEntity<HospitalReceiptReviewListResponse> getReceiptReviewList(@AuthUserId String userId,
                                                                                 @PathVariable String hospitalId, @PathVariable String doctorId,

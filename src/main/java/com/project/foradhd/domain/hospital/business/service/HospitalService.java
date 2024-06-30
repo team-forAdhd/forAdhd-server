@@ -95,25 +95,6 @@ public class HospitalService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOSPITAL));
     }
 
-    public DoctorDetailsData getDoctorDetails(String hospitalId, String doctorId) {
-        Doctor doctor = getDoctor(hospitalId, doctorId);
-        Long totalBriefReviewCount = 0L;
-
-        DoctorDetailsData.BriefReviewData briefReviewData = DoctorDetailsData.BriefReviewData.builder()
-                .totalReviewCount(totalBriefReviewCount)
-//                .kindness(calculateAverage(briefReviewSummary.getTotalKindnessSum(), totalBriefReviewCount))
-//                .adhdUnderstanding(calculateAverage(briefReviewSummary.getTotalAdhdUnderstandingSum(), totalBriefReviewCount))
-//                .enoughMedicalTime(calculateAverage(briefReviewSummary.getTotalEnoughMedicalTimeSum(), totalBriefReviewCount))
-                .build();
-        return DoctorDetailsData.builder()
-                .name(doctor.getName())
-                .totalGrade(0D)
-                .totalReviewCount(0L)
-                .profile(doctor.getProfile())
-                .briefReview(briefReviewData)
-                .build();
-    }
-
     public Doctor getDoctor(String doctorId) {
         return doctorRepository.findById(doctorId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_DOCTOR));

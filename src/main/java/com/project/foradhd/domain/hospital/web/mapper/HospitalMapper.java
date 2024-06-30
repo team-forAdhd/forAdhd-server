@@ -63,8 +63,6 @@ public interface HospitalMapper {
     @Named("mapToDoctor")
     HospitalDetailsResponse.DoctorResponse mapToDoctor(Doctor doctor);
 
-    DoctorDetailsResponse toDoctorDetailsResponse(DoctorDetailsData doctorDetailsData);
-
     @Mappings({
             @Mapping(target = "receiptReviewList", source = "receiptReviewList", qualifiedByName = "mapToReceiptReviewList")
     })
