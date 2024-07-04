@@ -28,4 +28,5 @@ public class MedicineReviewResponse {
     private String profileImage;
     private String ageRange;
     private Gender gender;
+    private double averageGrade;
 }

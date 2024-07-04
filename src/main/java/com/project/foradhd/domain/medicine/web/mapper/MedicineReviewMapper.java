@@ -11,5 +11,6 @@ public interface MedicineReviewMapper {
     @Mapping(source = "user.userProfile.profileImage", target = "profileImage")
     @Mapping(source = "user.userPrivacy.ageRange", target = "ageRange")
     @Mapping(source = "user.userPrivacy.gender", target = "gender")
+    @Mapping(target = "averageGrade", expression = "java(review.getMedicine().calculateAverageGrade())")
     MedicineReviewResponse toResponseDto(MedicineReview review);
 }

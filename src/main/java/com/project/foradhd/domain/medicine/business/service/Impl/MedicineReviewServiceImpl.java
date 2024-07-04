@@ -129,4 +129,5 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable) {
         return reviewRepository.findByUserId(userId, pageable);
     }
+
 }

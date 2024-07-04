@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.List;
+
 @Getter
 @Entity
 @AllArgsConstructor
@@ -30,4 +32,18 @@ public class Medicine {
     private String itemEngName; //제품영문명
     private double rating; // 별점
     private boolean isFavorite; // 즐겨찾기 여부
+
+    @OneToMany(mappedBy = "medicine")
+    private List<MedicineReview> reviews;
+
+    public double calculateAverageGrade() {
+        if (reviews == null || reviews.isEmpty()) {
+            return 0.0;
+        }
+        return reviews.stream()
+                .mapToDouble(MedicineReview::getGrade)
+                .average()
+                .orElse(0.0);
+    }
+
 }
