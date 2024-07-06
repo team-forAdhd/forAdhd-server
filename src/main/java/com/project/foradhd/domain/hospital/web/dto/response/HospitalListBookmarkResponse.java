@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.hospital.web.dto.response;
 
 import com.project.foradhd.domain.hospital.web.enums.HospitalOperationStatus;
+import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,6 +12,7 @@ import java.util.List;
 public class HospitalListBookmarkResponse {
 
     private List<HospitalBookmarkResponse> hospitalList;
+    private PagingResponse paging;
 
     @Getter
     @Builder
