@@ -41,7 +41,7 @@ public class PagingResponse {
                 .numberOfElements(numberOfElements)
                 .totalElements(totalElements)
                 .isFirst(page == 0)
-                .isLast(page == totalPages)
+                .isLast(page == totalPages - 1)
                 .isEmpty(numberOfElements == 0)
                 .build();
     }
