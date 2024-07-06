@@ -19,8 +19,6 @@ public interface HospitalMapper {
 
     HospitalListNearbySearchCond mapToSearchCond(HospitalListNearbyRequest request);
 
-    HospitalListBookmarkSearchCond mapToSearchCond(HospitalListBookmarkRequest request);
-
     @Mappings({
             @Mapping(target = "hospitalList", source = "hospitalList", qualifiedByName = "mapToHospitalListNearby")
     })

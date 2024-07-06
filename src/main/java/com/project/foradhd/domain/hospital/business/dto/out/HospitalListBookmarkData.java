@@ -19,6 +19,5 @@ public class HospitalListBookmarkData {
     public static class HospitalBookmarkData {
 
         private Hospital hospital;
-        private Double distance;
     }
 }

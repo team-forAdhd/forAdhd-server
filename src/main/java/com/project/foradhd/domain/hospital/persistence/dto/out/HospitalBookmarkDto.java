@@ -8,11 +8,9 @@ import lombok.Getter;
 public class HospitalBookmarkDto {
 
     private Hospital hospital;
-    private double distance;
 
     @QueryProjection
-    public HospitalBookmarkDto(Hospital hospital, double distance) {
+    public HospitalBookmarkDto(Hospital hospital) {
         this.hospital = hospital;
-        this.distance = distance;
     }
 }

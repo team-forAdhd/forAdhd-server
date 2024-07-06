@@ -20,7 +20,6 @@ public class HospitalListBookmarkResponse {
         private String name;
         private Integer totalReceiptReviewCount;
         private Integer totalEvaluationReviewCount;
-        private Double distance;
         private HospitalOperationStatus operationStatus;
     }
 }

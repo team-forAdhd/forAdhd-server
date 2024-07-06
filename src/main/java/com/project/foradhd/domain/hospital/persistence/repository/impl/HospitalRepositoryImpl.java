@@ -1,6 +1,5 @@
 package com.project.foradhd.domain.hospital.persistence.repository.impl;
 
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalListBookmarkSearchCond;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalBookmarkDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalNearbyDto;
@@ -66,15 +65,11 @@ public class HospitalRepositoryImpl implements HospitalRepositoryCustom {
     }
 
     @Override
-    public Page<HospitalBookmarkDto> findAllBookmark(String userId, HospitalListBookmarkSearchCond searchCond, Pageable pageable) {
-        Double longitude = searchCond.getLongitude();
-        Double latitude = searchCond.getLatitude();
-        HospitalBookmarkSoringOrder.updateDefaultOrderExpression(getDistanceSQL(longitude, latitude));
+    public Page<HospitalBookmarkDto> findAllBookmark(String userId, Pageable pageable) {
         OrderSpecifier<?>[] orderSpecifiers = querydslPagingSupportRepository.getOrderSpecifiers(pageable.getSort(),
                 HospitalBookmarkSoringOrder::valueOf);
 
-        List<HospitalBookmarkDto> content = queryFactory.select(new QHospitalBookmarkDto(
-                        hospital, getDistanceSQL(longitude, latitude)))
+        List<HospitalBookmarkDto> content = queryFactory.select(new QHospitalBookmarkDto(hospital))
                 .from(hospital)
                 .innerJoin(hospitalBookmark).on(hospitalBookmark.id.hospital.id.eq(hospital.id),
                         hospitalBookmark.id.user.id.eq(userId),

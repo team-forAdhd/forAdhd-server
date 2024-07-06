@@ -7,22 +7,10 @@ import static com.project.foradhd.domain.hospital.persistence.entity.QHospitalBo
 
 public enum HospitalBookmarkSoringOrder implements SortingOrder {
 
-    DISTANCE {
-        @Override
-        public Expression<? extends Comparable<?>> getOrderExpression() {
-            return HospitalBookmarkSoringOrder.defaultOrderExpression;
-        }
-    },
     CREATED_AT {
         @Override
         public Expression<? extends Comparable<?>> getOrderExpression() {
             return hospitalBookmark.createdAt;
         }
-    };
-
-    private static Expression<? extends Comparable<?>> defaultOrderExpression;
-
-    public static void updateDefaultOrderExpression(Expression<? extends Comparable<?>> defaultOrderExpression) {
-        HospitalBookmarkSoringOrder.defaultOrderExpression = defaultOrderExpression;
     }
 }

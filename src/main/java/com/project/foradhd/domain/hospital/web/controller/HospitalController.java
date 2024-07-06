@@ -46,10 +46,8 @@ public class HospitalController {
 
     @GetMapping("/bookmark")
     public ResponseEntity<HospitalListBookmarkResponse> getHospitalListBookmark(@AuthUserId String userId,
-                                                                                @ModelAttribute HospitalListBookmarkRequest request,
                                                                                 Pageable pageable) {
-        HospitalListBookmarkSearchCond searchCond = hospitalMapper.mapToSearchCond(request);
-        HospitalListBookmarkData hospitalListBookmarkData = hospitalService.getHospitalListBookmark(userId, searchCond, pageable);
+        HospitalListBookmarkData hospitalListBookmarkData = hospitalService.getHospitalListBookmark(userId, pageable);
         HospitalListBookmarkResponse hospitalListBookmarkResponse = hospitalMapper.toHospitalListBookmarkResponse(hospitalListBookmarkData);
         return ResponseEntity.ok(hospitalListBookmarkResponse);
     }

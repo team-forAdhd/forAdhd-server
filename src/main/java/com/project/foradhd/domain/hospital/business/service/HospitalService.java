@@ -92,12 +92,11 @@ public class HospitalService {
                 .build();
     }
 
-    public HospitalListBookmarkData getHospitalListBookmark(String userId, HospitalListBookmarkSearchCond searchCond, Pageable pageable) {
-        Page<HospitalBookmarkDto> hospitalPaging = hospitalRepository.findAllBookmark(userId, searchCond, pageable);
+    public HospitalListBookmarkData getHospitalListBookmark(String userId, Pageable pageable) {
+        Page<HospitalBookmarkDto> hospitalPaging = hospitalRepository.findAllBookmark(userId, pageable);
         List<HospitalBookmarkData> hospitalList = hospitalPaging.getContent().stream()
                 .map(dto -> HospitalBookmarkData.builder()
                         .hospital(dto.getHospital())
-                        .distance(dto.getDistance())
                         .build())
                 .toList();
         PagingResponse paging = PagingResponse.from(hospitalPaging);
