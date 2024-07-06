@@ -20,13 +20,13 @@ import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import com.project.foradhd.global.util.JsonUtil;
+import com.project.foradhd.global.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -114,7 +114,7 @@ public class HospitalService {
                         .hospitalId(hospitalReview.getHospitalId())
                         .hospitalName(hospitalReview.getHospitalName())
                         .reviewType(HospitalReviewType.valueOf(hospitalReview.getReviewType()))
-                        .createdAt(hospitalReview.getCreatedAt().toEpochSecond(ZoneOffset.of("+09:00"))) //TODO: 유틸 클래스 리팩토링
+                        .createdAt(TimeUtil.toEpochSecond(hospitalReview.getCreatedAt()))
                         .content(hospitalReview.getContent())
                         .imageList(JsonUtil.readValue(hospitalReview.getImageList(), new TypeReference<>() {}))
                         .build())
