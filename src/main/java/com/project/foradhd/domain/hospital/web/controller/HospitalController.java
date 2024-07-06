@@ -54,7 +54,7 @@ public class HospitalController {
         return ResponseEntity.ok(hospitalListBookmarkResponse);
     }
 
-    @GetMapping("/{hospitalId}/my-reviews")
+    @GetMapping("/my-reviews")
     public ResponseEntity<MyHospitalReviewListResponse> getMyHospitalReviewList(@AuthUserId String userId,
                                                                                 @RequestParam HospitalReviewFilter filter,
                                                                                 Pageable pageable) {
