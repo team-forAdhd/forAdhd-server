@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.hospital.business.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.project.foradhd.domain.hospital.business.dto.in.*;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationReviewCreateData.HospitalEvaluationAnswerCreateData;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
@@ -8,22 +9,24 @@ import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyDa
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalBookmarkDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalNearbyDto;
 import com.project.foradhd.domain.hospital.persistence.dto.out.HospitalReceiptReviewDto;
-import com.project.foradhd.domain.hospital.persistence.dto.out.MyHospitalReviewDto;
 import com.project.foradhd.domain.hospital.persistence.entity.*;
 import com.project.foradhd.domain.hospital.persistence.entity.HospitalBookmark.HospitalBookmarkId;
 import com.project.foradhd.domain.hospital.persistence.repository.*;
 import com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter;
+import com.project.foradhd.domain.hospital.web.enums.HospitalReviewType;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
+import com.project.foradhd.global.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -104,11 +107,27 @@ public class HospitalService {
                 .build();
     }
 
-    //TODO
     public MyHospitalReviewListData getMyHospitalReviewList(String userId, HospitalReviewFilter filter, Pageable pageable) {
-        Page<MyHospitalReviewDto> hospitalReviewPaging = hospitalReviewRepository.findAll(userId, filter, pageable);
+        List<MyHospitalReviewListData.MyHospitalReviewData> hospitalReviewList = hospitalReviewRepository.findMyHospitalReviewList(userId, filter, pageable)
+                .stream().map(hospitalReview -> MyHospitalReviewListData.MyHospitalReviewData.builder()
+                        .hospitalReviewId(hospitalReview.getHospitalReviewId())
+                        .hospitalId(hospitalReview.getHospitalId())
+                        .hospitalName(hospitalReview.getHospitalName())
+                        .reviewType(HospitalReviewType.valueOf(hospitalReview.getReviewType()))
+                        .createdAt(hospitalReview.getCreatedAt().toEpochSecond(ZoneOffset.of("+09:00"))) //TODO: 유틸 클래스 리팩토링
+                        .content(hospitalReview.getContent())
+                        .imageList(JsonUtil.readValue(hospitalReview.getImageList(), new TypeReference<>() {}))
+                        .build())
+                .toList();
 
-        return null;
+        long totalElements = hospitalReviewRepository.countMyHospitalReviewList(userId, filter);
+        PagingResponse paging = PagingResponse.from(pageable.getPageNumber(), pageable.getPageSize(),
+                hospitalReviewList.size(), totalElements);
+
+        return MyHospitalReviewListData.builder()
+                .hospitalReviewList(hospitalReviewList)
+                .paging(paging)
+                .build();
     }
 
     public DoctorBriefListData getDoctorBriefList(String hospitalId) {

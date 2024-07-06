@@ -31,4 +31,18 @@ public class PagingResponse {
                 .isEmpty(paging.isEmpty())
                 .build();
     }
+
+    public static PagingResponse from(int page, int size, int numberOfElements, long totalElements) {
+        int totalPages = (int) (totalElements + size - 1) / size;
+        return PagingResponse.builder()
+                .page(page)
+                .size(size)
+                .totalPages(totalPages)
+                .numberOfElements(numberOfElements)
+                .totalElements(totalElements)
+                .isFirst(page == 0)
+                .isLast(page == totalPages)
+                .isEmpty(numberOfElements == 0)
+                .build();
+    }
 }

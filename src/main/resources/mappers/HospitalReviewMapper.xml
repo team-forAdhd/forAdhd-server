@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.foradhd.domain.hospital.persistence.repository.HospitalReviewRepository">
+    <select id="findMyHospitalReviewList" resultType="com.project.foradhd.domain.hospital.persistence.dto.out.MyHospitalReviewDto">
+        select
+            hospitalReviewId, hospitalId, hospitalName, reviewType,
+            createdAt, content, imageList
+        from (select
+                hrr.hospital_receipt_review_id hospitalReviewId,
+                hrr.hospital_id hospitalId,
+                h.name hospitalName,
+                1 reviewType,
+                hrr.created_at createdAt,
+                hrr.content content,
+                hrr.images imageList
+            from hospital_receipt_review hrr
+            inner join hospital h on h.hospital_id = hrr.hospital_id
+            where hrr.user_id = #{userId} and hrr.deleted = false
+            <if test="filter != null and filter == @com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter@EVALUATION_REVIEW">
+                and false
+            </if>
+
+            union all
+
+            select
+                her.hospital_evaluation_review_id hospitalReviewId,
+                her.hospital_id hospitalId,
+                h.name hospitalName,
+                2 reviewType,
+                her.created_at createdAt,
+                (select json_arrayagg(json_object('seq', heq.seq,
+                    'question', heq.question,
+                    'answer', if(hea.answer = true, true, false)))
+                from hospital_evaluation_answer hea
+                inner join hospital_evaluation_question heq on heq.hospital_evaluation_question_id = hea.hospital_evaluation_question_id
+                where hea.hospital_evaluation_review_id = her.hospital_evaluation_review_id
+                order by heq.seq) content,
+                '[]' imageList
+            from hospital_evaluation_review her
+            inner join hospital h on h.hospital_id = her.hospital_id
+            where her.user_id = #{userId}
+            <if test="filter != null and filter == @com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter@RECEIPT_REVIEW">
+                and false
+            </if>
+        ) tmp
+        <if test="pageable.sort != null and !pageable.sort.isEmpty()">
+            order by
+            <foreach collection="pageable.sort" item="sort" separator=",">
+                ${sort.property} ${sort.direction}
+            </foreach>
+        </if>
+        limit #{pageable.pageSize} offset #{pageable.offset}
+    </select>
+
+    <select id="countMyHospitalReviewList" resultType="long">
+        select count(*)
+        from (select hrr.hospital_receipt_review_id hospitalReviewId
+            from hospital_receipt_review hrr
+            inner join hospital h on h.hospital_id = hrr.hospital_id
+            where hrr.user_id = #{userId} and hrr.deleted = false
+            <if test="filter != null and filter == @com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter@EVALUATION_REVIEW">
+                and false
+            </if>
+
+            union all
+
+            select her.hospital_evaluation_review_id hospitalReviewId
+            from hospital_evaluation_review her
+            inner join hospital h on h.hospital_id = her.hospital_id
+            where her.user_id = #{userId}
+            <if test="filter != null and filter == @com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter@RECEIPT_REVIEW">
+                and false
+            </if>
+        ) tmp
+    </select>
+</mapper>

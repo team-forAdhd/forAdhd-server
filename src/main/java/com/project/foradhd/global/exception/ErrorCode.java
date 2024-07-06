@@ -36,6 +36,7 @@ public enum ErrorCode {
     FORBIDDEN_HOSPITAL_EVALUATION_REVIEW(FORBIDDEN, "포에이리본 병원 평가 리뷰에 접근할 수 있는 권한이 없습니다."),
     ALREADY_EXISTS_HOSPITAL_RECEIPT_REVIEW(CONFLICT, "이미 작성한 영수증 리뷰가 있습니다."),
     ALREADY_EXISTS_HOSPITAL_EVALUATION_REVIEW(CONFLICT, "이미 작성한 포에이리본 병원 평가 리뷰가 있습니다."),
+    INVALID_HOSPITAL_REVIEW_TYPE(INTERNAL_SERVER_ERROR, "유효하지 않은 병원 리뷰 타입입니다."),
 
     //S3
     EMPTY_FILE(BAD_REQUEST, "유효한 파일이어야 합니다."),
