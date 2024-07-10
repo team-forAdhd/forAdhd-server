@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class MedicineReview extends BaseTimeEntity {
 
     @jakarta.persistence.Id
