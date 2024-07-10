@@ -1,13 +1,12 @@
 package com.project.foradhd.domain.medicine.web.dto;
 
 import com.nimbusds.jose.shaded.gson.annotations.SerializedName;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
 @RequiredArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MedicineDto {
     @SerializedName("ITEM_SEQ") private String itemSeq;
     @SerializedName("ITEM_NAME") private String itemName;
