@@ -7,6 +7,8 @@ import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
 import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
+import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.exception.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +48,50 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+
+import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
+import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
+import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.BDDMockito.*;
 import static org.assertj.core.api.Assertions.*;
@@ -125,7 +171,7 @@ class MedicineServiceImplTest {
         String itemname = "Test Medicine";
         String json = "{\"body\": {\"items\": [{\"ITEM_SEQ\": \"123456\", \"ITEM_NAME\": \"Test Medicine\", \"RATING\": 4.5}]}}";
 
-        // Mock the internal methods
+        // Mocking the methods
         doReturn(json).when(medicineService).fetchMedicineInfo(itemname);
         doReturn(medicineDto).when(medicineService).parseMedicine(json);
         given(medicineMapper.toEntity(medicineDto)).willReturn(medicine);
@@ -136,6 +182,24 @@ class MedicineServiceImplTest {
 
         // then
         then(medicineRepository).should().save(medicine);
+    }
+
+    @Test
+    void saveMedicine_ShouldThrowException_WhenMedicineNotFound() throws IOException {
+        // given
+        String itemname = "Test Medicine";
+        String json = "{\"body\": {\"items\": []}}";
+
+        // Mocking the methods
+        doReturn(json).when(medicineService).fetchMedicineInfo(itemname);
+        doReturn(null).when(medicineService).parseMedicine(json);
+
+        // when
+        Throwable thrown = catchThrowable(() -> medicineService.saveMedicine(itemname));
+
+        // then
+        assertThat(thrown).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEDICINE.getMessage());
     }
 
     @Test

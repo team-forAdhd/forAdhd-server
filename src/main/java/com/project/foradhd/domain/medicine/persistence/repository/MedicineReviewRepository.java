@@ -10,4 +10,3 @@ import java.util.List;
 public interface MedicineReviewRepository extends JpaRepository<MedicineReview, Long> {
     Page<MedicineReview> findByUserId(String userId, Pageable pageable);
 }
-

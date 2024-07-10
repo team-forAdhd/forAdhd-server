@@ -17,5 +17,3 @@ public interface MedicineReviewService {
     Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable);
     void incrementHelpCount(Long reviewId);
 }
-
-

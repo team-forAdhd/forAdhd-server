@@ -9,6 +9,8 @@ import com.project.foradhd.domain.medicine.persistence.repository.MedicineBookma
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.exception.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,13 +31,13 @@ class MedicineBookmarkServiceImplTest {
     private MedicineBookmarkRepository bookmarkRepository;
 
     @Mock
-    private UserService userService;
-
-    @Mock
     private MedicineRepository medicineRepository;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
-    private MedicineBookmarkServiceImpl medicineBookmarkService;
+    private MedicineBookmarkServiceImpl bookmarkService;
 
     private User user;
     private Medicine medicine;
@@ -59,7 +61,7 @@ class MedicineBookmarkServiceImplTest {
     }
 
     @Test
-    void toggleBookmark_ShouldAddBookmarkIfNotExists() {
+    void toggleBookmark_ShouldCreateBookmark() {
         // given
         given(userService.getUser("user1")).willReturn(user);
         given(medicineRepository.findById(1L)).willReturn(Optional.of(medicine));
@@ -67,53 +69,67 @@ class MedicineBookmarkServiceImplTest {
         given(bookmarkRepository.save(any(MedicineBookmark.class))).willReturn(bookmark);
 
         // when
-        medicineBookmarkService.toggleBookmark("user1", 1L);
+        bookmarkService.toggleBookmark("user1", 1L);
 
         // then
         then(bookmarkRepository).should().save(any(MedicineBookmark.class));
     }
 
     @Test
-    void toggleBookmark_ShouldRemoveBookmarkIfExists() {
+    void toggleBookmark_ShouldDeleteBookmark() {
         // given
         given(userService.getUser("user1")).willReturn(user);
         given(medicineRepository.findById(1L)).willReturn(Optional.of(medicine));
         given(bookmarkRepository.existsByUserIdAndMedicineId("user1", 1L)).willReturn(true);
+        willDoNothing().given(bookmarkRepository).deleteByUserIdAndMedicineId("user1", 1L);
 
         // when
-        medicineBookmarkService.toggleBookmark("user1", 1L);
+        bookmarkService.toggleBookmark("user1", 1L);
 
         // then
         then(bookmarkRepository).should().deleteByUserIdAndMedicineId("user1", 1L);
     }
 
     @Test
-    void toggleBookmark_ShouldThrowExceptionForInvalidMedicineId() {
+    void toggleBookmark_ShouldThrowException_WhenUserNotFound() {
+        // given
+        given(userService.getUser("user1")).willReturn(null);
+
+        // when
+        Throwable thrown = catchThrowable(() -> bookmarkService.toggleBookmark("user1", 1L));
+
+        // then
+        assertThat(thrown).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_USER.getMessage());
+    }
+
+    @Test
+    void toggleBookmark_ShouldThrowException_WhenMedicineNotFound() {
         // given
         given(userService.getUser("user1")).willReturn(user);
         given(medicineRepository.findById(1L)).willReturn(Optional.empty());
 
         // when
-        Throwable thrown = catchThrowable(() -> medicineBookmarkService.toggleBookmark("user1", 1L));
+        Throwable thrown = catchThrowable(() -> bookmarkService.toggleBookmark("user1", 1L));
 
         // then
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid medicineId: 1");
+        assertThat(thrown).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEDICINE.getMessage());
     }
 
     @Test
-    void getBookmarksByUser_ShouldReturnBookmarks() {
+    void getBookmarksByUser_ShouldReturnPageOfBookmarks() {
         // given
         Pageable pageable = Pageable.unpaged();
         Page<MedicineBookmark> bookmarkPage = new PageImpl<>(Collections.singletonList(bookmark));
         given(bookmarkRepository.findByUserIdAndDeletedIsFalse("user1", pageable)).willReturn(bookmarkPage);
 
         // when
-        Page<MedicineBookmark> result = medicineBookmarkService.getBookmarksByUser("user1", pageable);
+        Page<MedicineBookmark> result = bookmarkService.getBookmarksByUser("user1", pageable);
 
         // then
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).getUser().getId()).isEqualTo("user1");
+        assertThat(result.getContent().get(0).getMedicine().getId()).isEqualTo(1L);
     }
 }

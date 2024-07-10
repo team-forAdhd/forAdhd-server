@@ -8,6 +8,8 @@ import com.project.foradhd.domain.medicine.persistence.repository.MedicineReposi
 import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
+import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -37,27 +56,30 @@ public class MedicineServiceImpl implements MedicineService {
     private final MedicineRepository medicineRepository;
     private final MedicineMapper medicineMapper;
 
-    // API URL 및 API 키
     private static final String SERVICE_URL = "http://apis.data.go.kr/1471000/MdcinGrnIdntfcInfoService01/getMdcinGrnIdntfcInfoList01";
     private static final String SERVICE_KEY = "rzJVpYr3DAwYcKr+SyRZ5K0lIxsMeO5OdiaJrlGZ2O8C+B7oqEGRd96NskmVrzYItbIwhSD/Z2Y+ifVDTPlFkQ==";
 
     private static final Logger log = LoggerFactory.getLogger(MedicineServiceImpl.class);
 
     @Override
+    @Transactional
     public void saveMedicine(String itemname) throws IOException {
         String json = fetchMedicineInfo(itemname);
         MedicineDto dto = parseMedicine(json);
+        if (dto == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_MEDICINE);
+        }
         Medicine medicine = medicineMapper.toEntity(dto);
         medicineRepository.save(medicine);
     }
 
     public String fetchMedicineInfo(String itemname) throws IOException {
         StringBuilder urlBuilder = new StringBuilder(SERVICE_URL);
-        urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=" + SERVICE_KEY);
-        urlBuilder.append("&" + URLEncoder.encode("item_name","UTF-8") + "=" + URLEncoder.encode(itemname, "UTF-8"));
-        urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=1");
-        urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=10");
-        urlBuilder.append("&" + URLEncoder.encode("type","UTF-8") + "=json");
+        urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + SERVICE_KEY);
+        urlBuilder.append("&" + URLEncoder.encode("item_name", "UTF-8") + "=" + URLEncoder.encode(itemname, "UTF-8"));
+        urlBuilder.append("&" + URLEncoder.encode("pageNo", "UTF-8") + "=1");
+        urlBuilder.append("&" + URLEncoder.encode("numOfRows", "UTF-8") + "=10");
+        urlBuilder.append("&" + URLEncoder.encode("type", "UTF-8") + "=json");
 
         URL url = new URL(urlBuilder.toString());
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -98,11 +120,10 @@ public class MedicineServiceImpl implements MedicineService {
             }
             return null;
         } catch (JsonSyntaxException e) {
-            System.err.println("JSON parsing error: " + e.getMessage());
+            log.error("JSON parsing error: {}", e.getMessage());
             return null;
         }
     }
-
 
     @Override
     public List<MedicineDto> getSortedMedicines(String sortOption) {
@@ -120,7 +141,7 @@ public class MedicineServiceImpl implements MedicineService {
             case "ingredientAsc": // 성분 순 정렬
                 List<Medicine> result = new ArrayList<>();
                 result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("메틸페니데이트"));
-                result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("아소목세틴"));
+                result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("아토목세틴"));
                 result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("클로니딘"));
                 medicines = result;
                 break;
@@ -129,8 +150,7 @@ public class MedicineServiceImpl implements MedicineService {
         }
 
         if (medicines.isEmpty()) {
-            // 데이터가 없을 경우 빈 리스트 반환
-            return new ArrayList<>();
+            return Collections.emptyList();
         } else {
             return medicines.stream()
                     .map(medicineMapper::toDto)

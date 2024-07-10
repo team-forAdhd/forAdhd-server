@@ -11,6 +11,25 @@ import com.project.foradhd.domain.medicine.persistence.repository.MedicineReview
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.exception.ErrorCode;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +57,7 @@ class MedicineReviewServiceImplTest {
     private UserService userService;
 
     @InjectMocks
-    private MedicineReviewServiceImpl medicineReviewService;
+    private MedicineReviewServiceImpl reviewService;
 
     private MedicineReviewRequest request;
     private MedicineReview review;
@@ -84,13 +103,40 @@ class MedicineReviewServiceImplTest {
         given(reviewRepository.save(any(MedicineReview.class))).willReturn(review);
 
         // when
-        MedicineReview createdReview = medicineReviewService.createReview(request);
+        MedicineReview createdReview = reviewService.createReview(request);
 
         // then
         assertThat(createdReview).isNotNull();
         assertThat(createdReview.getUser().getId()).isEqualTo("user1");
         assertThat(createdReview.getMedicine().getId()).isEqualTo(1L);
         assertThat(createdReview.getContent()).isEqualTo("Great medicine!");
+    }
+
+    @Test
+    void createReview_ShouldThrowException_WhenUserNotFound() {
+        // given
+        given(userService.getUser("user1")).willReturn(null);
+
+        // when
+        Throwable thrown = catchThrowable(() -> reviewService.createReview(request));
+
+        // then
+        assertThat(thrown).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_USER.getMessage());
+    }
+
+    @Test
+    void createReview_ShouldThrowException_WhenMedicineNotFound() {
+        // given
+        given(userService.getUser("user1")).willReturn(user);
+        given(medicineRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when
+        Throwable thrown = catchThrowable(() -> reviewService.createReview(request));
+
+        // then
+        assertThat(thrown).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEDICINE.getMessage());
     }
 
     @Test
@@ -101,10 +147,23 @@ class MedicineReviewServiceImplTest {
         given(reviewRepository.save(any(MedicineReview.class))).willReturn(updatedReview);
 
         // when
-        medicineReviewService.incrementHelpCount(1L);
+        reviewService.incrementHelpCount(1L);
 
         // then
         assertThat(updatedReview.getHelpCount()).isEqualTo(1);
+    }
+
+    @Test
+    void incrementHelpCount_ShouldThrowException_WhenReviewNotFound() {
+        // given
+        given(reviewRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when
+        Throwable thrown = catchThrowable(() -> reviewService.incrementHelpCount(1L));
+
+        // then
+        assertThat(thrown).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEDICINE_REVIEW.getMessage());
     }
 
     @Test
@@ -115,12 +174,39 @@ class MedicineReviewServiceImplTest {
         given(reviewRepository.save(any(MedicineReview.class))).willReturn(review);
 
         // when
-        MedicineReview updatedReview = medicineReviewService.updateReview(1L, request);
+        MedicineReview updatedReview = reviewService.updateReview(1L, request);
 
         // then
         assertThat(updatedReview).isNotNull();
         assertThat(updatedReview.getMedicine().getId()).isEqualTo(1L);
         assertThat(updatedReview.getContent()).isEqualTo("Great medicine!");
+    }
+
+    @Test
+    void updateReview_ShouldThrowException_WhenReviewNotFound() {
+        // given
+        given(reviewRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when
+        Throwable thrown = catchThrowable(() -> reviewService.updateReview(1L, request));
+
+        // then
+        assertThat(thrown).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEDICINE_REVIEW.getMessage());
+    }
+
+    @Test
+    void updateReview_ShouldThrowException_WhenMedicineNotFound() {
+        // given
+        given(reviewRepository.findById(1L)).willReturn(Optional.of(review));
+        given(medicineRepository.findById(1L)).willReturn(Optional.empty());
+
+        // when
+        Throwable thrown = catchThrowable(() -> reviewService.updateReview(1L, request));
+
+        // then
+        assertThat(thrown).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEDICINE.getMessage());
     }
 
     @Test
@@ -130,10 +216,23 @@ class MedicineReviewServiceImplTest {
         willDoNothing().given(reviewRepository).deleteById(1L);
 
         // when
-        medicineReviewService.deleteReview(1L);
+        reviewService.deleteReview(1L);
 
         // then
         then(reviewRepository).should().deleteById(1L);
+    }
+
+    @Test
+    void deleteReview_ShouldThrowException_WhenReviewNotFound() {
+        // given
+        given(reviewRepository.existsById(1L)).willReturn(false);
+
+        // when
+        Throwable thrown = catchThrowable(() -> reviewService.deleteReview(1L));
+
+        // then
+        assertThat(thrown).isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.NOT_FOUND_MEDICINE_REVIEW.getMessage());
     }
 
     @Test
@@ -144,7 +243,7 @@ class MedicineReviewServiceImplTest {
         given(reviewRepository.findAll(pageable)).willReturn(reviewPage);
 
         // when
-        Page<MedicineReview> result = medicineReviewService.findReviews(pageable);
+        Page<MedicineReview> result = reviewService.findReviews(pageable);
 
         // then
         assertThat(result).isNotNull();
@@ -160,7 +259,7 @@ class MedicineReviewServiceImplTest {
         given(reviewRepository.findByUserId("user1", pageable)).willReturn(reviewPage);
 
         // when
-        Page<MedicineReview> result = medicineReviewService.findReviewsByUserId("user1", pageable);
+        Page<MedicineReview> result = reviewService.findReviewsByUserId("user1", pageable);
 
         // then
         assertThat(result).isNotNull();
