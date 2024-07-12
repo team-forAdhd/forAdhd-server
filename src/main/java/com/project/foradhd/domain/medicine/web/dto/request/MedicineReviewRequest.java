@@ -1,9 +1,5 @@
 package com.project.foradhd.domain.medicine.web.dto.request;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
-import com.project.foradhd.domain.user.persistence.enums.Gender;
 import lombok.*;
 
 import java.util.List;

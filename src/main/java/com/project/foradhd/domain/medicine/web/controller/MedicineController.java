@@ -4,7 +4,6 @@ import com.project.foradhd.domain.medicine.business.service.Impl.MedicineService
 import com.project.foradhd.domain.medicine.business.service.MedicineService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
-import com.project.foradhd.domain.medicine.web.dto.response.MedicineResponse;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineSearchResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
 import lombok.RequiredArgsConstructor;

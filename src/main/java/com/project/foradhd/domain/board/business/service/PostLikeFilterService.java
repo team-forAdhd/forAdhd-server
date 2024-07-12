@@ -1,7 +1,6 @@
 package com.project.foradhd.domain.board.business.service;
 
 import com.project.foradhd.domain.board.persistence.entity.Post;
-import com.project.foradhd.domain.board.persistence.entity.PostLikeFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

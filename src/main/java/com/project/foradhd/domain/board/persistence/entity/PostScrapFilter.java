@@ -3,9 +3,7 @@ package com.project.foradhd.domain.board.persistence.entity;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter

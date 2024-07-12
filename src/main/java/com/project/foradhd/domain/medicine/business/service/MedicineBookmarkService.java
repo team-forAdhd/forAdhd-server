@@ -2,8 +2,6 @@ package com.project.foradhd.domain.medicine.business.service;
 
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineBookmark;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

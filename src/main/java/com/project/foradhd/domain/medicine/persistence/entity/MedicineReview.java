@@ -1,31 +1,13 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
-import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.List;
-
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "medicine_review")

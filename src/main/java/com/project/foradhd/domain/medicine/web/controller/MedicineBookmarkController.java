@@ -2,11 +2,8 @@ package com.project.foradhd.domain.medicine.web.controller;
 
 import com.project.foradhd.domain.medicine.business.service.MedicineBookmarkService;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineBookmark;
-import com.project.foradhd.domain.medicine.web.dto.request.MedicineBookmarkRequest;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineBookmarkResponse;
-import com.project.foradhd.domain.medicine.web.dto.response.MedicineResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
-import com.project.foradhd.global.AuthUserId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,9 +13,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/medicine/bookmarks")

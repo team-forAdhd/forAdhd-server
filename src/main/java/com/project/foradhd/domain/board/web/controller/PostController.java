@@ -4,7 +4,6 @@ import com.project.foradhd.domain.board.business.service.PostLikeFilterService;
 import com.project.foradhd.domain.board.business.service.PostScrapFilterService;
 import com.project.foradhd.domain.board.business.service.PostService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
-import com.project.foradhd.domain.board.persistence.entity.PostLikeFilter;
 import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;

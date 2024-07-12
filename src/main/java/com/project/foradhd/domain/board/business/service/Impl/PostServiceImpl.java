@@ -1,12 +1,10 @@
 package com.project.foradhd.domain.board.business.service.Impl;
 
-import com.project.foradhd.domain.board.business.service.PostScrapFilterService;
 import com.project.foradhd.domain.board.business.service.PostService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
-import com.project.foradhd.domain.board.persistence.repository.PostScrapFilterRepository;
 import com.project.foradhd.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
