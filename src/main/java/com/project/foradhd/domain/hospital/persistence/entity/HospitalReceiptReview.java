@@ -66,4 +66,8 @@ public class HospitalReceiptReview extends BaseTimeEntity {
         this.images = images;
         this.medicalExpense = medicalExpense;
     }
+
+    public void delete() {
+        this.deleted = Boolean.TRUE;
+    }
 }

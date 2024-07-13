@@ -25,14 +25,6 @@ public interface HospitalReceiptReviewRepository extends JpaRepository<HospitalR
     """)
     Optional<HospitalReceiptReview> findByUserIdAndReceiptId(@Param("userId") String userId, @Param("receiptId") String receiptId);
 
-    @Modifying
-    @Query("""
-        update HospitalReceiptReview hrr
-        set hrr.deleted = true
-        where hrr.id = :hospitalReceiptReviewId
-    """)
-    void deleteSoftly(@Param("hospitalReceiptReviewId") String hospitalReceiptReviewId);
-
     @Query("""
         select count(*)
         from HospitalReceiptReview hrr

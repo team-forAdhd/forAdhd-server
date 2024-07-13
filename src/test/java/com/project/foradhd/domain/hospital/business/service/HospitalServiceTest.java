@@ -460,7 +460,7 @@ class HospitalServiceTest {
         hospitalService.deleteReceiptReview(userId, hospitalReceiptReviewId);
 
         //then
-        then(hospitalReceiptReviewRepository).should(times(1)).deleteSoftly(hospitalReceiptReviewId);
+        assertThat(hospitalReceiptReview.getDeleted()).isTrue();
         assertThat(hospital.getTotalReceiptReviewCount()).isEqualTo(totalHospitalReceiptReviewCount);
         assertThat(doctor.getTotalReceiptReviewCount()).isEqualTo(totalDoctorReceiptReviewCount);
     }

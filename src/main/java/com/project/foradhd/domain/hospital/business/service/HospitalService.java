@@ -333,7 +333,7 @@ public class HospitalService {
     public void deleteReceiptReview(String userId, String hospitalReceiptReviewId) {
         HospitalReceiptReview hospitalReceiptReview = getHospitalReceiptReview(hospitalReceiptReviewId);
         validateReceiptReviewer(hospitalReceiptReview, userId);
-        hospitalReceiptReviewRepository.deleteSoftly(hospitalReceiptReviewId);
+        hospitalReceiptReview.delete();
 
         String hospitalId = hospitalReceiptReview.getHospital().getId();
         String doctorId = hospitalReceiptReview.getDoctor().getId();
