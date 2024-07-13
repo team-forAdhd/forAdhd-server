@@ -61,7 +61,7 @@ spring:
   data:
     web:
       pageable:
-        one-indexed-parameters: true
+        one-indexed-parameters: false
 
 logging:
   level:
@@ -89,7 +89,7 @@ spring:
   data:
     web:
       pageable:
-        one-indexed-parameters: true
+        one-indexed-parameters: false
 
 logging:
   level:
@@ -117,7 +117,7 @@ spring:
   data:
     web:
       pageable:
-        one-indexed-parameters: true
+        one-indexed-parameters: false
 
 logging:
   level:

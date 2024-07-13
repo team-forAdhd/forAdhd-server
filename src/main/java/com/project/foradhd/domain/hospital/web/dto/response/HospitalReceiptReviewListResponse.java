@@ -11,20 +11,22 @@ import java.util.List;
 @Builder
 public class HospitalReceiptReviewListResponse {
 
-    private List<ReceiptReviewResponse> receiptReviewList;
+    private List<HospitalReceiptReviewResponse> hospitalReceiptReviewList;
     private PagingResponse paging;
 
     @Getter
     @Builder
-    public static class ReceiptReviewResponse {
+    public static class HospitalReceiptReviewResponse {
 
+        private String hospitalReceiptReviewId;
         private String writerId;
-        private String name;
-        private String image;
-        private Double totalGrade;
+        private String writerName;
+        private String writerImage;
+        private String doctorName;
         private LocalDateTime createdAt;
-        private List<String> reviewImageList;
         private String content;
+        private List<String> imageList;
+        private Long medicalExpense;
         private Integer helpCount;
         private Boolean isHelped;
         private Boolean isMine;

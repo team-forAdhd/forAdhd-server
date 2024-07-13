@@ -2,6 +2,7 @@ package com.project.foradhd.domain.hospital.web.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.project.foradhd.domain.hospital.web.dto.response.serializer.PhoneSerializer;
+import com.project.foradhd.domain.hospital.web.enums.HospitalOperationStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,13 +12,22 @@ import java.util.List;
 @Builder
 public class HospitalDetailsResponse {
 
+    private String hospitalId;
     private String name;
     private String address;
     @JsonSerialize(using = PhoneSerializer.class)
     private String phone;
     private Double latitude;
     private Double longitude;
+    private Integer totalReceiptReviewCount;
+    private Integer totalEvaluationReviewCount;
     private Boolean isBookmarked;
+    private Boolean isEvaluationReviewed;
+    private HospitalOperationStatus operationStatus;
+    private Integer operationStartHour;
+    private Integer operationStartMin;
+    private Integer operationEndHour;
+    private Integer operationEndMin;
     private List<DoctorResponse> doctorList;
 
     @Getter
@@ -27,8 +37,7 @@ public class HospitalDetailsResponse {
         private String doctorId;
         private String name;
         private String image;
-        private Double totalGrade;
-        private Long totalReviewCount;
+        private Long totalReceiptReviewCount;
         private String profile;
     }
 }

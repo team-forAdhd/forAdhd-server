@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.hospital.web.dto.response;
 
+import com.project.foradhd.domain.hospital.web.enums.HospitalOperationStatus;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,11 +20,12 @@ public class HospitalListNearbyResponse {
 
         private String hospitalId;
         private String name;
-        private Double totalGrade;
-        private Long totalReviewCount;
+        private Integer totalReceiptReviewCount;
+        private Integer totalEvaluationReviewCount;
         private Double latitude;
         private Double longitude;
         private Double distance;
+        private HospitalOperationStatus operationStatus;
         private Boolean isBookmarked;
     }
 }

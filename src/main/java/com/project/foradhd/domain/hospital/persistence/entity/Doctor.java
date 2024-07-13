@@ -6,8 +6,6 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
-import static com.project.foradhd.global.util.AverageCalculator.calculateAverage;
-
 @Getter
 @Builder
 @AllArgsConstructor
@@ -28,10 +26,10 @@ public class Doctor extends BaseTimeEntity {
     @Column(nullable = false)
     private String name;
 
-    @Builder.Default
-    @ColumnDefault("0")
-    @Column(nullable = false)
-    private Long totalGradeSum = 0L;
+    private String image;
+
+    @Column(columnDefinition = "longtext")
+    private String profile;
 
     @Builder.Default
     @ColumnDefault("0")
@@ -41,43 +39,9 @@ public class Doctor extends BaseTimeEntity {
     @Builder.Default
     @ColumnDefault("0")
     @Column(nullable = false)
-    private Integer totalBriefReviewCount = 0;
-
-    private String image;
-
-    @Column(columnDefinition = "longtext")
-    private String profile;
-
-    @Builder.Default
-    @ColumnDefault("0")
-    @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
 
-    public Double calculateTotalGrade() {
-        return calculateAverage(totalGradeSum, calculateTotalReviewCount() * 3);
-    }
-
-    public Long calculateTotalReviewCount() {
-        return (long) totalReceiptReviewCount + totalBriefReviewCount;
-    }
-
-    public void updateByCreatedReceiptReview(Integer receiptReviewTotalGradeSum) {
-        totalGradeSum += receiptReviewTotalGradeSum;
-        totalReceiptReviewCount++;
-    }
-
-    public void updateByDeletedReceiptReview(Integer receiptReviewTotalGradeSum) {
-        totalGradeSum -= receiptReviewTotalGradeSum;
-        totalReceiptReviewCount--;
-    }
-
-    public void updateByCreatedBriefReview(Integer briefReviewTotalGradeSum) {
-        totalGradeSum += briefReviewTotalGradeSum;
-        totalBriefReviewCount++;
-    }
-
-    public void updateByDeletedBriefReview(Integer briefReviewTotalGradeSum) {
-        totalGradeSum -= briefReviewTotalGradeSum;
-        totalBriefReviewCount--;
+    public void updateTotalReceiptReviewCount(int totalReceiptReviewCount) {
+        this.totalReceiptReviewCount = totalReceiptReviewCount;
     }
 }
