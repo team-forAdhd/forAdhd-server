@@ -5,6 +5,7 @@ import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -22,7 +23,7 @@ public class MyHospitalReviewListData {
         private String hospitalId;
         private String hospitalName;
         private HospitalReviewType reviewType;
-        private Long createdAt;
+        private LocalDateTime createdAt;
         private String content;
         private List<String> imageList;
     }
