@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class PostScrapFilterServiceImpl implements PostScrapFilterService {
 
-    private final PostScrapFilterRepository scrapFilterRepository;
+    private final PostScrapFilterRepository postScrapFilterRepository;
     private final PostRepository postRepository;
     private final UserService userService;
 
@@ -31,10 +31,10 @@ public class PostScrapFilterServiceImpl implements PostScrapFilterService {
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         User user = userService.getUser(userId);
 
-        scrapFilterRepository.findByPostIdAndUserId(postId, userId)
+        postScrapFilterRepository.findByPostIdAndUserId(postId, userId)
                 .ifPresentOrElse(
                         scrap -> {
-                            scrapFilterRepository.delete(scrap);
+                            postScrapFilterRepository.delete(scrap);
                             post.decrementScrapCount();
                         },
                         () -> {
@@ -42,7 +42,7 @@ public class PostScrapFilterServiceImpl implements PostScrapFilterService {
                                     .post(post)
                                     .user(user)
                                     .build();
-                            scrapFilterRepository.save(newScrap);
+                            postScrapFilterRepository.save(newScrap);
                             post.incrementScrapCount();
                         }
                 );
@@ -50,7 +50,7 @@ public class PostScrapFilterServiceImpl implements PostScrapFilterService {
 
     public Page<PostScrapFilter> getScrapsByUser(String userId, Pageable pageable, SortOption sortOption) {
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), getSortByOption(sortOption));
-        return scrapFilterRepository.findByUserId(userId, sortedPageable);
+        return postScrapFilterRepository.findByUserId(userId, sortedPageable);
     }
 
     private Sort getSortByOption(SortOption option) {

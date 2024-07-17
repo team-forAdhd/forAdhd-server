@@ -23,53 +23,52 @@ import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
-    private final CommentRepository repository;
+    private final CommentRepository commentRepository;
     private final CommentLikeFilterRepository commentLikeFilterRepository;
 
     @Override
     public Comment getComment(Long commentId) {
-        return repository.findById(commentId)
+        return commentRepository.findById(commentId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
     }
 
     @Override
     @Transactional
     public Comment createComment(Comment comment) {
-        return repository.save(comment);
+        return commentRepository.save(comment);
     }
 
     @Transactional
     public void deleteComment(Long commentId) {
-        Comment comment = repository.findById(commentId)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
+        Comment comment = getComment(commentId);
 
         // 원 댓글에 연결된 대댓글의 부모 ID를 null로 설정
         for (Comment childComment : comment.getChildComments()) {
             childComment.setParentComment(null);
-            repository.save(childComment);
+            commentRepository.save(childComment);
         }
         // 원 댓글 삭제
-        repository.delete(comment);
+        commentRepository.delete(comment);
     }
 
     @Override
     @Transactional
     public Comment updateComment(Comment comment) {
-        Comment existingComment = repository.findById(comment.getId())
+        Comment existingComment = commentRepository.findById(comment.getId())
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
         existingComment.setContent(comment.getContent());
-        return repository.save(existingComment);
+        return commentRepository.save(existingComment);
     }
 
     @Override
     public Page<Comment> getMyComments(Long writerId, Pageable pageable) {
-        return repository.findByWriterId(writerId, pageable);
+        return commentRepository.findByWriterId(writerId, pageable);
     }
 
     @Override
     public Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption) {
         pageable = applySorting(pageable, sortOption);
-        return repository.findByPostId(postId, pageable);
+        return commentRepository.findByPostId(postId, pageable);
     }
 
     @Override
