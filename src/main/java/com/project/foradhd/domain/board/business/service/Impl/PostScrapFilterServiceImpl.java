@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PostScrapFilterServiceImpl implements PostScrapFilterService {
 
     private final PostScrapFilterRepository scrapFilterRepository;

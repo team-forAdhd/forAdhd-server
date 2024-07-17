@@ -19,7 +19,7 @@ import java.util.Optional;
 import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
 
 @Service
-@Transactional
+@Transactional(readOnly=true)
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 

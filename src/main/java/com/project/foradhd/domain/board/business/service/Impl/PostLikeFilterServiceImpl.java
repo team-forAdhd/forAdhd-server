@@ -19,7 +19,7 @@ import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PostLikeFilterServiceImpl implements PostLikeFilterService {
 
     private final PostLikeFilterRepository postLikeFilterRepository;
