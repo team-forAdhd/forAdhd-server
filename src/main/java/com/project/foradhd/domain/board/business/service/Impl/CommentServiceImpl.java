@@ -48,7 +48,12 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.save(childComment);
         }
         // 원 댓글 삭제
-        commentRepository.delete(comment);
+        commentRepository.deleteByParentId(commentId);
+    }
+
+    @Transactional
+    public void deleteChildrenComment(Long commentId) {
+        commentRepository.deleteById(commentId);
     }
 
     @Override
@@ -57,7 +62,7 @@ public class CommentServiceImpl implements CommentService {
         Comment existingComment = commentRepository.findById(comment.getId())
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
         existingComment.setContent(comment.getContent());
-        return commentRepository.save(existingComment);
+        return existingComment;
     }
 
     @Override

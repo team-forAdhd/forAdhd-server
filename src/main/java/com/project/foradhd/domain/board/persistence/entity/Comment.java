@@ -39,7 +39,7 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "parent_id", referencedColumnName = "comment_id", nullable = true)
     private Comment parentComment;
 
-    @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> childComments;
 
     private boolean anonymous;

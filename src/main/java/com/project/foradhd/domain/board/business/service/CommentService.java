@@ -9,6 +9,7 @@ public interface CommentService {
     Comment getComment(Long commentId);
     Comment createComment(Comment comment);
     void deleteComment(Long commentId);
+    void deleteChildrenComment(Long commentId);
     Comment updateComment(Comment comment);
     Page<Comment> getMyComments(Long writerId, Pageable pageable);
     Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption);
