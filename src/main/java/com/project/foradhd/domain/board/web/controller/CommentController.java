@@ -2,9 +2,11 @@ package com.project.foradhd.domain.board.web.controller;
 
 import com.project.foradhd.domain.board.persistence.entity.Comment;
 import com.project.foradhd.domain.board.business.service.CommentService;
+import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
 import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.mapper.CommentMapper;
 import com.project.foradhd.global.AuthUserId;
 import lombok.RequiredArgsConstructor;
@@ -59,9 +61,9 @@ public class CommentController {
 
     //나의 댓글
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<CommentResponseDto>> getMyComments(@AuthUserId String userId, Pageable pageable) {
-        Page<Comment> comments = commentService.getMyComments(userId, pageable);
-        return ResponseEntity.ok(comments.map(commentMapper::toDto));
+    public ResponseEntity<Page<PostResponseDto>> getMyCommentedPosts(@AuthUserId String userId, Pageable pageable) {
+        Page<PostResponseDto> posts = commentService.getMyCommentedPosts(userId, pageable);
+        return ResponseEntity.ok(posts);
     }
 
     //글별 댓글 모아보기

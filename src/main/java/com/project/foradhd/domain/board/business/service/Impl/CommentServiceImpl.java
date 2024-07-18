@@ -7,6 +7,7 @@ import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
+import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
@@ -59,7 +60,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         // 원 댓글 삭제
-        commentRepository.deleteById(commentId);
+        commentRepository.deleteByParentId(commentId);
     }
 
     @Transactional
@@ -86,11 +87,17 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Page<Comment> getMyComments(String userId, Pageable pageable) {
+    public Page<PostResponseDto> getMyCommentedPosts(String userId, Pageable pageable) {
         Page<Comment> userComments = commentRepository.findByUserId(userId, pageable);
-        List<Post> posts = userComments.stream()
+        List<PostResponseDto> posts = userComments.stream()
                 .map(Comment::getPost)
                 .distinct()
+                .map(post -> PostResponseDto.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .content(post.getContent())
+                        .createdAt(post.getCreatedAt())
+                        .build())
                 .collect(Collectors.toList());
         return new PageImpl<>(posts, pageable, posts.size());
     }
