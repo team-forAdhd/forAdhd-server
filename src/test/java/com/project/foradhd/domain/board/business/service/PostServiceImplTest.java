@@ -7,8 +7,10 @@ import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostScrapFilterRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,7 +20,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Collections;
 import java.util.Optional;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class PostServiceImplTest {
 
     @Mock
