@@ -5,6 +5,7 @@ import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
+import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 
@@ -91,6 +95,38 @@ public class PostServiceImpl implements PostService {
         Post post = getPost(postId);
         post.incrementViewCount();
         return postRepository.save(post);
+    }
+
+    @Override
+    public List<PostRankingResponseDto> getTopPosts(Pageable pageable) {
+        List<Post> topPosts = postRepository.findTopPosts(pageable);
+        return topPosts.stream()
+                .map(post -> PostRankingResponseDto.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .category(post.getCategory())
+                        .viewCount(post.getViewCount())
+                        .likeCount(post.getLikeCount())
+                        .createdAt(post.getCreatedAt())
+                        .images(post.getImages())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostRankingResponseDto> getTopPostsByCategory(CategoryName category, Pageable pageable) {
+        List<Post> topPosts = postRepository.findTopPostsByCategory(category, pageable);
+        return topPosts.stream()
+                .map(post -> PostRankingResponseDto.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .category(post.getCategory())
+                        .viewCount(post.getViewCount())
+                        .likeCount(post.getLikeCount())
+                        .createdAt(post.getCreatedAt())
+                        .images(post.getImages())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private Pageable applySorting(Pageable pageable, SortOption sortOption) {

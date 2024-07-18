@@ -3,9 +3,12 @@ package com.project.foradhd.domain.board.business.service;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
+import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 public interface PostService {
     // 특정 게시글 조회
@@ -32,4 +35,7 @@ public interface PostService {
 
     // 글 조회수
     Post getAndIncrementViewCount(Long postId);
+
+    List<PostRankingResponseDto> getTopPosts(Pageable pageable);
+    List<PostRankingResponseDto> getTopPostsByCategory(CategoryName category, Pageable pageable);
 }

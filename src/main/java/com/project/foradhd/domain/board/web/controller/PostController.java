@@ -10,6 +10,7 @@ import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.web.dto.PostDto;
 import com.project.foradhd.domain.board.web.dto.PostScrapFilterDto;
 import com.project.foradhd.domain.board.web.dto.request.PostRequestDto;
+import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.mapper.PostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapFilterMapper;
@@ -21,6 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -142,5 +145,21 @@ public class PostController {
         Page<Post> likedPosts = postLikeFilterService.getLikedPostsByUser(userId, pageable);
         Page<PostResponseDto> responseDtos = likedPosts.map(postMapper::responsetoDto);
         return ResponseEntity.ok(responseDtos);
+    }
+
+    // 메인홈 - 실시간 랭킹순
+    @GetMapping("/main/top")
+    public ResponseEntity<List<PostRankingResponseDto>> getTopPosts(Pageable pageable) {
+        List<PostRankingResponseDto> topPosts = postService.getTopPosts(pageable);
+        return ResponseEntity.ok(topPosts);
+    }
+
+    // 메인홈 - 카테고리별 랭킹순
+    @GetMapping("/main/top/{category}")
+    public ResponseEntity<List<PostRankingResponseDto>> getTopPostsByCategory(
+            @PathVariable CategoryName category,
+            Pageable pageable) {
+        List<PostRankingResponseDto> topPosts = postService.getTopPostsByCategory(category, pageable);
+        return ResponseEntity.ok(topPosts);
     }
 }
