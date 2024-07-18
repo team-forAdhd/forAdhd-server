@@ -1,0 +1,12 @@
+package com.project.foradhd.domain.board.web.dto.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class CreateCommentRequestDto {
+    private Long postId;
+    private String content;
+    private boolean anonymous;
+}

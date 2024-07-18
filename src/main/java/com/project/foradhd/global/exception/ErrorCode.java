@@ -38,6 +38,11 @@ public enum ErrorCode {
     ALREADY_EXISTS_HOSPITAL_EVALUATION_REVIEW(CONFLICT, "이미 작성한 포에이리본 병원 평가 리뷰가 있습니다."),
     INVALID_HOSPITAL_REVIEW_TYPE(INTERNAL_SERVER_ERROR, "유효하지 않은 병원 리뷰 타입입니다."),
 
+    //medicine
+    NOT_FOUND_MEDICINE(NOT_FOUND, "존재하지 않는 약입니다."),
+
+    //medicine_review
+    NOT_FOUND_MEDICINE_REVIEW(NOT_FOUND, "존재하지 않는 약 리뷰입니다."),
     //S3
     EMPTY_FILE(BAD_REQUEST, "유효한 파일이어야 합니다."),
     NOT_FOUND_FILE_EXTENSION(BAD_REQUEST, "파일 확장자가 존재하지 않습니다."),
@@ -49,7 +54,16 @@ public enum ErrorCode {
     INVALID_REQUEST(BAD_REQUEST, "잘못된 요청입니다."),
 
     //system
-    SYSTEM_ERROR(INTERNAL_SERVER_ERROR, "시스템 에러입니다.");
+    SYSTEM_ERROR(INTERNAL_SERVER_ERROR, "시스템 에러입니다."),
+
+    //board
+    BOARD_NOT_FOUND(NOT_FOUND, "존재하지 않는 게시물입니다."),
+    ACCESS_DENIED(FORBIDDEN, "접근 권한이 없습니다."),
+
+    //comment
+    NOT_FOUND_COMMENT(NOT_FOUND, "존재하지 않는 댓글입니다."),
+    NOT_FOUND_COMMENT_LIKE(NOT_FOUND, "존재하지 않는 댓글 좋아요입니다."),
+    ALREADY_LIKED_COMMENT(CONFLICT, "이미 좋아요한 댓글입니다."),;
 
     private final HttpStatus status;
     private final String message;
