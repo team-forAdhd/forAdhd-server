@@ -10,7 +10,7 @@ public interface CommentService {
     Comment createComment(Comment comment, String userId);
     void deleteComment(Long commentId);
     void deleteChildrenComment(Long commentId);
-    Comment updateComment(Comment comment);
+    Comment updateComment(Long commentId, String content);
     Page<Comment> getMyComments(String userId, Pageable pageable);
     Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption);
     void toggleCommentLike(Long commentId, String userId);

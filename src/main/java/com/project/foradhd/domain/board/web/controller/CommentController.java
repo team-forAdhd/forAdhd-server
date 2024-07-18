@@ -28,6 +28,7 @@ public class CommentController {
         return ResponseEntity.ok(commentMapper.toDto(comment));
     }
 
+    // 댓글 작성 API
     @PostMapping
     public ResponseEntity<CommentResponseDto> createComment(@AuthUserId String userId, @RequestBody CreateCommentRequestDto createCommentRequest) {
         Comment comment = commentMapper.toEntity(createCommentRequest);
@@ -49,11 +50,10 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
+    //댓글 수정 API
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long commentId, @RequestBody CreateCommentRequestDto createCommentRequest) {
-        Comment comment = commentMapper.toEntity(createCommentRequest);
-        comment.setId(commentId);
-        Comment updatedComment = commentService.updateComment(comment);
+        Comment updatedComment = commentService.updateComment(commentId, createCommentRequest.getContent());
         return ResponseEntity.ok(commentMapper.toDto(updatedComment));
     }
 
@@ -64,6 +64,7 @@ public class CommentController {
         return ResponseEntity.ok(comments.map(commentMapper::toDto));
     }
 
+    //글별 댓글 모아보기
     @GetMapping("/post/{postId}")
     public ResponseEntity<Page<CommentResponseDto>> getCommentsByPost(
             @PathVariable Long postId,

@@ -69,11 +69,20 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment updateComment(Comment comment) {
-        Comment existingComment = commentRepository.findById(comment.getId())
+    public Comment updateComment(Long commentId, String content) {
+        Comment existingComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
-        existingComment.setContent(comment.getContent());
-        return existingComment;
+        Comment updatedComment = Comment.builder()
+                .id(existingComment.getId())
+                .post(existingComment.getPost())
+                .user(existingComment.getUser())
+                .content(content)
+                .anonymous(existingComment.isAnonymous())
+                .likeCount(existingComment.getLikeCount())
+                .parentComment(existingComment.getParentComment())
+                .childComments(existingComment.getChildComments())
+                .build();
+        return commentRepository.save(updatedComment);
     }
 
     @Override
