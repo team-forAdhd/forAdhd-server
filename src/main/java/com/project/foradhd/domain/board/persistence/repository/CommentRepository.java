@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    Page<Comment> findByWriterId(Long writerId, Pageable pageable);
     Page<Comment> findByPostId(Long postId, Pageable pageable);
 
     @Query("SELECT c FROM Comment c WHERE c.user.id = :userId")

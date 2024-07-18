@@ -81,4 +81,10 @@ public class CommentController {
         return ResponseEntity.ok(comments.map(commentMapper::toDto));
     }
 
+    //댓글 좋아요 토글
+    @PostMapping("/{commentId}/like")
+    public ResponseEntity<Void> toggleCommentLike(@PathVariable Long commentId, @AuthUserId String userId) {
+        commentService.toggleCommentLike(commentId, userId);
+        return ResponseEntity.ok().build();
+    }
 }

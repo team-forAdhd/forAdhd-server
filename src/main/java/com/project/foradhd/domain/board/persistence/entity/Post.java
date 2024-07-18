@@ -10,7 +10,6 @@ import java.util.List;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -73,4 +72,7 @@ public class Post extends BaseTimeEntity {
         if (this.scrapCount > 0) this.scrapCount--;
     }
 
+    public void incrementViewCount() {
+        this.viewCount++;
+    }
 }

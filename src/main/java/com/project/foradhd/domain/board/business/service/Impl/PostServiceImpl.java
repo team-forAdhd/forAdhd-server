@@ -38,14 +38,28 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Post updatePost(Post post) {
-        Post existingPost = postRepository.findById(post.getId())
-                .orElseThrow(() -> new BusinessException(BOARD_NOT_FOUND));
+        Post existingPost = getPost(post.getId());
 
-        existingPost.setTitle(post.getTitle());
-        existingPost.setContent(post.getContent());
-        existingPost.setImages(post.getImages());
-        return postRepository.save(existingPost);
+        Post updatedPost = Post.builder()
+                .id(existingPost.getId())
+                .writerId(existingPost.getWriterId())
+                .user(existingPost.getUser())
+                .category(existingPost.getCategory())
+                .comments(existingPost.getComments())
+                .writerName(existingPost.getWriterName())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .anonymous(existingPost.isAnonymous())
+                .images(post.getImages())
+                .likeCount(existingPost.getLikeCount())
+                .commentCount(existingPost.getCommentCount())
+                .scrapCount(existingPost.getScrapCount())
+                .viewCount(existingPost.getViewCount())
+                .build();
+
+        return postRepository.save(updatedPost);
     }
+
     @Override
     @Transactional
     public void deletePost(Long postId) {
@@ -70,12 +84,12 @@ public class PostServiceImpl implements PostService {
         return postRepository.findByCategory(category, pageable);
     }
 
-    // 글 조회수
+    // 글 조회수 증가
+    @Override
     @Transactional
     public Post getAndIncrementViewCount(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
-        post.setViewCount(post.getViewCount() + 1);
+        Post post = getPost(postId);
+        post.incrementViewCount();
         return postRepository.save(post);
     }
 

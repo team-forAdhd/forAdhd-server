@@ -69,6 +69,7 @@ public class CommentServiceImplTest {
         // given
         String updatedContent = "Updated Comment Content";
         given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
+        given(commentRepository.save(any(Comment.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // when
         Comment updatedComment = commentService.updateComment(comment.getId(), updatedContent);
