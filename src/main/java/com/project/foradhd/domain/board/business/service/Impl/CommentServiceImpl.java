@@ -3,18 +3,19 @@ package com.project.foradhd.domain.board.business.service.Impl;
 import com.project.foradhd.domain.board.business.service.CommentService;
 import com.project.foradhd.domain.board.persistence.entity.Comment;
 import com.project.foradhd.domain.board.persistence.entity.CommentLikeFilter;
+import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
 import com.project.foradhd.global.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
 
@@ -34,21 +35,31 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment createComment(Comment comment) {
+    public Comment createComment(Comment comment, String userId) {
         return commentRepository.save(comment);
     }
 
+    @Override
     @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = getComment(commentId);
 
         // 원 댓글에 연결된 대댓글의 부모 ID를 null로 설정
         for (Comment childComment : comment.getChildComments()) {
-            childComment.setParentComment(null);
-            commentRepository.save(childComment);
+            Comment updatedChildComment = Comment.builder()
+                    .id(childComment.getId())
+                    .post(childComment.getPost())
+                    .user(childComment.getUser())
+                    .content(childComment.getContent())
+                    .anonymous(childComment.isAnonymous())
+                    .likeCount(childComment.getLikeCount())
+                    .parentComment(null)
+                    .build();
+            commentRepository.save(updatedChildComment);
         }
+
         // 원 댓글 삭제
-        commentRepository.deleteByParentId(commentId);
+        commentRepository.deleteById(commentId);
     }
 
     @Transactional
@@ -66,8 +77,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Page<Comment> getMyComments(Long writerId, Pageable pageable) {
-        return commentRepository.findByWriterId(writerId, pageable);
+    public Page<Comment> getMyComments(String userId, Pageable pageable) {
+        Page<Comment> userComments = commentRepository.findByUserId(userId, pageable);
+        List<Post> posts = userComments.stream()
+                .map(Comment::getPost)
+                .distinct()
+                .collect(Collectors.toList());
+        return new PageImpl<>(posts, pageable, posts.size());
     }
 
     @Override

@@ -7,11 +7,11 @@ import org.springframework.data.domain.Pageable;
 
 public interface CommentService {
     Comment getComment(Long commentId);
-    Comment createComment(Comment comment);
+    Comment createComment(Comment comment, String userId);
     void deleteComment(Long commentId);
     void deleteChildrenComment(Long commentId);
     Comment updateComment(Comment comment);
-    Page<Comment> getMyComments(Long writerId, Pageable pageable);
+    Page<Comment> getMyComments(String userId, Pageable pageable);
     Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption);
     void toggleCommentLike(Long commentId, String userId);
 }

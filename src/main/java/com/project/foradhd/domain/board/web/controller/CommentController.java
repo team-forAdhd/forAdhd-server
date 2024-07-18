@@ -6,6 +6,7 @@ import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
 import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
 import com.project.foradhd.domain.board.web.mapper.CommentMapper;
+import com.project.foradhd.global.AuthUserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,15 +29,23 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<CommentResponseDto> createComment(@RequestBody CreateCommentRequestDto createCommentRequest) {
+    public ResponseEntity<CommentResponseDto> createComment(@AuthUserId String userId, @RequestBody CreateCommentRequestDto createCommentRequest) {
         Comment comment = commentMapper.toEntity(createCommentRequest);
-        Comment createdComment = commentService.createComment(comment);
+        Comment createdComment = commentService.createComment(comment, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(commentMapper.toDto(createdComment));
     }
 
+    //원댓글 삭제 API
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
         commentService.deleteComment(commentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    //대댓글 삭제 API
+    @DeleteMapping("/{commentId}/children")
+    public ResponseEntity<Void> deleteChildrenComment(@PathVariable Long commentId) {
+        commentService.deleteChildrenComment(commentId);
         return ResponseEntity.noContent().build();
     }
 
@@ -48,9 +57,10 @@ public class CommentController {
         return ResponseEntity.ok(commentMapper.toDto(updatedComment));
     }
 
-    @GetMapping("/user/{writerId}")
-    public ResponseEntity<Page<CommentResponseDto>> getMyComments(@PathVariable Long writerId, Pageable pageable) {
-        Page<Comment> comments = commentService.getMyComments(writerId, pageable);
+    //나의 댓글
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<CommentResponseDto>> getMyComments(@AuthUserId String userId, Pageable pageable) {
+        Page<Comment> comments = commentService.getMyComments(userId, pageable);
         return ResponseEntity.ok(comments.map(commentMapper::toDto));
     }
 
