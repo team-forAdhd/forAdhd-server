@@ -75,14 +75,7 @@ public interface CommentMapper {
     default List<CommentResponseDto> mapChildComments(List<Comment> childComments) {
         if (childComments == null) return null;
         return childComments.stream()
-                .map(this::toDtoWithoutParent)
+                .map(this::toDto)
                 .collect(Collectors.toList());
-    }
-
-    default CommentResponseDto toDtoWithoutParent(Comment comment) {
-        CommentResponseDto dto = toDto(comment);
-        return dto.toBuilder()
-                .parentComment(null)
-                .build();
     }
 }
