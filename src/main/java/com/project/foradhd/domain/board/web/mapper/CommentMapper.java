@@ -11,7 +11,7 @@ import org.mapstruct.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {UserService.class, CommentMapper.class})
+@Mapper(componentModel = "spring", uses = {UserService.class})
 public interface CommentMapper {
 
     @Mapping(source = "post.id", target = "postId")
@@ -26,7 +26,8 @@ public interface CommentMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "likeCount", ignore = true)
     @Mapping(target = "childComments", ignore = true)
-    @Mapping(target = "writerId", ignore = true)
+    @Mapping(target = "nickname", ignore = true)
+    @Mapping(target = "profileImage", ignore = true)
     Comment toEntity(CreateCommentRequestDto requestDto);
 
     default Long map(Post post) {
@@ -74,7 +75,14 @@ public interface CommentMapper {
     default List<CommentResponseDto> mapChildComments(List<Comment> childComments) {
         if (childComments == null) return null;
         return childComments.stream()
-                .map(this::toDto)
+                .map(this::toDtoWithoutParent)
                 .collect(Collectors.toList());
+    }
+
+    default CommentResponseDto toDtoWithoutParent(Comment comment) {
+        CommentResponseDto dto = toDto(comment);
+        return dto.toBuilder()
+                .parentComment(null)
+                .build();
     }
 }

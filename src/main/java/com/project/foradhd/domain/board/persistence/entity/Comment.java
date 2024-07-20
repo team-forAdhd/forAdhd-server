@@ -31,8 +31,6 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user; // 댓글 작성자 id
 
-    private String writerId;
-
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -40,7 +38,7 @@ public class Comment extends BaseTimeEntity {
     private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Comment> childComments = new ArrayList<>();
+    private List<Comment> childComments;
 
     private boolean anonymous;
     private long likeCount;

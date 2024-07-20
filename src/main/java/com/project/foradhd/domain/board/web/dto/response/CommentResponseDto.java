@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @RequiredArgsConstructor
 public class CommentResponseDto {
     private final Long id;
