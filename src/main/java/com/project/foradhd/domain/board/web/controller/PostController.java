@@ -8,10 +8,10 @@ import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.web.dto.PostDto;
-import com.project.foradhd.domain.board.web.dto.PostScrapFilterDto;
 import com.project.foradhd.domain.board.web.dto.request.PostRequestDto;
 import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.PostScrapFilterResponseDto;
 import com.project.foradhd.domain.board.web.mapper.PostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapFilterMapper;
 import com.project.foradhd.global.AuthUserId;
@@ -33,8 +33,8 @@ public class PostController {
     private final PostService postService;
     private final PostMapper postMapper;
     private final PostScrapFilterService postScrapFilterService;
-    private final PostScrapFilterMapper postScrapFilterMapper;
     private final PostLikeFilterService postLikeFilterService;
+    private final PostScrapFilterMapper postScrapFilterMapper;
 
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable Long postId) {
@@ -107,23 +107,26 @@ public class PostController {
         return ResponseEntity.ok(userPostsDto);
     }
 
-    // 내가 스크랩한 글 조회 API
-    @GetMapping("/scrap/{userId}")
-    public ResponseEntity<Page<PostScrapFilterDto>> getScrapsByUser(@AuthUserId String userId, Pageable pageable, @RequestParam SortOption sortOption) {
-        Page<PostScrapFilter> scraps = postScrapFilterService.getScrapsByUser(userId, pageable, sortOption);
-        Page<PostScrapFilterDto> dtoPage = scraps.map(postScrapFilterMapper::toDto);
-        return ResponseEntity.ok(dtoPage);
-    }
-
     // 스크랩 토글 API
-    @PostMapping("/scrap/toggle")
-    public ResponseEntity<?> toggleScrap(@RequestBody PostScrapFilterDto requestDto) {
+    @PostMapping("/scrap/{postId}/toggle")
+    public ResponseEntity<?> toggleScrap(@PathVariable Long postId, @AuthUserId String userId) {
         try {
-            postScrapFilterService.toggleScrap(requestDto.getPostId(), requestDto.getUserId());
+            postScrapFilterService.toggleScrap(postId, userId);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+    }
+
+    // 유저가 스크랩 한 글 조회
+    @GetMapping("/scrap")
+    public ResponseEntity<Page<PostScrapFilterResponseDto>> getScrapsByUser(
+            @AuthUserId String userId,
+            Pageable pageable,
+            @RequestParam(required = false, defaultValue = "NEWEST_FIRST") SortOption sortOption) {
+        Page<PostScrapFilter> scraps = postScrapFilterService.getScrapsByUser(userId, pageable, sortOption);
+        Page<PostScrapFilterResponseDto> responseDtos = scraps.map(scrap -> postScrapFilterMapper.toResponseDto(scrap, postScrapFilterService));
+        return ResponseEntity.ok(responseDtos);
     }
 
     // 좋아요 토글 API

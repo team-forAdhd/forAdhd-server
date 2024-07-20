@@ -4,6 +4,7 @@ import com.project.foradhd.domain.board.business.service.PostScrapFilterService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
+import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostScrapFilterRepository;
 import com.project.foradhd.domain.user.business.service.UserService;
@@ -26,6 +27,7 @@ public class PostScrapFilterServiceImpl implements PostScrapFilterService {
     private final PostScrapFilterRepository postScrapFilterRepository;
     private final PostRepository postRepository;
     private final UserService userService;
+    private final CommentRepository commentRepository;
 
     @Override
     @Transactional
@@ -56,6 +58,13 @@ public class PostScrapFilterServiceImpl implements PostScrapFilterService {
     public Page<PostScrapFilter> getScrapsByUser(String userId, Pageable pageable, SortOption sortOption) {
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), getSortByOption(sortOption));
         return postScrapFilterRepository.findByUserId(userId, sortedPageable);
+    }
+
+    @Override
+    public long getCommentCount(Long postId) {
+        long commentCount = commentRepository.countByPostId(postId);
+        long replyCount = commentRepository.countByParentCommentId(postId);
+        return commentCount + replyCount;
     }
 
     private Sort getSortByOption(SortOption option) {
