@@ -1,4 +1,4 @@
-package com.project.foradhd.domain.hospital.web.dto.response.serializer;
+package com.project.foradhd.global.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;

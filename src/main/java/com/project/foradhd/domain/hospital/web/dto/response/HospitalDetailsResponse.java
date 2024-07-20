@@ -1,7 +1,7 @@
 package com.project.foradhd.domain.hospital.web.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.project.foradhd.domain.hospital.web.dto.response.serializer.PhoneSerializer;
+import com.project.foradhd.global.serializer.PhoneSerializer;
 import com.project.foradhd.domain.hospital.web.enums.HospitalOperationStatus;
 import lombok.Builder;
 import lombok.Getter;

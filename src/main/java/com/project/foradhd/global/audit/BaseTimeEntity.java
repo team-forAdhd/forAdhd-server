@@ -1,5 +1,6 @@
 package com.project.foradhd.global.audit;
 
+import com.project.foradhd.domain.board.persistence.entity.Post;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -20,4 +21,5 @@ public abstract class BaseTimeEntity {
 
     @LastModifiedDate
     private LocalDateTime lastModifiedAt;
+
 }

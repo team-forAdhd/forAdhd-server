@@ -2,16 +2,11 @@ package com.project.foradhd.domain.user.persistence.entity;
 
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.global.audit.BaseTimeEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
+import java.time.Period;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,4 +44,24 @@ public class UserPrivacy extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private Gender gender = Gender.UNKNOWN;
+
+    @PostLoad
+    private void calculateAgeRange() {
+        if (this.birth != null) {
+            int age = Period.between(this.birth, LocalDate.now()).getYears();
+            if (age < 20) {
+                this.ageRange = "10대";
+            } else if (age < 30) {
+                this.ageRange = "20대";
+            } else if (age < 40) {
+                this.ageRange = "30대";
+            } else if (age < 50) {
+                this.ageRange = "40대";
+            } else {
+                this.ageRange = "50대 이상";
+            }
+        } else {
+            this.ageRange = "Unknown";
+        }
+    }
 }

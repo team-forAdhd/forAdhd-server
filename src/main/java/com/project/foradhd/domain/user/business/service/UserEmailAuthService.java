@@ -8,6 +8,7 @@ import com.project.foradhd.global.service.AwsSesService;
 import com.project.foradhd.global.service.RedisService;
 import com.project.foradhd.global.util.EmailAuthCodeGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -26,13 +27,17 @@ public class UserEmailAuthService {
     private final RedisService redisService;
     private static final int AUTH_CODE_TIMEOUT_MIN = 3;
 
+    @Value("${cloud.aws.cloud-front.deploy-domain}")
+    private String staticResourceHost;
+
     public void authenticateEmail(String userId, EmailAuthData emailAuthData) {
         String email = emailAuthData.getEmail();
         userService.validateDuplicatedEmail(email, userId);
 
         String authCode = EmailAuthCodeGenerator.generate();
         redisService.setValue(USER_EMAIL_AUTH_CODE, email, authCode, AUTH_CODE_TIMEOUT_MIN, MINUTES);
-        awsSesService.sendEmail(USER_EMAIL_AUTH_TEMPLATE, Map.of("authCode", authCode), email);
+        awsSesService.sendEmail(USER_EMAIL_AUTH_TEMPLATE,
+                Map.of("authCode", authCode, "staticResourceHost", staticResourceHost), email);
     }
 
     public User validateEmailAuth(String userId, EmailAuthValidationData emailAuthValidationData) {

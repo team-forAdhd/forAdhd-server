@@ -20,7 +20,6 @@ import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import com.project.foradhd.global.util.JsonUtil;
-import com.project.foradhd.global.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -113,7 +112,7 @@ public class HospitalService {
                         .hospitalId(hospitalReview.getHospitalId())
                         .hospitalName(hospitalReview.getHospitalName())
                         .reviewType(HospitalReviewType.valueOf(hospitalReview.getReviewType()))
-                        .createdAt(TimeUtil.toEpochSecond(hospitalReview.getCreatedAt()))
+                        .createdAt(hospitalReview.getCreatedAt())
                         .content(hospitalReview.getContent())
                         .imageList(JsonUtil.readValue(hospitalReview.getImageList(), new TypeReference<>() {}))
                         .build())
