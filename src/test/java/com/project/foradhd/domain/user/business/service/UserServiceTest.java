@@ -32,14 +32,11 @@ import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationAp
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval.UserTermsApprovalId;
 import com.project.foradhd.domain.user.persistence.enums.ForAdhdType;
+import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.domain.user.persistence.enums.Role;
-import com.project.foradhd.domain.user.persistence.repository.PushNotificationApprovalRepository;
-import com.project.foradhd.domain.user.persistence.repository.TermsRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserPushNotificationApprovalRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserTermsApprovalRepository;
+import com.project.foradhd.domain.user.persistence.repository.*;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,6 +75,9 @@ class UserServiceTest {
 
     @Mock
     UserPushNotificationApprovalRepository userPushNotificationApprovalRepository;
+
+    @Mock
+    UserDeviceRepository userDeviceRepository;
 
     @Mock
     UserAuthInfoService userAuthInfoService;
@@ -473,6 +473,42 @@ class UserServiceTest {
         then(userTermsApprovalRepository).should(never()).saveAll(userTermsApprovals);
     }
 
+    @DisplayName("유저 탈퇴 로직 테스트")
+    @Test
+    void withdraw_test() {
+        //given
+        String userId = "userId";
+        User withdrawnUser = toUser().build();
+        UserProfile withdrawnUserProfile = toUserProfile().build();
+        UserPrivacy withdrawnUserPrivacy = toUserPrivacy().build();
+        given(userRepository.findById(userId)).willReturn(Optional.of(withdrawnUser));
+        given(userProfileRepository.findByUserId(userId)).willReturn(Optional.of(withdrawnUserProfile));
+        given(userPrivacyRepository.findByUserId(userId)).willReturn(Optional.of(withdrawnUserPrivacy));
+
+        //when
+        userService.withdraw(userId);
+
+        //then
+        then(userTermsApprovalRepository).should(times(1)).deleteByUserId(userId);
+        then(userPushNotificationApprovalRepository).should(times(1)).deleteByUserId(userId);
+        then(userDeviceRepository).should(times(1)).deleteByUserId(userId);
+        then(userAuthInfoService).should(times(1)).withdraw(userId);
+
+        assertThat(withdrawnUser.getEmail()).isEmpty();
+        assertThat(withdrawnUser.getRole()).isEqualTo(Role.ANONYMOUS);
+        assertThat(withdrawnUser.getIsVerifiedEmail()).isFalse();
+        assertThat(withdrawnUser.getDeleted()).isTrue();
+        assertThat(withdrawnUser.getDeletedAt()).isNotNull();
+
+        assertThat(withdrawnUserProfile.getNickname()).isEmpty();
+        assertThat(withdrawnUserProfile.getProfileImage()).isEmpty();
+
+        assertThat(withdrawnUserPrivacy.getName()).isEmpty();
+        assertThat(withdrawnUserPrivacy.getBirth()).isEqualTo(LocalDate.of(1970, 1, 1));
+        assertThat(withdrawnUserPrivacy.getAgeRange()).isEmpty();
+        assertThat(withdrawnUserPrivacy.getGender()).isEqualTo(Gender.UNKNOWN);
+    }
+
     @DisplayName("ID로 User 조회 테스트 - 실패")
     @Test
     void get_user_test_fail() {
@@ -499,6 +535,20 @@ class UserServiceTest {
             .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(NOT_FOUND_USER_PROFILE);
+    }
+
+    @DisplayName("ID로 UserPrivacy 조회 테스트 - 실패")
+    @Test
+    void get_user_privacy_test_fail() {
+        //given
+        String userId = "userId";
+        given(userPrivacyRepository.findByUserId(userId)).willReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() -> userService.getUserPrivacy(userId))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(NOT_FOUND_USER_PRIVACY);
     }
 
     @DisplayName("ID로 조회된 User의 이메일 인증 여부 테스트")
