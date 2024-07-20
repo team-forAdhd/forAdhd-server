@@ -74,4 +74,12 @@ public class User extends BaseTimeEntity {
             this.role = Role.USER;
         }
     }
+
+    public void withdraw() {
+        this.email = "";
+        this.role = Role.ANONYMOUS;
+        this.isVerifiedEmail = false;
+        this.deleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }

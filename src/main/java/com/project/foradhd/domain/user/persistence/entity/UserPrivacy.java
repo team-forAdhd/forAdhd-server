@@ -64,4 +64,11 @@ public class UserPrivacy extends BaseTimeEntity {
             this.ageRange = "Unknown";
         }
     }
+
+    public void withdraw() {
+        this.name = "";
+        this.birth = LocalDate.of(1970, 1, 1);
+        this.ageRange = "";
+        this.gender = Gender.UNKNOWN;
+    }
 }
