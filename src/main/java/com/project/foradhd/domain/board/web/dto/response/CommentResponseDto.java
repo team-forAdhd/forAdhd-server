@@ -15,10 +15,11 @@ public class CommentResponseDto {
     private final String content;
     private final String userId;
     private final Long postId;
-    private final Long writerId;
     private final boolean anonymous;
     private final long likeCount;
     private final LocalDateTime createdAt;
     private final Comment parentComment;
     private final List<CommentResponseDto> children;
+    private final String nickname;
+    private final String profileImage;
 }

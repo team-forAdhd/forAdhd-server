@@ -33,7 +33,7 @@ public interface PostScrapFilterMapper {
     }
 
     @Named("userIdToUser")
-    default User userIdToUser(@AuthUserId String userId) {
+    default User userIdToUser(String userId) {
         return User.builder()
                 .id(userId)
                 .build();
@@ -41,8 +41,8 @@ public interface PostScrapFilterMapper {
 
     @Named("postIdToPost")
     default Post postIdToPost(Long postId) {
-        Post post = new Post();
-        post.setId(postId);
-        return post;
+        return Post.builder()
+                .id(postId)
+                .build();
     }
 }

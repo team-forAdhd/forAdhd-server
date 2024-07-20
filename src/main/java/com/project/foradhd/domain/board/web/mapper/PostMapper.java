@@ -27,6 +27,10 @@ public interface PostMapper {
     @Mapping(target = "commentCount", ignore = true)
     @Mapping(target = "scrapCount", ignore = true)
     @Mapping(target = "viewCount", ignore = true)
+    @Mapping(target = "writerId", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "writerName", ignore = true)
     Post toEntity(PostRequestDto dto);
 
     @Mapping(source = "comments", target = "comments", qualifiedByName = "toDtoList")

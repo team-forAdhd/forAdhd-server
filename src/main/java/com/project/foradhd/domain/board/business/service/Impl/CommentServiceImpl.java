@@ -7,8 +7,18 @@ import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
+import com.project.foradhd.domain.board.persistence.repository.PostRepository;
+import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
+import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
+import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
+import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
+import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
+import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -18,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.amazonaws.services.kms.model.ConnectionErrorCodeType.USER_NOT_FOUND;
 import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
 
 @Service
@@ -27,6 +38,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final CommentLikeFilterRepository commentLikeFilterRepository;
+    private final UserProfileRepository userProfileRepository;
 
     @Override
     public Comment getComment(Long commentId) {
@@ -37,6 +49,22 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Comment createComment(Comment comment, String userId) {
+        UserProfile userProfile = userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
+
+        comment = Comment.builder()
+                .post(comment.getPost())
+                .user(User.builder().id(userId).build())
+                .writerId(userId)
+                .content(comment.getContent())
+                .anonymous(comment.isAnonymous())
+                .likeCount(comment.getLikeCount())
+                .parentComment(comment.getParentComment())
+                .childComments(comment.getChildComments())
+                .nickname(userProfile.getNickname())
+                .profileImage(userProfile.getProfileImage())
+                .build();
+
         return commentRepository.save(comment);
     }
 
