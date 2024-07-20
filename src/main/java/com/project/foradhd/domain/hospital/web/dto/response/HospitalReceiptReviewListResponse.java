@@ -1,6 +1,8 @@
 package com.project.foradhd.domain.hospital.web.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
+import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,20 +13,23 @@ import java.util.List;
 @Builder
 public class HospitalReceiptReviewListResponse {
 
-    private List<ReceiptReviewResponse> receiptReviewList;
+    private List<HospitalReceiptReviewResponse> hospitalReceiptReviewList;
     private PagingResponse paging;
 
     @Getter
     @Builder
-    public static class ReceiptReviewResponse {
+    public static class HospitalReceiptReviewResponse {
 
+        private String hospitalReceiptReviewId;
         private String writerId;
-        private String name;
-        private String image;
-        private Double totalGrade;
+        private String writerName;
+        private String writerImage;
+        private String doctorName;
+        @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
         private LocalDateTime createdAt;
-        private List<String> reviewImageList;
         private String content;
+        private List<String> imageList;
+        private Long medicalExpense;
         private Integer helpCount;
         private Boolean isHelped;
         private Boolean isMine;

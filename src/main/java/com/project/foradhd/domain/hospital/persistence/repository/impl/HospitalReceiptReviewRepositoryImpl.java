@@ -6,6 +6,7 @@ import com.project.foradhd.domain.hospital.persistence.repository.custom.Hospita
 import com.project.foradhd.domain.hospital.persistence.repository.enums.HospitalReceiptReviewSortingOrder;
 import com.project.foradhd.global.paging.persistence.repository.support.QuerydslPagingSupportRepository;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -17,7 +18,6 @@ import org.springframework.data.support.PageableExecutionUtils;
 import java.util.List;
 
 import static com.project.foradhd.domain.hospital.persistence.entity.QDoctor.doctor;
-import static com.project.foradhd.domain.hospital.persistence.entity.QHospital.hospital;
 import static com.project.foradhd.domain.hospital.persistence.entity.QHospitalReceiptReview.hospitalReceiptReview;
 import static com.project.foradhd.domain.hospital.persistence.entity.QHospitalReceiptReviewHelp.hospitalReceiptReviewHelp;
 import static com.project.foradhd.domain.user.persistence.entity.QUserProfile.userProfile;
@@ -34,20 +34,20 @@ public class HospitalReceiptReviewRepositoryImpl implements HospitalReceiptRevie
                 HospitalReceiptReviewSortingOrder::valueOf);
         List<HospitalReceiptReviewDto> content = queryFactory
                 .select(new QHospitalReceiptReviewDto(
-                        hospitalReceiptReview, userProfile,
+                        hospitalReceiptReview, userProfile, doctor,
                         hospitalReceiptReviewHelp.isNotNull(),
                         new CaseBuilder()
-                                .when(userProfile.user.id.eq(userId)).then(true)
-                                .otherwise(false)
-                ))
+                                .when(hospitalReceiptReview.user.id.eq(userId)).then(true)
+                                .otherwise(false)))
                 .from(hospitalReceiptReview)
-                .innerJoin(hospitalReceiptReview.doctor, doctor).on(doctor.id.eq(doctorId))
-                .innerJoin(doctor.hospital, hospital).on(hospital.id.eq(hospitalId))
-                .innerJoin(userProfile).on(hospitalReceiptReview.user.id.eq(userProfile.user.id))
+                .innerJoin(userProfile).on(userProfile.user.id.eq(hospitalReceiptReview.user.id))
+                .leftJoin(hospitalReceiptReview.doctor, doctor)
                 .leftJoin(hospitalReceiptReviewHelp)
-                .on(hospitalReceiptReview.id.eq(hospitalReceiptReviewHelp.id.hospitalReceiptReview.id),
+                .on(hospitalReceiptReviewHelp.id.hospitalReceiptReview.id.eq(hospitalReceiptReview.id),
                         hospitalReceiptReviewHelp.id.user.id.eq(userId),
                         hospitalReceiptReviewHelp.deleted.isFalse())
+                .where(hospitalReceiptReview.hospital.id.eq(hospitalId), doctorIdEq(doctorId),
+                        hospitalReceiptReview.deleted.isFalse())
                 .orderBy(orderSpecifiers)
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
@@ -55,10 +55,15 @@ public class HospitalReceiptReviewRepositoryImpl implements HospitalReceiptRevie
 
         JPAQuery<Long> countQuery = queryFactory.select(hospitalReceiptReview.count())
                 .from(hospitalReceiptReview)
-                .innerJoin(hospitalReceiptReview.doctor, doctor).on(doctor.id.eq(doctorId))
-                .innerJoin(doctor.hospital, hospital).on(hospital.id.eq(hospitalId))
-                .innerJoin(userProfile).on(hospitalReceiptReview.user.id.eq(userProfile.user.id));
+                .innerJoin(userProfile).on(userProfile.user.id.eq(hospitalReceiptReview.user.id))
+                .leftJoin(hospitalReceiptReview.doctor, doctor)
+                .where(hospitalReceiptReview.hospital.id.eq(hospitalId), doctorIdEq(doctorId),
+                        hospitalReceiptReview.deleted.isFalse());
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    private Predicate doctorIdEq(String doctorId) {
+        return doctorId == null ? null : doctor.id.eq(doctorId);
     }
 }

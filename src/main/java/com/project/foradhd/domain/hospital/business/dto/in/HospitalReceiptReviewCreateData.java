@@ -9,9 +9,7 @@ import java.util.List;
 @Builder
 public class HospitalReceiptReviewCreateData {
 
-    private Integer kindness;
-    private Integer adhdUnderstanding;
-    private Integer enoughMedicalTime;
     private String content;
     private List<String> imageList;
+    private Long medicalExpense;
 }

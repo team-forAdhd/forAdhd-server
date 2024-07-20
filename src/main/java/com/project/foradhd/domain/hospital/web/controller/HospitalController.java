@@ -1,22 +1,11 @@
 package com.project.foradhd.domain.hospital.web.controller;
 
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalBriefReviewCreateData;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalListNearbySearchCond;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
-import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
-import com.project.foradhd.domain.hospital.business.dto.out.DoctorDetailsData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalListNearbyData;
-import com.project.foradhd.domain.hospital.business.dto.out.HospitalReceiptReviewListData;
+import com.project.foradhd.domain.hospital.business.dto.in.*;
+import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalBriefReviewCreateRequest;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalListNearbyRequest;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewCreateRequest;
-import com.project.foradhd.domain.hospital.web.dto.request.HospitalReceiptReviewUpdateRequest;
-import com.project.foradhd.domain.hospital.web.dto.response.DoctorDetailsResponse;
-import com.project.foradhd.domain.hospital.web.dto.response.HospitalDetailsResponse;
-import com.project.foradhd.domain.hospital.web.dto.response.HospitalListNearbyResponse;
-import com.project.foradhd.domain.hospital.web.dto.response.HospitalReceiptReviewListResponse;
+import com.project.foradhd.domain.hospital.web.dto.request.*;
+import com.project.foradhd.domain.hospital.web.dto.response.*;
+import com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter;
 import com.project.foradhd.domain.hospital.web.mapper.HospitalMapper;
 import com.project.foradhd.global.AuthUserId;
 import jakarta.validation.Valid;
@@ -44,6 +33,41 @@ public class HospitalController {
         return ResponseEntity.ok(hospitalListNearbyResponse);
     }
 
+    @GetMapping("/{hospitalId}/receipt-reviews")
+    public ResponseEntity<HospitalReceiptReviewListResponse> getReceiptReviewList(@AuthUserId String userId,
+                                                                                @PathVariable String hospitalId,
+                                                                                @RequestParam(required = false) String doctorId,
+                                                                                Pageable pageable) {
+        HospitalReceiptReviewListData hospitalReceiptReviewListData = hospitalService.getReceiptReviewList(userId, hospitalId, doctorId, pageable);
+        HospitalReceiptReviewListResponse hospitalReceiptReviewListResponse =
+                hospitalMapper.toReceiptReviewListResponse(hospitalReceiptReviewListData);
+        return ResponseEntity.ok(hospitalReceiptReviewListResponse);
+    }
+
+    @GetMapping("/bookmark")
+    public ResponseEntity<HospitalListBookmarkResponse> getHospitalListBookmark(@AuthUserId String userId,
+                                                                                Pageable pageable) {
+        HospitalListBookmarkData hospitalListBookmarkData = hospitalService.getHospitalListBookmark(userId, pageable);
+        HospitalListBookmarkResponse hospitalListBookmarkResponse = hospitalMapper.toHospitalListBookmarkResponse(hospitalListBookmarkData);
+        return ResponseEntity.ok(hospitalListBookmarkResponse);
+    }
+
+    @GetMapping("/my-reviews")
+    public ResponseEntity<MyHospitalReviewListResponse> getMyHospitalReviewList(@AuthUserId String userId,
+                                                                                @RequestParam HospitalReviewFilter filter,
+                                                                                Pageable pageable) {
+        MyHospitalReviewListData myHospitalReviewListData = hospitalService.getMyHospitalReviewList(userId, filter, pageable);
+        MyHospitalReviewListResponse myHospitalReviewListResponse = hospitalMapper.toMyHospitalReviewListResponse(myHospitalReviewListData);
+        return ResponseEntity.ok(myHospitalReviewListResponse);
+    }
+
+    @GetMapping("/{hospitalId}/doctors/brief")
+    public ResponseEntity<DoctorBriefListResponse> getDoctorBriefList(@PathVariable String hospitalId) {
+        DoctorBriefListData doctorBriefListData = hospitalService.getDoctorBriefList(hospitalId);
+        DoctorBriefListResponse doctorBriefListResponse = hospitalMapper.toDoctorBriefListResponse(doctorBriefListData);
+        return ResponseEntity.ok(doctorBriefListResponse);
+    }
+
     @GetMapping("/{hospitalId}")
     public ResponseEntity<HospitalDetailsResponse> getHospitalDetails(@AuthUserId String userId,
                                                                     @PathVariable String hospitalId) {
@@ -52,21 +76,46 @@ public class HospitalController {
         return ResponseEntity.ok(hospitalDetailsResponse);
     }
 
-    @GetMapping("/{hospitalId}/doctors/{doctorId}")
-    public ResponseEntity<DoctorDetailsResponse> getDoctorDetails(@PathVariable String hospitalId, @PathVariable String doctorId) {
-        DoctorDetailsData doctorDetailsData = hospitalService.getDoctorDetails(hospitalId, doctorId);
-        DoctorDetailsResponse doctorDetailsResponse = hospitalMapper.toDoctorDetailsResponse(doctorDetailsData);
-        return ResponseEntity.ok(doctorDetailsResponse);
+    @GetMapping("/evaluation-questions")
+    public ResponseEntity<HospitalEvaluationQuestionListResponse> getEvaluationQuestionList() {
+        HospitalEvaluationQuestionListData hospitalEvaluationQuestionListData = hospitalService.getEvaluationQuestionList();
+        HospitalEvaluationQuestionListResponse hospitalEvaluationQuestionListResponse =
+                hospitalMapper.toEvaluationQuestionListResponse(hospitalEvaluationQuestionListData);
+        return ResponseEntity.ok(hospitalEvaluationQuestionListResponse);
     }
 
-    @GetMapping("/{hospitalId}/doctors/{doctorId}/receipt-reviews")
-    public ResponseEntity<HospitalReceiptReviewListResponse> getReceiptReviewList(@AuthUserId String userId,
-                                                                                @PathVariable String hospitalId, @PathVariable String doctorId,
-                                                                                Pageable pageable) {
-        HospitalReceiptReviewListData hospitalReceiptReviewListData = hospitalService.getReceiptReviewList(userId, hospitalId, doctorId, pageable);
-        HospitalReceiptReviewListResponse hospitalReceiptReviewListResponse =
-                hospitalMapper.toReceiptReviewListResponse(hospitalReceiptReviewListData);
-        return ResponseEntity.ok(hospitalReceiptReviewListResponse);
+    @GetMapping("/evaluation-reviews/{hospitalEvaluationReviewId}")
+    public ResponseEntity<HospitalEvaluationReviewResponse> getEvaluationReview(@AuthUserId String userId,
+                                                                                @PathVariable String hospitalEvaluationReviewId) {
+        HospitalEvaluationReviewData hospitalEvaluationReviewData = hospitalService.getEvaluationReview(userId, hospitalEvaluationReviewId);
+        HospitalEvaluationReviewResponse hospitalEvaluationReviewResponse =
+                hospitalMapper.toEvaluationReviewResponse(hospitalEvaluationReviewData);
+        return ResponseEntity.ok(hospitalEvaluationReviewResponse);
+    }
+
+    @PostMapping("/{hospitalId}/evaluation-reviews")
+    public ResponseEntity<Void> createEvaluationReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalId,
+                                                    @RequestBody @Valid HospitalEvaluationReviewCreateRequest request) {
+        HospitalEvaluationReviewCreateData hospitalEvaluationReviewCreateData = hospitalMapper.toHospitalEvaluationReviewCreateData(request);
+        hospitalService.createEvaluationReview(userId, hospitalId, hospitalEvaluationReviewCreateData);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PutMapping("/evaluation-reviews/{hospitalEvaluationReviewId}")
+    public ResponseEntity<Void> updateEvaluationReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalEvaluationReviewId,
+                                                    @RequestBody @Valid HospitalEvaluationReviewUpdateRequest request) {
+        HospitalEvaluationReviewUpdateData hospitalEvaluationReviewUpdateData = hospitalMapper.toHospitalEvaluationReviewUpdateData(request);
+        hospitalService.updateEvaluationReview(userId, hospitalEvaluationReviewId, hospitalEvaluationReviewUpdateData);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/evaluation-reviews/{hospitalEvaluationReviewId}")
+    public ResponseEntity<Void> deleteEvaluationReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalEvaluationReviewId) {
+        hospitalService.deleteEvaluationReview(userId, hospitalEvaluationReviewId);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{hospitalId}/bookmark")
@@ -77,24 +126,17 @@ public class HospitalController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{hospitalId}/doctors/{doctorId}/brief-reviews")
-    public ResponseEntity<Void> createBriefReview(@AuthUserId String userId,
-                                                @PathVariable String hospitalId, @PathVariable String doctorId,
-                                                @RequestBody @Valid HospitalBriefReviewCreateRequest request) {
-        HospitalBriefReviewCreateData hospitalBriefReviewCreateData = hospitalMapper.toHospitalBriefReviewCreateData(request);
-        hospitalService.createBriefReview(userId, hospitalId, doctorId, hospitalBriefReviewCreateData);
+    @PostMapping("/{hospitalId}/receipt-reviews")
+    public ResponseEntity<Void> createHospitalReceiptReview(@AuthUserId String userId,
+                                                    @PathVariable String hospitalId,
+                                                    @RequestBody @Valid HospitalReceiptReviewCreateRequest request) {
+        HospitalReceiptReviewCreateData hospitalReceiptReviewCreateData = hospitalMapper.toHospitalReceiptReviewCreateData(request);
+        hospitalService.createReceiptReview(userId, hospitalId, hospitalReceiptReviewCreateData);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/doctors/brief-reviews/{hospitalBriefReviewId}")
-    public ResponseEntity<Void> deleteBriefReview(@AuthUserId String userId,
-                                                @PathVariable String hospitalBriefReviewId) {
-        hospitalService.deleteBriefReview(userId, hospitalBriefReviewId);
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("/{hospitalId}/doctors/{doctorId}/receipt-reviews")
-    public ResponseEntity<Void> createReceiptReview(@AuthUserId String userId,
+    public ResponseEntity<Void> createDoctorReceiptReview(@AuthUserId String userId,
                                                     @PathVariable String hospitalId, @PathVariable String doctorId,
                                                     @RequestBody @Valid HospitalReceiptReviewCreateRequest request) {
         HospitalReceiptReviewCreateData hospitalReceiptReviewCreateData = hospitalMapper.toHospitalReceiptReviewCreateData(request);
@@ -102,7 +144,7 @@ public class HospitalController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("/doctors/receipt-reviews/{hospitalReceiptReviewId}/help")
+    @PostMapping("/receipt-reviews/{hospitalReceiptReviewId}/help")
     public ResponseEntity<Void> markReceiptReviewAsHelpful(@AuthUserId String userId,
                                                         @PathVariable String hospitalReceiptReviewId,
                                                         @RequestParam Boolean help) {
@@ -110,7 +152,7 @@ public class HospitalController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/doctors/receipt-reviews/{hospitalReceiptReviewId}")
+    @PutMapping("/receipt-reviews/{hospitalReceiptReviewId}")
     public ResponseEntity<Void> updateReceiptReview(@AuthUserId String userId,
                                                     @PathVariable String hospitalReceiptReviewId,
                                                     @RequestBody @Valid HospitalReceiptReviewUpdateRequest request) {
@@ -119,7 +161,7 @@ public class HospitalController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/doctors/receipt-reviews/{hospitalReceiptReviewId}")
+    @DeleteMapping("/receipt-reviews/{hospitalReceiptReviewId}")
     public ResponseEntity<Void> deleteReceiptReview(@AuthUserId String userId,
                                                     @PathVariable String hospitalReceiptReviewId) {
         hospitalService.deleteReceiptReview(userId, hospitalReceiptReviewId);

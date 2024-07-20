@@ -42,6 +42,8 @@ cloud:
       auto: false #CloudFormation 스택 수동 관리 설정
     s3:
       bucket: ${AWS_S3_BUCKET}
+    cloud-front:
+      deploy-domain: ${CLOUD_FRONT_DEPLOY_DOMAIN}
 
 ---
 spring:
@@ -61,7 +63,7 @@ spring:
   data:
     web:
       pageable:
-        one-indexed-parameters: true
+        one-indexed-parameters: false
 
 logging:
   level:
@@ -89,7 +91,7 @@ spring:
   data:
     web:
       pageable:
-        one-indexed-parameters: true
+        one-indexed-parameters: false
 
 logging:
   level:
@@ -117,7 +119,7 @@ spring:
   data:
     web:
       pageable:
-        one-indexed-parameters: true
+        one-indexed-parameters: false
 
 logging:
   level:

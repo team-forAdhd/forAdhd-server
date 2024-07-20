@@ -18,13 +18,5 @@ public enum HospitalReceiptReviewSortingOrder implements SortingOrder {
         public Expression<? extends Comparable<?>> getOrderExpression() {
             return hospitalReceiptReview.helpCount;
         }
-    },
-    TOTAL_GRADE {
-        @Override
-        public Expression<? extends Comparable<?>> getOrderExpression() {
-            return hospitalReceiptReview.kindness
-                    .add(hospitalReceiptReview.adhdUnderstanding)
-                    .add(hospitalReceiptReview.enoughMedicalTime);
-        }
     }
 }
