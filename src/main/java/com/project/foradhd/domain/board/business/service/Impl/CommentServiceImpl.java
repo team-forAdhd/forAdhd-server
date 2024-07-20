@@ -61,8 +61,8 @@ public class CommentServiceImpl implements CommentService {
                 .likeCount(comment.getLikeCount())
                 .parentComment(comment.getParentComment())
                 .childComments(comment.getChildComments())
-                .nickname(userProfile.getNickname())
-                .profileImage(userProfile.getProfileImage())
+                .nickname(comment.isAnonymous() ? null : userProfile.getNickname())
+                .profileImage(comment.isAnonymous() ? null : userProfile.getProfileImage())
                 .build();
 
         return commentRepository.save(comment);
