@@ -150,6 +150,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void toggleCommentLike(Long commentId, String userId) {
         Optional<CommentLikeFilter> likeFilter = commentLikeFilterRepository.findByCommentIdAndUserId(commentId, userId);
         if (likeFilter.isPresent()) {
