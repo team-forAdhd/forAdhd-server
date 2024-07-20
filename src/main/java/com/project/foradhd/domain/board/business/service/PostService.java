@@ -38,4 +38,5 @@ public interface PostService {
 
     List<PostRankingResponseDto> getTopPosts(Pageable pageable);
     List<PostRankingResponseDto> getTopPostsByCategory(CategoryName category, Pageable pageable);
+    void addComment(Long postId, String commentContent, String userId);
 }

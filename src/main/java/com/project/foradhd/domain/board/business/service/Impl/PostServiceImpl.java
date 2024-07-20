@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.board.business.service.Impl;
 
+import com.project.foradhd.domain.board.business.service.NotificationService;
 import com.project.foradhd.domain.board.business.service.PostService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
@@ -7,6 +8,7 @@ import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
 import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.util.SseEmitters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,8 @@ import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final NotificationService notificationService;
+    private final SseEmitters sseEmitters;
 
     @Override
     public Post getPost(Long postId) {
@@ -100,6 +104,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostRankingResponseDto> getTopPosts(Pageable pageable) {
         List<Post> topPosts = postRepository.findTopPosts(pageable);
+        notifyUsersAboutTopPosts(topPosts);
         return topPosts.stream()
                 .map(post -> PostRankingResponseDto.builder()
                         .id(post.getId())
@@ -116,6 +121,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostRankingResponseDto> getTopPostsByCategory(CategoryName category, Pageable pageable) {
         List<Post> topPosts = postRepository.findTopPostsByCategory(category, pageable);
+        notifyUsersAboutTopPosts(topPosts);
         return topPosts.stream()
                 .map(post -> PostRankingResponseDto.builder()
                         .id(post.getId())
@@ -127,6 +133,25 @@ public class PostServiceImpl implements PostService {
                         .images(post.getImages())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private void notifyUsersAboutTopPosts(List<Post> topPosts) {
+        for (Post post : topPosts) {
+            String message = "내 글이 TOP 10 게시물로 선정됐어요!";
+            notificationService.createNotification(post.getUser().getId(), message);
+            sseEmitters.sendNotification(post.getUser().getId(), message);
+        }
+    }
+
+    @Override
+    public void addComment(Long postId, String commentContent, String userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        // 댓글 추가 로직 생략
+
+        String message = "새로운 댓글이 달렸어요: " + commentContent;
+        notificationService.createNotification(post.getUser().getId(), message);
+        sseEmitters.sendNotification(post.getUser().getId(), message);
     }
 
     private Pageable applySorting(Pageable pageable, SortOption sortOption) {
