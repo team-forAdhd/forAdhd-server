@@ -37,6 +37,11 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean isVerifiedEmail = Boolean.FALSE;
 
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Boolean deleted = Boolean.FALSE;
+
     public String getAuthority() {
         return this.role.getName();
     }
