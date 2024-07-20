@@ -24,6 +24,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,8 +43,28 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment getComment(Long commentId) {
-        return commentRepository.findById(commentId)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_COMMENT));
+
+        int childCommentCount = commentRepository.countByParentCommentId(commentId);
+        List<Comment> childComments = new ArrayList<>();
+        if (childCommentCount > 0) {
+            childComments = commentRepository.findByParentCommentId(commentId);
+        }
+
+        return Comment.builder()
+                .id(comment.getId())
+                .post(comment.getPost())
+                .user(comment.getUser())
+                .writerId(comment.getWriterId())
+                .content(comment.getContent())
+                .parentComment(comment.getParentComment())
+                .anonymous(comment.isAnonymous())
+                .likeCount(comment.getLikeCount())
+                .nickname(comment.getNickname())
+                .profileImage(comment.getProfileImage())
+                .childComments(childComments)
+                .build();
     }
 
     @Override

@@ -11,12 +11,13 @@ import org.mapstruct.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = {UserService.class})
+@Mapper(componentModel = "spring", uses = {UserService.class, CommentMapper.class})
 public interface CommentMapper {
 
-    @Mapping(source = "post", target = "postId")
-    @Mapping(source = "user", target = "userId")
+    @Mapping(source = "post.id", target = "postId")
+    @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "childComments", target = "children", qualifiedByName = "mapChildComments")
+    @Mapping(source = "parentComment", target = "parentComment", qualifiedByName = "mapParentCommentToDto")
     CommentResponseDto toDto(Comment comment);
 
     @Mapping(source = "postId", target = "post")
@@ -52,6 +53,21 @@ public interface CommentMapper {
     @Named("mapParentComment")
     default Comment mapParentComment(Long parentCommentId) {
         return parentCommentId == null ? null : Comment.builder().id(parentCommentId).build();
+    }
+
+    @Named("mapParentCommentToDto")
+    default CommentResponseDto mapParentCommentToDto(Comment parentComment) {
+        if (parentComment == null) return null;
+        return CommentResponseDto.builder()
+                .id(parentComment.getId())
+                .content(parentComment.getContent())
+                .userId(parentComment.getUser() != null ? parentComment.getUser().getId() : null)
+                .postId(parentComment.getPost() != null ? parentComment.getPost().getId() : null)
+                .anonymous(parentComment.isAnonymous())
+                .likeCount(parentComment.getLikeCount())
+                .nickname(parentComment.getNickname())
+                .profileImage(parentComment.getProfileImage())
+                .build();
     }
 
     @Named("mapChildComments")

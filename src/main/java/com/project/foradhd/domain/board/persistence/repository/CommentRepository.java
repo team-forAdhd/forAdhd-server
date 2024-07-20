@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findByPostId(Long postId, Pageable pageable);
@@ -23,4 +25,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Modifying
     @Query("delete Comment c where c.parentComment.id = :parentId")
     void deleteByParentId(@Param("parentId") Long parentId);
+
+    @Query("SELECT COUNT(c) FROM Comment c WHERE c.parentComment.id = :parentId")
+    int countByParentCommentId(@Param("parentId") Long parentId);
+
+    List<Comment> findByParentCommentId(Long parentCommentId);
 }

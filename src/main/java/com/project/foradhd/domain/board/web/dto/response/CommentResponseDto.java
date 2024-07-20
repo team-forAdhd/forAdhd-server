@@ -18,7 +18,7 @@ public class CommentResponseDto {
     private final boolean anonymous;
     private final long likeCount;
     private final LocalDateTime createdAt;
-    private final Comment parentComment;
+    private final CommentResponseDto parentComment;
     private final List<CommentResponseDto> children;
     private final String nickname;
     private final String profileImage;
