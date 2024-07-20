@@ -45,8 +45,8 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    //대댓글 삭제 API
-    @DeleteMapping("/{commentId}/children")
+    // 개별 대댓글 삭제 API
+    @DeleteMapping("/{parentId}/children/{commentId}")
     public ResponseEntity<Void> deleteChildrenComment(@PathVariable Long commentId) {
         commentService.deleteChildrenComment(commentId);
         return ResponseEntity.noContent().build();

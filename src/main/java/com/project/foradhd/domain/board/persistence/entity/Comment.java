@@ -44,4 +44,8 @@ public class Comment extends BaseTimeEntity {
     private long likeCount;
     private String nickname;
     private String profileImage;
+
+    public void setParentComment(Comment parentComment) {
+        this.parentComment = parentComment;
+    }
 }

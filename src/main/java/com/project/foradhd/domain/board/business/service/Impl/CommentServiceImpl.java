@@ -90,24 +90,18 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void deleteComment(Long commentId) {
-        Comment comment = getComment(commentId);
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_COMMENT));
 
-        // 원 댓글에 연결된 대댓글의 부모 ID를 null로 설정
-        for (Comment childComment : comment.getChildComments()) {
-            Comment updatedChildComment = Comment.builder()
-                    .id(childComment.getId())
-                    .post(childComment.getPost())
-                    .user(childComment.getUser())
-                    .content(childComment.getContent())
-                    .anonymous(childComment.isAnonymous())
-                    .likeCount(childComment.getLikeCount())
-                    .parentComment(null)
-                    .build();
-            commentRepository.save(updatedChildComment);
+        // 원댓글에 연결된 대댓글의 부모 참조를 null로 설정
+        List<Comment> childComments = commentRepository.findByParentCommentId(commentId);
+        for (Comment childComment : childComments) {
+            childComment.setParentComment(null);
+            commentRepository.save(childComment);
         }
 
         // 원 댓글 삭제
-        commentRepository.deleteByParentId(commentId);
+        commentRepository.deleteById(commentId);
     }
 
     @Transactional
