@@ -50,11 +50,9 @@ public class PostServiceImpl implements PostService {
 
         Post updatedPost = Post.builder()
                 .id(existingPost.getId())
-                .writerId(existingPost.getWriterId())
                 .user(existingPost.getUser())
                 .category(existingPost.getCategory())
                 .comments(existingPost.getComments())
-                .writerName(existingPost.getWriterName())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .anonymous(existingPost.isAnonymous())

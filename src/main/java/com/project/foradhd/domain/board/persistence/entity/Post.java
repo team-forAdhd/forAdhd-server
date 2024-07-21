@@ -23,8 +23,6 @@ public class Post extends BaseTimeEntity {
     @Column(name = "post_id")
     private Long id;
 
-    private Long writerId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
@@ -35,8 +33,6 @@ public class Post extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Comment> comments;
-
-    private String writerName;
 
     private String title;
 
@@ -74,5 +70,9 @@ public class Post extends BaseTimeEntity {
 
     public void incrementViewCount() {
         this.viewCount++;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

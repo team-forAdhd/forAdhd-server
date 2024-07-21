@@ -1,6 +1,8 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -25,6 +27,7 @@ public class MedicineReview extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
+
 
     @Column(name = "age_range", length = 50)
     private String ageRange;

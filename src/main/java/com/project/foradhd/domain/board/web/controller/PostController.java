@@ -14,8 +14,10 @@ import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostScrapFilterResponseDto;
 import com.project.foradhd.domain.board.web.mapper.PostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapFilterMapper;
+import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.AuthUserId;
 import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,35 +36,34 @@ public class PostController {
     private final PostService postService;
     private final PostMapper postMapper;
     private final PostScrapFilterService postScrapFilterService;
-    private final PostLikeFilterService postLikeFilterService;
     private final PostScrapFilterMapper postScrapFilterMapper;
+    private final PostLikeFilterService postLikeFilterService;
 
+    // 게시글 개별 조회 api
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable Long postId) {
-        Post post = postService.getAndIncrementViewCount(postId);
+        Post post = postService.getPost(postId);
         PostResponseDto response = postMapper.responsetoDto(post);
         return ResponseEntity.ok(response);
     }
 
-    // 글 작성 API
-    @PostMapping()
-    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto postRequestDto) {
-        Post post = postMapper.toEntity(postRequestDto);
+    // 게시글 생성 api
+    @PostMapping
+    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto postRequestDto, @AuthUserId String userId) {
+        Post post = postMapper.toEntity(postRequestDto, userId);
         Post createdPost = postService.createPost(post);
         return ResponseEntity.status(HttpStatus.CREATED).body(postMapper.responsetoDto(createdPost));
     }
 
-    // 글 수정 API
+    // 게시글 수정 api
     @PutMapping("/{postId}")
     public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto postRequestDto) {
         Post existingPost = postService.getPost(postId);
         Post updatedPost = Post.builder()
                 .id(existingPost.getId())
-                .writerId(existingPost.getWriterId())
                 .user(existingPost.getUser())
                 .category(existingPost.getCategory())
                 .comments(existingPost.getComments())
-                .writerName(existingPost.getWriterName())
                 .title(postRequestDto.getTitle())
                 .content(postRequestDto.getContent())
                 .anonymous(existingPost.isAnonymous())
@@ -75,36 +77,67 @@ public class PostController {
         return ResponseEntity.ok(postMapper.responsetoDto(savedPost));
     }
 
-    // 글 삭제 API
+    // 게시글 삭제 api
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
 
-    // 전체 글 조회 API
+    // 전체 게시글 조회 api
     @GetMapping("/all")
-    public ResponseEntity<Page<PostResponseDto>> getAllPosts(Pageable pageable) {
-        Page<Post> posts = postService.getAllPosts(pageable);
-        return ResponseEntity.ok(posts.map(postMapper::responsetoDto));
-    }
+    public ResponseEntity<PostResponseDto> getAllPosts(Pageable pageable) {
+        Page<Post> postPage = postService.getAllPosts(pageable);
+        List<PostResponseDto> postResponseDtoList = postPage.getContent().stream()
+                .map(postMapper::responsetoDto)
+                .collect(Collectors.toList());
 
-    // 카테고리별 글 조회 API
-    @GetMapping("/category")
-    public ResponseEntity<Page<PostResponseDto>> getPostsByCategory(
-            @RequestParam("category") CategoryName category,
-            Pageable pageable) {
-        Page<Post> posts = postService.listByCategory(category, pageable);
-        Page<PostResponseDto> response = posts.map(postMapper::responsetoDto);
+        PagingResponse pagingResponse = PagingResponse.from(postPage);
+
+        PostResponseDto response = PostResponseDto.builder()
+                .postList(postResponseDtoList)
+                .paging(pagingResponse)
+                .build();
+
         return ResponseEntity.ok(response);
     }
 
-    // 나의 글 조회 API
+    // 카테고리별 게시글 조회 api
+    @GetMapping("/category")
+    public ResponseEntity<PostResponseDto> getPostsByCategory(
+            @RequestParam("category") CategoryName category,
+            Pageable pageable) {
+        Page<Post> postPage = postService.listByCategory(category, pageable);
+        List<PostResponseDto> postResponseDtoList = postPage.getContent().stream()
+                .map(postMapper::responsetoDto)
+                .collect(Collectors.toList());
+
+        PagingResponse pagingResponse = PagingResponse.from(postPage);
+
+        PostResponseDto response = PostResponseDto.builder()
+                .postList(postResponseDtoList)
+                .paging(pagingResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 마이페이지 - 나의 글 조회 api
     @GetMapping("/{userId}/my-posts")
-    public ResponseEntity<Page<PostDto>> getUserPosts(@AuthUserId String userId, Pageable pageable, @RequestParam SortOption sortOption) {
+    public ResponseEntity<PostResponseDto> getUserPosts(@AuthUserId String userId, Pageable pageable, @RequestParam SortOption sortOption) {
         Page<Post> userPosts = postService.getUserPosts(userId, pageable, sortOption);
-        Page<PostDto> userPostsDto = userPosts.map(postMapper::toDto);
-        return ResponseEntity.ok(userPostsDto);
+        List<PostResponseDto> postResponseDtoList = userPosts.getContent().stream()
+                .map(postMapper::responsetoDto)
+                .collect(Collectors.toList());
+
+        PagingResponse pagingResponse = PagingResponse.from(userPosts);
+
+        PostResponseDto response = PostResponseDto.builder()
+                .postList(postResponseDtoList)
+                .paging(pagingResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     // 스크랩 토글 API
