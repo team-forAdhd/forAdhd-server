@@ -3,8 +3,7 @@ package com.project.foradhd.global.util;
 public abstract class StringUtil {
 
     public static String strip(String value) {
-        if (value == null) return null;
-        return value.strip();
+        return value == null ? null : value.strip();
     }
 
     public static String addPrefix(String value, String prefix) {
