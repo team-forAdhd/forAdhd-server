@@ -16,26 +16,20 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = { UserRepository.class, PostRepository.class })
+@Mapper(componentModel = "spring", uses = {UserRepository.class, PostRepository.class})
 public interface PostScrapFilterMapper {
 
-    @Mapping(source = "user", target = "userId", qualifiedByName = "getUserId")
-    @Mapping(source = "post", target = "postId", qualifiedByName = "getPostId")
-    PostScrapFilterDto toDto(PostScrapFilter postScrapFilter);
-
-    @Mapping(source = "userId", target = "user", qualifiedByName = "userIdToUser")
-    @Mapping(source = "postId", target = "post", qualifiedByName = "postIdToPost")
-    PostScrapFilter toEntity(PostScrapFilterDto dto);
-
-    @Mapping(source = "post.id", target = "postId")
-    @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "post.title", target = "postTitle")
-    @Mapping(source = "post.category", target = "category")
-    @Mapping(source = "post.viewCount", target = "viewCount")
-    @Mapping(source = "post.likeCount", target = "likeCount")
-    @Mapping(target = "commentCount", expression = "java(getCommentCount(postScrapFilter.getPost(), postScrapFilterService))")
-    @Mapping(source = "post.images", target = "imageUrl", qualifiedByName = "getFirstImageUrl")
-    PostScrapFilterResponseDto toResponseDto(PostScrapFilter postScrapFilter, @Context PostScrapFilterService postScrapFilterService);
+    @Mappings({
+            @Mapping(source = "post.id", target = "postId"),
+            @Mapping(source = "user.id", target = "userId"),
+            @Mapping(source = "post.title", target = "postTitle"),
+            @Mapping(source = "post.category", target = "category"),
+            @Mapping(source = "post.viewCount", target = "viewCount"),
+            @Mapping(source = "post.likeCount", target = "likeCount"),
+            @Mapping(target = "commentCount", expression = "java(getCommentCount(postScrapFilter.getPost(), postScrapFilterService))"),
+            @Mapping(source = "post.images", target = "imageUrl", qualifiedByName = "getFirstImageUrl")
+    })
+    PostScrapFilterResponseDto.PostScrapFilterListResponseDto toListResponseDto(PostScrapFilter postScrapFilter, @Context PostScrapFilterService postScrapFilterService);
 
     @Named("getUserId")
     default String getUserId(User user) {

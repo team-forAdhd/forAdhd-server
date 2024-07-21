@@ -14,7 +14,9 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.mapstruct.*;
 
+import org.mapstruct.*;
 
 import org.mapstruct.*;
 
@@ -44,10 +46,12 @@ public interface PostMapper {
         }
     }
 
-    @Mapping(source = "comments", target = "comments", qualifiedByName = "toDtoList")
-    @Mapping(target = "commentCount", expression = "java(calculateCommentCount(post.getComments()))")
-    @Mapping(source = "user.id", target = "userId")
-    PostResponseDto responsetoDto(Post post);
+    @Mappings({
+            @Mapping(source = "comments", target = "comments", qualifiedByName = "toDtoList"),
+            @Mapping(target = "commentCount", expression = "java(calculateCommentCount(post.getComments()))"),
+            @Mapping(source = "user.id", target = "userId")
+    })
+    PostResponseDto.PostListResponseDto toPostListResponseDto(Post post);
 
     @Named("toDtoList")
     default List<CommentResponseDto> mapComments(List<Comment> comments) {

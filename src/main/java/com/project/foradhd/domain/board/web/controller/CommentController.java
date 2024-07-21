@@ -9,12 +9,15 @@ import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.mapper.CommentMapper;
 import com.project.foradhd.global.AuthUserId;
+import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,9 +64,18 @@ public class CommentController {
 
     //나의 댓글
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<PostResponseDto>> getMyCommentedPosts(@AuthUserId String userId, Pageable pageable) {
-        Page<PostResponseDto> posts = commentService.getMyCommentedPosts(userId, pageable);
-        return ResponseEntity.ok(posts);
+    public ResponseEntity<PostResponseDto> getMyCommentedPosts(@AuthUserId String userId, Pageable pageable) {
+        Page<PostResponseDto.PostListResponseDto> posts = commentService.getMyCommentedPosts(userId, pageable);
+        List<PostResponseDto.PostListResponseDto> postList = posts.getContent();
+
+        PagingResponse pagingResponse = PagingResponse.from(posts);
+
+        PostResponseDto response = PostResponseDto.builder()
+                .postList(postList)
+                .paging(pagingResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     //글별 댓글 모아보기

@@ -128,12 +128,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Page<PostResponseDto> getMyCommentedPosts(String userId, Pageable pageable) {
+    public Page<PostResponseDto.PostListResponseDto> getMyCommentedPosts(String userId, Pageable pageable) {
         Page<Comment> userComments = commentRepository.findByUserId(userId, pageable);
-        List<PostResponseDto> posts = userComments.stream()
+        List<PostResponseDto.PostListResponseDto> posts = userComments.stream()
                 .map(Comment::getPost)
                 .distinct()
-                .map(post -> PostResponseDto.builder()
+                .map(post -> PostResponseDto.PostListResponseDto.builder()
                         .id(post.getId())
                         .title(post.getTitle())
                         .content(post.getContent())

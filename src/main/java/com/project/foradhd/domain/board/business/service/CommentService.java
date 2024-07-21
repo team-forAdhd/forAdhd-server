@@ -14,7 +14,7 @@ public interface CommentService {
     void deleteComment(Long commentId);
     void deleteChildrenComment(Long commentId);
     Comment updateComment(Long commentId, String content);
-    Page<PostResponseDto> getMyCommentedPosts(String userId, Pageable pageable);
+    Page<PostResponseDto.PostListResponseDto> getMyCommentedPosts(String userId, Pageable pageable);
     Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption);
     void toggleCommentLike(Long commentId, String userId);
 }
