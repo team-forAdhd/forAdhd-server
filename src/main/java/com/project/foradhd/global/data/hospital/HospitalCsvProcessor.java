@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static com.project.foradhd.global.util.StringUtil.strip;
 
+@Profile("init")
 @RequiredArgsConstructor
 @Component
 public class HospitalCsvProcessor implements CommandLineRunner {
