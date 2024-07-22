@@ -37,7 +37,9 @@ public class PostResponseDto {
         private long scrapCount;
         private long viewCount;
         private CategoryName category;
-        private List<CommentResponseDto> comments;
+        private List<CommentResponseDto.CommentListResponseDto> comments; // 수정된 부분
+        private String nickname;
+        private String profileImage;
 
         @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
         private LocalDateTime createdAt;

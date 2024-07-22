@@ -134,7 +134,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/scrap")
+    @GetMapping("/{userId}/scrap")
     public ResponseEntity<PostScrapFilterResponseDto> getScrapsByUser(
             @AuthUserId String userId,
             Pageable pageable,
@@ -176,7 +176,7 @@ public class PostController {
         }
     }
 
-    @GetMapping("/liked")
+    @GetMapping("/{userId}/liked")
     public ResponseEntity<PostResponseDto> getLikedPostsByUser(@AuthUserId String userId, Pageable pageable) {
         Page<Post> likedPosts = postLikeFilterService.getLikedPostsByUser(userId, pageable);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = likedPosts.getContent().stream()

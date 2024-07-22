@@ -2,12 +2,12 @@ package com.project.foradhd.domain.board.web.controller;
 
 import com.project.foradhd.domain.board.persistence.entity.Comment;
 import com.project.foradhd.domain.board.business.service.CommentService;
-import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
 import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.mapper.CommentMapper;
+import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.global.AuthUserId;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,22 +37,23 @@ public class CommentController {
 
     private final CommentService commentService;
     private final CommentMapper commentMapper;
+    private final UserRepository userRepository;
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<CommentResponseDto> getComment(@PathVariable Long commentId) {
+    public ResponseEntity<CommentResponseDto.CommentListResponseDto> getComment(@PathVariable Long commentId) {
         Comment comment = commentService.getComment(commentId);
-        return ResponseEntity.ok(commentMapper.toDto(comment));
+        return ResponseEntity.ok(commentMapper.commentToCommentListResponseDto(comment));
     }
 
     // 댓글 작성 API
     @PostMapping
-    public ResponseEntity<CommentResponseDto> createComment(@AuthUserId String userId, @RequestBody CreateCommentRequestDto createCommentRequest) {
-        Comment comment = commentMapper.toEntity(createCommentRequest);
+    public ResponseEntity<CommentResponseDto.CommentListResponseDto> createComment(@AuthUserId String userId, @RequestBody CreateCommentRequestDto createCommentRequest) {
+        Comment comment = commentMapper.createCommentRequestDtoToComment(createCommentRequest, userRepository);
         Comment createdComment = commentService.createComment(comment, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentMapper.toDto(createdComment));
+        return ResponseEntity.status(HttpStatus.CREATED).body(commentMapper.commentToCommentListResponseDto(createdComment));
     }
 
-    //원댓글 삭제 API
+    // 원댓글 삭제 API
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
         commentService.deleteComment(commentId);
@@ -55,15 +67,15 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    //댓글 수정 API
+    // 댓글 수정 API
     @PutMapping("/{commentId}")
-    public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long commentId, @RequestBody CreateCommentRequestDto createCommentRequest) {
+    public ResponseEntity<CommentResponseDto.CommentListResponseDto> updateComment(@PathVariable Long commentId, @RequestBody CreateCommentRequestDto createCommentRequest) {
         Comment updatedComment = commentService.updateComment(commentId, createCommentRequest.getContent());
-        return ResponseEntity.ok(commentMapper.toDto(updatedComment));
+        return ResponseEntity.ok(commentMapper.commentToCommentListResponseDto(updatedComment));
     }
 
-    //나의 댓글
-    @GetMapping("/user/{userId}")
+    // 나의 댓글
+    @GetMapping("/{userId}/my-comments")
     public ResponseEntity<PostResponseDto> getMyCommentedPosts(@AuthUserId String userId, Pageable pageable) {
         Page<PostResponseDto.PostListResponseDto> posts = commentService.getMyCommentedPosts(userId, pageable);
         List<PostResponseDto.PostListResponseDto> postList = posts.getContent();
@@ -78,9 +90,9 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
-    //글별 댓글 모아보기
+    // 글별 댓글 모아보기
     @GetMapping("/post/{postId}")
-    public ResponseEntity<Page<CommentResponseDto>> getCommentsByPost(
+    public ResponseEntity<CommentResponseDto> getCommentsByPost(
             @PathVariable Long postId,
             Pageable pageable,
             @RequestParam(required = false) SortOption sortOption) {
@@ -90,10 +102,21 @@ public class CommentController {
         }
 
         Page<Comment> comments = commentService.getCommentsByPost(postId, pageable, sortOption);
-        return ResponseEntity.ok(comments.map(commentMapper::toDto));
+        List<CommentResponseDto.CommentListResponseDto> commentList = comments.getContent().stream()
+                .map(commentMapper::commentToCommentListResponseDto)
+                .collect(Collectors.toList());
+
+        PagingResponse pagingResponse = PagingResponse.from(comments);
+
+        CommentResponseDto response = CommentResponseDto.builder()
+                .commentList(commentList)
+                .paging(pagingResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
-    //댓글 좋아요 토글
+    // 댓글 좋아요 토글
     @PostMapping("/{commentId}/like")
     public ResponseEntity<Void> toggleCommentLike(@PathVariable Long commentId, @AuthUserId String userId) {
         commentService.toggleCommentLike(commentId, userId);

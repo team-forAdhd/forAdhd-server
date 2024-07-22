@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 public class PostRankingResponseDto {
     private Long id;
+    private String userId;
     private String title;
     private CategoryName category;
     private long viewCount;
@@ -21,4 +22,3 @@ public class PostRankingResponseDto {
     private LocalDateTime createdAt;
     private List<String> images;
 }
-

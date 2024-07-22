@@ -5,32 +5,34 @@ import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.web.dto.PostDto;
 import com.project.foradhd.domain.board.web.dto.request.PostRequestDto;
 import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+
+import org.mapstruct.AfterMapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Context;
+
+import org.mapstruct.factory.Mappers;
+
 import java.util.stream.Collectors;
-import org.mapstruct.*;
 
-import org.mapstruct.*;
 
-import org.mapstruct.*;
-
-import org.mapstruct.*;
-
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {CommentMapper.class})
 public interface PostMapper {
 
-    @Mapping(source = "category", target = "categoryName")
+    PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
+
+    @Mapping(source = "category", target = "category")
     @Mapping(source = "user.id", target = "userId")
     PostDto toDto(Post post);
 
     @Mapping(source = "category", target = "category")
-    @Mapping(target = "user", ignore = true) // user는 별도로 설정합니다
+    @Mapping(target = "user", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "likeCount", ignore = true)
     @Mapping(target = "commentCount", ignore = true)
@@ -46,18 +48,18 @@ public interface PostMapper {
         }
     }
 
-    @Mappings({
-            @Mapping(source = "comments", target = "comments", qualifiedByName = "toDtoList"),
-            @Mapping(target = "commentCount", expression = "java(calculateCommentCount(post.getComments()))"),
-            @Mapping(source = "user.id", target = "userId")
-    })
+    @Mapping(target = "comments", expression = "java(mapCommentList(post.getComments()))")
+    @Mapping(target = "commentCount", expression = "java(calculateCommentCount(post.getComments()))")
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.userProfile.nickname", target = "nickname")
+    @Mapping(source = "user.userProfile.profileImage", target = "profileImage")
     PostResponseDto.PostListResponseDto toPostListResponseDto(Post post);
 
-    @Named("toDtoList")
-    default List<CommentResponseDto> mapComments(List<Comment> comments) {
+    default List<CommentResponseDto.CommentListResponseDto> mapCommentList(List<Comment> comments) {
         if (comments == null) return null;
+        CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
         return comments.stream()
-                .map(comment -> Mappers.getMapper(CommentMapper.class).toDto(comment))
+                .map(commentMapper::commentToCommentListResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -67,4 +69,8 @@ public interface PostMapper {
                 .mapToLong(comment -> 1 + comment.getChildComments().size())
                 .sum();
     }
+
+    @Mapping(source = "category", target = "category")
+    @Mapping(source = "user.id", target = "userId")
+    PostRankingResponseDto toPostRankingResponseDto(Post post);
 }

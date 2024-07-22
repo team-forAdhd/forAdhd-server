@@ -12,7 +12,7 @@ import java.util.List;
 public class PostDto {
     private Long id;
     private String userId;
-    private String categoryName;
+    private String category;
     private String title;
     private String content;
     private boolean anonymous;
