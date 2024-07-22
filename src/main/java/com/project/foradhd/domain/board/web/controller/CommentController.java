@@ -39,6 +39,7 @@ public class CommentController {
     private final CommentMapper commentMapper;
     private final UserRepository userRepository;
 
+    // 개별 댓글 조회 API
     @GetMapping("/{commentId}")
     public ResponseEntity<CommentResponseDto.CommentListResponseDto> getComment(@PathVariable Long commentId) {
         Comment comment = commentService.getComment(commentId);
@@ -47,10 +48,11 @@ public class CommentController {
 
     // 댓글 작성 API
     @PostMapping
-    public ResponseEntity<CommentResponseDto.CommentListResponseDto> createComment(@AuthUserId String userId, @RequestBody CreateCommentRequestDto createCommentRequest) {
-        Comment comment = commentMapper.createCommentRequestDtoToComment(createCommentRequest, userRepository);
+    public ResponseEntity<CommentResponseDto.CommentListResponseDto> createComment(@RequestBody CreateCommentRequestDto createCommentRequestDto, @AuthUserId String userId) {
+        Comment comment = commentMapper.createCommentRequestDtoToComment(createCommentRequestDto, userId);
         Comment createdComment = commentService.createComment(comment, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentMapper.commentToCommentListResponseDto(createdComment));
+        CommentResponseDto.CommentListResponseDto response = commentMapper.commentToCommentListResponseDto(createdComment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 원댓글 삭제 API

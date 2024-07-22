@@ -29,7 +29,9 @@ public class CommentResponseDto {
         private final long likeCount;
 
         @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
-        private final LocalDateTime createdAt;
+        private LocalDateTime createdAt;
+        @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
+        private LocalDateTime lastModifiedAt;
 
         private final CommentResponseDto parentComment;
         private final List<CommentResponseDto> children;

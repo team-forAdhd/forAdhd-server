@@ -8,6 +8,9 @@ import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
+import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
+import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -19,6 +22,7 @@ import org.mapstruct.Context;
 
 import org.mapstruct.factory.Mappers;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -51,9 +55,18 @@ public interface PostMapper {
     @Mapping(target = "comments", expression = "java(mapCommentList(post.getComments()))")
     @Mapping(target = "commentCount", expression = "java(calculateCommentCount(post.getComments()))")
     @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "user.userProfile.nickname", target = "nickname")
-    @Mapping(source = "user.userProfile.profileImage", target = "profileImage")
-    PostResponseDto.PostListResponseDto toPostListResponseDto(Post post);
+    PostResponseDto.PostListResponseDto toPostListResponseDto(Post post, @Context UserProfileRepository userProfileRepository);
+
+    @AfterMapping
+    default void setUserProfile(@MappingTarget PostResponseDto.PostListResponseDto.PostListResponseDtoBuilder dto, Post post, @Context UserProfileRepository userProfileRepository) {
+        if (post.getUser() != null) {
+            Optional<UserProfile> userProfileOptional = userProfileRepository.findByUserId(post.getUser().getId());
+            userProfileOptional.ifPresent(userProfile -> {
+                dto.nickname(userProfile.getNickname());
+                dto.profileImage(userProfile.getProfileImage());
+            });
+        }
+    }
 
     default List<CommentResponseDto.CommentListResponseDto> mapCommentList(List<Comment> comments) {
         if (comments == null) return null;
@@ -72,5 +85,5 @@ public interface PostMapper {
 
     @Mapping(source = "category", target = "category")
     @Mapping(source = "user.id", target = "userId")
-    PostRankingResponseDto toPostRankingResponseDto(Post post);
+    PostRankingResponseDto toPostRankingResponseDto(Post post, @Context UserProfileRepository userProfileRepository);
 }

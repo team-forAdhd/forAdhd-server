@@ -7,16 +7,11 @@ import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
-import com.project.foradhd.domain.board.persistence.repository.PostRepository;
 import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
-import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
-import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
 import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.amazonaws.services.kms.model.ConnectionErrorCodeType.USER_NOT_FOUND;
 import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
 
 @Service
@@ -72,7 +66,7 @@ public class CommentServiceImpl implements CommentService {
         UserProfile userProfile = userProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
 
-        comment = Comment.builder()
+        Comment newComment = Comment.builder()
                 .post(comment.getPost())
                 .user(User.builder().id(userId).build())
                 .content(comment.getContent())
@@ -84,7 +78,7 @@ public class CommentServiceImpl implements CommentService {
                 .profileImage(comment.isAnonymous() ? null : userProfile.getProfileImage())
                 .build();
 
-        return commentRepository.save(comment);
+        return commentRepository.save(newComment);
     }
 
     @Override
@@ -157,6 +151,11 @@ public class CommentServiceImpl implements CommentService {
             commentLikeFilterRepository.deleteByCommentIdAndUserId(commentId, userId);
             commentLikeFilterRepository.decrementLikeCount(commentId);
         } else {
+            CommentLikeFilter newLikeFilter = CommentLikeFilter.builder()
+                    .comment(Comment.builder().id(commentId).build())
+                    .user(User.builder().id(userId).build())
+                    .build();
+            commentLikeFilterRepository.save(newLikeFilter);
             commentLikeFilterRepository.incrementLikeCount(commentId);
         }
     }

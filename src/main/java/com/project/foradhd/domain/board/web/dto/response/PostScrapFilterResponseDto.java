@@ -1,6 +1,8 @@
 package com.project.foradhd.domain.board.web.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
+import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -35,5 +38,9 @@ public class PostScrapFilterResponseDto {
         private long likeCount;
         private long commentCount;
         private String imageUrl;
+        @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
+        private LocalDateTime createdAt;
+        @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
+        private LocalDateTime lastModifiedAt;
     }
 }
