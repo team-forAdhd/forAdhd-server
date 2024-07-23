@@ -59,7 +59,10 @@ public interface PostMapper {
 
     @AfterMapping
     default void setUserProfile(@MappingTarget PostResponseDto.PostListResponseDto.PostListResponseDtoBuilder dto, Post post, @Context UserProfileRepository userProfileRepository) {
-        if (post.getUser() != null) {
+        if (post.isAnonymous()) {
+            dto.nickname("익명");
+            dto.profileImage("http://example.com/default-profile.png");
+        } else if (post.getUser() != null) {
             Optional<UserProfile> userProfileOptional = userProfileRepository.findByUserId(post.getUser().getId());
             userProfileOptional.ifPresent(userProfile -> {
                 dto.nickname(userProfile.getNickname());
@@ -67,6 +70,7 @@ public interface PostMapper {
             });
         }
     }
+
 
     default List<CommentResponseDto.CommentListResponseDto> mapCommentList(List<Comment> comments) {
         if (comments == null) return null;
