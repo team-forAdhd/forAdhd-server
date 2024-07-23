@@ -100,6 +100,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public List<PostRankingResponseDto> getTopPosts(Pageable pageable) {
         List<Post> topPosts = postRepository.findTopPosts(pageable);
         notifyUsersAboutTopPosts(topPosts);
@@ -117,6 +118,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public List<PostRankingResponseDto> getTopPostsByCategory(CategoryName category, Pageable pageable) {
         List<Post> topPosts = postRepository.findTopPostsByCategory(category, pageable);
         notifyUsersAboutTopPosts(topPosts);
