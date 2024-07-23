@@ -1,5 +1,7 @@
 package com.project.foradhd.domain.board.persistence.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +27,6 @@ public class Notification {
 
     private boolean isRead;
 
-    @CreatedDate
+    @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
     private LocalDateTime createdAt;
 }
