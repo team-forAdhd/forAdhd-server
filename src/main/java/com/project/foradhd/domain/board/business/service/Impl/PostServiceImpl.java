@@ -48,22 +48,13 @@ public class PostServiceImpl implements PostService {
     public Post updatePost(Post post) {
         Post existingPost = getPost(post.getId());
 
-        Post updatedPost = Post.builder()
-                .id(existingPost.getId())
-                .user(existingPost.getUser())
-                .category(existingPost.getCategory())
-                .comments(existingPost.getComments())
+        Post updatedPost = existingPost.toBuilder()
                 .title(post.getTitle())
                 .content(post.getContent())
-                .anonymous(existingPost.isAnonymous())
                 .images(post.getImages())
-                .likeCount(existingPost.getLikeCount())
-                .commentCount(existingPost.getCommentCount())
-                .scrapCount(existingPost.getScrapCount())
-                .viewCount(existingPost.getViewCount())
                 .build();
 
-        return postRepository.save(updatedPost);
+        return updatedPost;
     }
 
     @Override
@@ -96,7 +87,7 @@ public class PostServiceImpl implements PostService {
     public Post getAndIncrementViewCount(Long postId) {
         Post post = getPost(postId);
         post.incrementViewCount();
-        return postRepository.save(post);
+        return post;
     }
 
     @Override
@@ -146,8 +137,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public void addComment(Long postId, String commentContent, String userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
-        // 댓글 추가 로직 생략
+                .orElseThrow(() -> new BusinessException(BOARD_NOT_FOUND));
 
         String message = "새로운 댓글이 달렸어요: " + commentContent;
         notificationService.createNotification(post.getUser().getId(), message);

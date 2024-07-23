@@ -3,6 +3,7 @@ package com.project.foradhd.domain.board.business.service.Impl;
 import com.project.foradhd.domain.board.business.service.NotificationService;
 import com.project.foradhd.domain.board.persistence.entity.Notification;
 import com.project.foradhd.domain.board.persistence.repository.NotificationRepository;
+import com.project.foradhd.global.util.SseEmitters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
+    private final SseEmitters sseEmitters;
 
     @Override
     public void createNotification(String userId, String message) {
@@ -22,6 +24,7 @@ public class NotificationServiceImpl implements NotificationService {
                 .createdAt(LocalDateTime.now())
                 .build();
         notificationRepository.save(notification);
+        sseEmitters.sendNotification(userId, message); // SSE 알림 전송
     }
 
     @Override

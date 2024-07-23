@@ -117,7 +117,7 @@ public class CommentServiceImpl implements CommentService {
                 .content(content)
                 .build();
 
-        return commentRepository.save(updatedComment);
+        return updatedComment;
     }
 
     @Override
