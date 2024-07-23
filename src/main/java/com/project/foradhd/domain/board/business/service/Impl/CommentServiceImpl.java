@@ -104,7 +104,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     public void deleteChildrenComment(Long commentId) {
-        commentRepository.deleteById(commentId);
+        commentRepository.deleteByParentId(commentId);
     }
 
     @Override

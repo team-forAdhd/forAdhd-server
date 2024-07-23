@@ -10,11 +10,9 @@ import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Entity
+@Builder(toBuilder = true)
 @Table(name = "notification")
 public class Notification {
     @jakarta.persistence.Id

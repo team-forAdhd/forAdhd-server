@@ -63,7 +63,10 @@ public enum ErrorCode {
     //comment
     NOT_FOUND_COMMENT(NOT_FOUND, "존재하지 않는 댓글입니다."),
     NOT_FOUND_COMMENT_LIKE(NOT_FOUND, "존재하지 않는 댓글 좋아요입니다."),
-    ALREADY_LIKED_COMMENT(CONFLICT, "이미 좋아요한 댓글입니다."),;
+    ALREADY_LIKED_COMMENT(CONFLICT, "이미 좋아요한 댓글입니다."),
+
+    // notification
+    NOT_FOUND_NOTIFICATION(NOT_FOUND, "존재하지 않는 알림입니다."),;
 
     private final HttpStatus status;
     private final String message;
