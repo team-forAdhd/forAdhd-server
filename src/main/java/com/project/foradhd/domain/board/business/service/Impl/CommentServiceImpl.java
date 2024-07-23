@@ -112,16 +112,11 @@ public class CommentServiceImpl implements CommentService {
     public Comment updateComment(Long commentId, String content) {
         Comment existingComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
-        Comment updatedComment = Comment.builder()
-                .id(existingComment.getId())
-                .post(existingComment.getPost())
-                .user(existingComment.getUser())
+
+        Comment updatedComment = existingComment.toBuilder()
                 .content(content)
-                .anonymous(existingComment.isAnonymous())
-                .likeCount(existingComment.getLikeCount())
-                .parentComment(existingComment.getParentComment())
-                .childComments(existingComment.getChildComments())
                 .build();
+
         return commentRepository.save(updatedComment);
     }
 
@@ -142,6 +137,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption) {
         pageable = applySorting(pageable, sortOption);
         return commentRepository.findByPostId(postId, pageable);

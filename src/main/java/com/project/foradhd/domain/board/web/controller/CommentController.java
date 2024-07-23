@@ -93,7 +93,7 @@ public class CommentController {
     }
 
     // 글별 댓글 모아보기
-    @GetMapping("/post/{postId}")
+    @GetMapping("/posts/{postId}")
     public ResponseEntity<CommentResponseDto> getCommentsByPost(
             @PathVariable Long postId,
             Pageable pageable,
