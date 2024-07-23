@@ -33,8 +33,8 @@ public class CommentResponseDto {
         @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
         private LocalDateTime lastModifiedAt;
 
-        private final CommentResponseDto parentComment;
-        private final List<CommentResponseDto> children;
+        private final Long parentCommentId;
+        private final List<CommentResponseDto.CommentListResponseDto> children;
         private final String nickname;
         private final String profileImage;
     }

@@ -41,13 +41,36 @@ public interface CommentMapper {
 
     @Mapping(source = "post.id", target = "postId")
     @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "parentComment", target = "parentComment")
-    @Mapping(source = "childComments", target = "children")
+    @Mapping(source = "parentComment.id", target = "parentCommentId")
+    @Mapping(source = "childComments", target = "children", qualifiedByName = "mapChildComments")
     CommentResponseDto.CommentListResponseDto commentToCommentListResponseDto(Comment comment);
+
+    default CommentResponseDto.CommentListResponseDto commentToCommentListResponseDtoWithChildren(Comment comment) {
+        if (comment.getParentComment() != null) { // 자식 댓글인 경우
+            return commentToCommentListResponseDto(comment);
+        } else { // 부모 댓글인 경우
+            return CommentResponseDto.CommentListResponseDto.builder()
+                    .id(comment.getId())
+                    .content(comment.getContent())
+                    .userId(comment.getUser().getId())
+                    .postId(comment.getPost().getId())
+                    .anonymous(comment.isAnonymous())
+                    .likeCount(comment.getLikeCount())
+                    .createdAt(comment.getCreatedAt())
+                    .lastModifiedAt(comment.getLastModifiedAt())
+                    .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
+                    .children(comment.getChildComments().stream()
+                            .map(this::commentToCommentListResponseDto)
+                            .collect(Collectors.toList()))
+                    .nickname(comment.getNickname())
+                    .profileImage(comment.getProfileImage())
+                    .build();
+        }
+    }
 
     default CommentResponseDto toResponseDto(List<Comment> comments, PagingResponse paging) {
         List<CommentResponseDto.CommentListResponseDto> commentList = comments.stream()
-                .map(this::commentToCommentListResponseDto)
+                .map(this::commentToCommentListResponseDtoWithChildren)
                 .collect(Collectors.toList());
         return CommentResponseDto.builder()
                 .commentList(commentList)
@@ -78,4 +101,15 @@ public interface CommentMapper {
         }
         return userRepository.findById(userId).orElse(null);
     }
+
+    @Named("mapChildComments")
+    default List<CommentResponseDto.CommentListResponseDto> mapChildComments(List<Comment> childComments) {
+        if (childComments == null) {
+            return null;
+        }
+        return childComments.stream()
+                .map(this::commentToCommentListResponseDto)
+                .collect(Collectors.toList());
+    }
+
 }
