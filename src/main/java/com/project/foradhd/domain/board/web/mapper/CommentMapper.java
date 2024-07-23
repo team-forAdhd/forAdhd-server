@@ -7,6 +7,7 @@ import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
+import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import org.mapstruct.*;
 
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface CommentMapper {
+
     @Mapping(source = "postId", target = "post", qualifiedByName = "mapPost")
     @Mapping(source = "parentCommentId", target = "parentComment", qualifiedByName = "mapParentComment")
     @Mapping(target = "id", ignore = true)
@@ -22,16 +24,19 @@ public interface CommentMapper {
     @Mapping(target = "likeCount", constant = "0L")
     @Mapping(target = "nickname", ignore = true)
     @Mapping(target = "profileImage", ignore = true)
+    @Mapping(target = "user", ignore = true)
     Comment createCommentRequestDtoToComment(CreateCommentRequestDto createCommentRequestDto, @Context String userId);
 
     @AfterMapping
-    default void setUserProfileFields(@MappingTarget Comment.CommentBuilder commentBuilder, @Context String userId, @Context UserProfileRepository userProfileRepository) {
-        UserProfile userProfile = userProfileRepository.findByUserId(userId).orElse(null);
-        if (userProfile != null) {
-            commentBuilder.nickname(userProfile.getNickname());
-            commentBuilder.profileImage(userProfile.getProfileImage());
+    default void setUserProfileFields(@MappingTarget Comment.CommentBuilder commentBuilder, @Context String userId, @Context UserProfileRepository userProfileRepository, CreateCommentRequestDto createCommentRequestDto) {
+        if (!createCommentRequestDto.isAnonymous()) {
+            UserProfile userProfile = userProfileRepository.findByUserId(userId).orElse(null);
+            if (userProfile != null) {
+                commentBuilder.nickname(userProfile.getNickname());
+                commentBuilder.profileImage(userProfile.getProfileImage());
+            }
         }
-        commentBuilder.build();
+        commentBuilder.user(User.builder().id(userId).build());
     }
 
     @Mapping(source = "post.id", target = "postId")
@@ -58,14 +63,6 @@ public interface CommentMapper {
         return Post.builder().id(postId).build();
     }
 
-    @Named("mapUser")
-    static User mapUser(String userId) {
-        if (userId == null) {
-            return null;
-        }
-        return User.builder().id(userId).build();
-    }
-
     @Named("mapParentComment")
     static Comment mapParentComment(Long parentCommentId) {
         if (parentCommentId == null) {
@@ -74,10 +71,11 @@ public interface CommentMapper {
         return Comment.builder().id(parentCommentId).build();
     }
 
-    default List<CommentResponseDto.CommentListResponseDto> mapCommentList(List<Comment> comments) {
-        if (comments == null) return null;
-        return comments.stream()
-                .map(this::commentToCommentListResponseDto)
-                .collect(Collectors.toList());
+    @Named("mapUser")
+    static User mapUser(String userId, @Context UserRepository userRepository) {
+        if (userId == null) {
+            return null;
+        }
+        return userRepository.findById(userId).orElse(null);
     }
 }

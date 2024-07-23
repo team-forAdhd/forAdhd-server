@@ -18,4 +18,5 @@ public interface CommentService {
     Page<PostResponseDto.PostListResponseDto> getMyCommentedPosts(String userId, Pageable pageable);
     Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption);
     void toggleCommentLike(Long commentId, String userId);
+    String generateAnonymousNickname(Long postId, String userId);
 }

@@ -66,20 +66,24 @@ public class CommentServiceImpl implements CommentService {
         UserProfile userProfile = userProfileRepository.findByUserId(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
 
-        Comment newComment = Comment.builder()
-                .post(comment.getPost())
-                .user(User.builder().id(userId).build())
-                .content(comment.getContent())
-                .anonymous(comment.isAnonymous())
-                .likeCount(comment.getLikeCount())
-                .parentComment(comment.getParentComment())
-                .childComments(comment.getChildComments())
-                .nickname(comment.isAnonymous() ? null : userProfile.getNickname())
-                .profileImage(comment.isAnonymous() ? null : userProfile.getProfileImage())
-                .build();
+        Comment.CommentBuilder commentBuilder = comment.toBuilder().user(User.builder().id(userId).build());
 
-        return commentRepository.save(newComment);
+        if (comment.isAnonymous()) {
+            String anonymousNickname = generateAnonymousNickname(comment.getPost().getId(), userId);
+            String anonymousProfileImage = "http://example.com/anonymous-profile.png"; // 지정한 URL
+
+            commentBuilder
+                    .nickname(anonymousNickname)
+                    .profileImage(anonymousProfileImage);
+        } else {
+            commentBuilder
+                    .nickname(userProfile.getNickname())
+                    .profileImage(userProfile.getProfileImage());
+        }
+
+        return commentRepository.save(commentBuilder.build());
     }
+
 
     @Override
     @Transactional
@@ -167,5 +171,16 @@ public class CommentServiceImpl implements CommentService {
             default -> Sort.unsorted();
         };
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+    }
+
+    @Override
+    public String generateAnonymousNickname(Long postId, String userId) {
+        List<Comment> userComments = commentRepository.findByPostIdAndUserIdAndAnonymous(postId, userId, true);
+        if (!userComments.isEmpty()) {
+            return userComments.get(0).getNickname();
+        } else {
+            long anonymousCount = commentRepository.countByPostIdAndAnonymous(postId, true);
+            return "익명 " + (anonymousCount + 1);
+        }
     }
 }

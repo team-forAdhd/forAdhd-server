@@ -34,5 +34,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findByParentCommentId(Long parentCommentId);
 
-
+    long countByPostIdAndAnonymous(Long postId, boolean anonymous);
+    List<Comment> findByPostIdAndUserIdAndAnonymous(Long postId, String userId, boolean anonymous);
 }
