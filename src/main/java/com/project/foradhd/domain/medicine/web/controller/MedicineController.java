@@ -45,11 +45,8 @@ public class MedicineController {
             @RequestParam(defaultValue = "nameAsc") String sortOption) {
         try {
             List<MedicineDto> medicines = medicineService.getSortedMedicines(sortOption);
-            // 로그로 데이터 확인
-            System.out.println("Returned medicines: " + medicines);
             return ResponseEntity.ok(medicines);
         } catch (Exception e) {
-            System.out.println("Error retrieving sorted medicines: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
