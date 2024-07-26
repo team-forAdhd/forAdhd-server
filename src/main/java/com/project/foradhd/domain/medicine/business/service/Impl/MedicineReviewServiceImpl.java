@@ -29,8 +29,8 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
 
     @Override
     @Transactional
-    public MedicineReview createReview(MedicineReviewRequest request) {
-        User user = userService.getUser(request.getUserId());
+    public MedicineReview createReview(MedicineReviewRequest request, String userId) {
+        User user = userService.getUser(userId);
         if (user == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_USER);
         }

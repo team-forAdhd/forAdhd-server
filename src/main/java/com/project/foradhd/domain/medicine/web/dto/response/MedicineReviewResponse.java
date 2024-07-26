@@ -7,7 +7,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class MedicineReviewResponse {
     private Long id;
     private String content;

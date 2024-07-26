@@ -41,6 +41,7 @@ public class MedicineBookmarkController {
         }
     }
 
+    // 내가 북마크한 약 목록 조회
     @GetMapping("/my")
     public ResponseEntity<MedicineBookmarkResponse.PagedMedicineBookmarkResponse> getMyBookmarks(
             @AuthUserId String userId,

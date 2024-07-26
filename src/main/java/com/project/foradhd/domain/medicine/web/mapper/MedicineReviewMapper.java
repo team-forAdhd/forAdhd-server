@@ -1,7 +1,10 @@
 package com.project.foradhd.domain.medicine.web.mapper;
 
+import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
+import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
+import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
@@ -25,40 +28,24 @@ import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
 @Mapper(componentModel = "spring")
-public abstract class MedicineReviewMapper {
+public interface MedicineReviewMapper {
+    MedicineReview toEntity(MedicineReviewRequest request, @Context User user, @Context Medicine medicine);
 
-    @Autowired
-    protected UserProfileRepository userProfileRepository;
-
-    @Autowired
-    protected UserPrivacyRepository userPrivacyRepository;
-
-    @Mapping(target = "nickname", source = "user.id", qualifiedByName = "getNickname")
-    @Mapping(target = "profileImage", source = "user.id", qualifiedByName = "getProfileImage")
-    @Mapping(target = "ageRange", source = "user.id", qualifiedByName = "getAgeRange")
-    @Mapping(target = "gender", source = "user.id", qualifiedByName = "getGender")
+    @Mapping(target = "nickname", ignore = true)
+    @Mapping(target = "profileImage", ignore = true)
+    @Mapping(target = "ageRange", ignore = true)
+    @Mapping(target = "gender", ignore = true)
     @Mapping(target = "averageGrade", expression = "java(review.getMedicine().calculateAverageGrade())")
-    public abstract MedicineReviewResponse toResponseDto(MedicineReview review);
+    MedicineReviewResponse toResponseDto(MedicineReview review);
 
-    @Named("getNickname")
-    protected String getNickname(String userId) {
-        return userProfileRepository.findByUserId(userId).map(UserProfile::getNickname).orElse(null);
-    }
-
-    @Named("getProfileImage")
-    protected String getProfileImage(String userId) {
-        return userProfileRepository.findByUserId(userId).map(UserProfile::getProfileImage).orElse(null);
-    }
-
-    @Named("getAgeRange")
-    protected String getAgeRange(String userId) {
-        return userPrivacyRepository.findByUserId(userId).map(UserPrivacy::getAgeRange).orElse(null);
-    }
-
-    @Named("getGender")
-    protected Gender getGender(String userId) {
-        return userPrivacyRepository.findByUserId(userId).map(UserPrivacy::getGender).orElse(Gender.UNKNOWN);
+    @AfterMapping
+    default void setUserDetails(@MappingTarget MedicineReviewResponse.MedicineReviewResponseBuilder responseBuilder, MedicineReview review,
+                                @Context UserProfileRepository userProfileRepository, @Context UserPrivacyRepository userPrivacyRepository) {
+        String userId = review.getUser().getId();
+        responseBuilder.nickname(userProfileRepository.findByUserId(userId).map(UserProfile::getNickname).orElse(null))
+                .profileImage(userProfileRepository.findByUserId(userId).map(UserProfile::getProfileImage).orElse(null))
+                .ageRange(userPrivacyRepository.findByUserId(userId).map(UserPrivacy::getAgeRange).orElse(null))
+                .gender(userPrivacyRepository.findByUserId(userId).map(UserPrivacy::getGender).orElse(Gender.UNKNOWN));
     }
 }
