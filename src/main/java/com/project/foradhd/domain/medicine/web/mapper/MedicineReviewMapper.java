@@ -37,6 +37,7 @@ public interface MedicineReviewMapper {
     @Mapping(target = "ageRange", ignore = true)
     @Mapping(target = "gender", ignore = true)
     @Mapping(target = "averageGrade", expression = "java(review.getMedicine().calculateAverageGrade())")
+    @Mapping(target = "helpCount", source = "review.helpCount")
     MedicineReviewResponse toResponseDto(MedicineReview review);
 
     @AfterMapping

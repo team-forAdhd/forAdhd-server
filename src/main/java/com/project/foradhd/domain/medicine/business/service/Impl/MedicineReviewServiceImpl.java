@@ -3,7 +3,9 @@ package com.project.foradhd.domain.medicine.business.service.Impl;
 import com.project.foradhd.domain.medicine.business.service.MedicineReviewService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
+import com.project.foradhd.domain.medicine.persistence.entity.MedicineReviewLike;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
+import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewLikeRepository;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewRepository;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
 import com.project.foradhd.domain.user.business.service.UserService;
@@ -26,6 +28,7 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     private final MedicineReviewRepository reviewRepository;
     private final MedicineRepository medicineRepository;
     private final UserService userService;
+    private final MedicineReviewLikeRepository reviewLikeRepository;
 
     @Override
     @Transactional
@@ -55,10 +58,23 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
 
     @Override
     @Transactional
-    public void incrementHelpCount(Long reviewId) {
+    public void toggleHelpCount(Long reviewId, String userId) {
         MedicineReview review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW));
-        review = review.toBuilder().helpCount(review.getHelpCount() + 1).build();
+        User user = userService.getUser(userId);
+
+        if (reviewLikeRepository.existsByUserIdAndReviewId(userId, reviewId)) {
+            reviewLikeRepository.deleteByUserIdAndReviewId(userId, reviewId);
+            review = review.toBuilder().helpCount(review.getHelpCount() - 1).build();
+        } else {
+            MedicineReviewLike newLike = MedicineReviewLike.builder()
+                    .user(user)
+                    .review(review)
+                    .build();
+            reviewLikeRepository.save(newLike);
+            review = review.toBuilder().helpCount(review.getHelpCount() + 1).build();
+        }
+
         reviewRepository.save(review);
     }
 

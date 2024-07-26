@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface MedicineReviewService {
     MedicineReview createReview(MedicineReviewRequest request, String userId);
-    void incrementHelpCount(Long reviewId);
+    void toggleHelpCount(Long reviewId, String userId);
     MedicineReview updateReview(Long reviewId, MedicineReviewRequest request);
     void deleteReview(Long id);
     Page<MedicineReview> findReviews(Pageable pageable);

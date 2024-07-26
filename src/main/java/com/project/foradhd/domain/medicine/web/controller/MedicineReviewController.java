@@ -40,8 +40,8 @@ public class MedicineReviewController {
     }
 
     @PostMapping("/{id}/help")
-    public ResponseEntity<Void> incrementHelpCount(@PathVariable Long id) {
-        reviewService.incrementHelpCount(id);
+    public ResponseEntity<Void> toggleHelpCount(@PathVariable Long id, @AuthUserId String userId) {
+        reviewService.toggleHelpCount(id, userId);
         return ResponseEntity.ok().build();
     }
 
