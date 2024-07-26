@@ -12,6 +12,7 @@ import org.springframework.data.annotation.CreatedDate;
 import java.time.LocalDateTime;
 
 @Getter
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
