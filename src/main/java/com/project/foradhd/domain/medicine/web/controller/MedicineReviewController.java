@@ -26,7 +26,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/medicines/reviews")
 public class MedicineReviewController {
 
+    @Qualifier("medicineReviewService")
     private final MedicineReviewService reviewService;
+
+    @Qualifier("medicineReviewMapper")
     private final MedicineReviewMapper reviewMapper;
     private final UserProfileRepository userProfileRepository;
     private final UserPrivacyRepository userPrivacyRepository;
@@ -34,10 +37,10 @@ public class MedicineReviewController {
     @PostMapping
     public ResponseEntity<MedicineReviewResponse> createReview(@RequestBody MedicineReviewRequest request, @AuthUserId String userId) {
         MedicineReview review = reviewService.createReview(request, userId);
-        MedicineReviewResponse.MedicineReviewResponseBuilder responseBuilder = reviewMapper.toResponseDto(review).toBuilder();
-        reviewMapper.setUserDetails(responseBuilder, review, userProfileRepository, userPrivacyRepository);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseBuilder.build());
+        MedicineReviewResponse response = reviewMapper.toResponseDto(review);
+        return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/{id}/help")
     public ResponseEntity<Void> toggleHelpCount(@PathVariable Long id, @AuthUserId String userId) {
@@ -47,20 +50,17 @@ public class MedicineReviewController {
 
     @PutMapping("/{id}")
     public ResponseEntity<MedicineReviewResponse> updateReview(@PathVariable Long id, @RequestBody MedicineReviewRequest request, @AuthUserId String userId) {
-        MedicineReview review = reviewService.updateReview(id, request);
-        MedicineReviewResponse.MedicineReviewResponseBuilder responseBuilder = reviewMapper.toResponseDto(review).toBuilder();
-        reviewMapper.setUserDetails(responseBuilder, review, userProfileRepository, userPrivacyRepository);
-        return ResponseEntity.ok(responseBuilder.build());
+        MedicineReview review = reviewService.updateReview(id, request, userId);
+        MedicineReviewResponse response = reviewMapper.toResponseDto(review);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public ResponseEntity<Page<MedicineReviewResponse>> getReviews(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+    @GetMapping("")
+    public ResponseEntity<Page<MedicineReviewResponse>> getReviews(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<MedicineReview> reviews = reviewService.findReviews(pageable);
-        Page<MedicineReviewResponse> reviewDtos = reviews.map(review -> {
-            MedicineReviewResponse.MedicineReviewResponseBuilder responseBuilder = reviewMapper.toResponseDto(review).toBuilder();
-            reviewMapper.setUserDetails(responseBuilder, review, userProfileRepository, userPrivacyRepository);
-            return responseBuilder.build();
-        });
+        Page<MedicineReviewResponse> reviewDtos = reviews.map(reviewMapper::toResponseDto);
         return ResponseEntity.ok(reviewDtos);
     }
 
@@ -72,12 +72,7 @@ public class MedicineReviewController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<MedicineReviewResponse>> getUserReviews(@AuthUserId String userId, Pageable pageable) {
-        Page<MedicineReview> reviews = reviewService.findReviewsByUserId(userId, pageable);
-        Page<MedicineReviewResponse> reviewDtos = reviews.map(review -> {
-            MedicineReviewResponse.MedicineReviewResponseBuilder responseBuilder = reviewMapper.toResponseDto(review).toBuilder();
-            reviewMapper.setUserDetails(responseBuilder, review, userProfileRepository, userPrivacyRepository);
-            return responseBuilder.build();
-        });
+        Page<MedicineReviewResponse> reviewDtos = reviewService.findReviewsByUserId(userId, pageable);
         return ResponseEntity.ok(reviewDtos);
     }
 }

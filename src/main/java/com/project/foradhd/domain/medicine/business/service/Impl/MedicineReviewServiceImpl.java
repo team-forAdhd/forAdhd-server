@@ -8,8 +8,15 @@ import com.project.foradhd.domain.medicine.persistence.repository.MedicineReposi
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewLikeRepository;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewRepository;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
+import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
+import com.project.foradhd.domain.medicine.web.mapper.MedicineReviewMapper;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
+import com.project.foradhd.domain.user.persistence.enums.Gender;
+import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
+import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +34,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class MedicineReviewServiceImpl implements MedicineReviewService {
     private final MedicineReviewRepository reviewRepository;
     private final MedicineRepository medicineRepository;
-    private final UserService userService;
+    private final MedicineReviewMapper reviewMapper;
     private final MedicineReviewLikeRepository reviewLikeRepository;
+    private final UserService userService;
+    private final UserProfileRepository userProfileRepository;
+    private final UserPrivacyRepository userPrivacyRepository;
 
     @Override
     @Transactional
@@ -41,20 +51,27 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE));
 
-        List<Long> coMedications = request.getCoMedications() != null ? request.getCoMedications() : Collections.emptyList();
+        // 사용자 상세 정보 조회
+        UserProfile userProfile = userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER_PROFILE));
+        UserPrivacy userPrivacy = userPrivacyRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
 
         MedicineReview review = MedicineReview.builder()
-                .user(user)
                 .medicine(medicine)
-                .coMedications(coMedications)
+                .user(user)
                 .content(request.getContent())
-                .images(request.getImages())
                 .grade(request.getGrade())
-                .helpCount(0)
+                .nickname(userProfile.getNickname())
+                .profileImage(userProfile.getProfileImage())
+                .ageRange(userPrivacy.getAgeRange())
+                .gender(userPrivacy.getGender())
                 .build();
 
         return reviewRepository.save(review);
     }
+
+
 
     @Override
     @Transactional
@@ -80,7 +97,7 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
 
     @Override
     @Transactional
-    public MedicineReview updateReview(Long reviewId, MedicineReviewRequest request) {
+    public MedicineReview updateReview(Long reviewId, MedicineReviewRequest request, String userId) {
         MedicineReview existingReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW));
 
@@ -112,7 +129,7 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     }
 
     @Override
-    public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable) {
+    public Page<MedicineReviewResponse> findReviewsByUserId(String userId, Pageable pageable) {
         return reviewRepository.findByUserId(userId, pageable);
     }
 }

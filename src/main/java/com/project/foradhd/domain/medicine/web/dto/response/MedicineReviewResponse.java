@@ -10,6 +10,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class MedicineReviewResponse {
     private Long id;
+    private Long medicineId;
     private String content;
     private List<String> images;
     private float grade;
