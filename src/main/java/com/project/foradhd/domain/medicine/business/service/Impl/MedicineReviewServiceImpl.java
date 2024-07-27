@@ -153,4 +153,8 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         medicineRepository.save(updatedMedicine);
     }
 
+    @Override
+    public Page<MedicineReview> findReviewsByMedicineId(Long medicineId, Pageable pageable) {
+        return reviewRepository.findByMedicineId(medicineId, pageable);
+    }
 }

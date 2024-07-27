@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MedicineReviewRepository extends JpaRepository<MedicineReview, Long> {
     Page<MedicineReview> findByUserId(String userId, Pageable pageable);
+    Page<MedicineReview> findByMedicineId(Long medicineId, Pageable pageable);
 }

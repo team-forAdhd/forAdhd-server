@@ -94,4 +94,22 @@ public class MedicineReviewController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/medicine/{medicineId}")
+    public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getReviewsByMedicineId(
+            @PathVariable Long medicineId,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<MedicineReview> reviews = reviewService.findReviewsByMedicineId(medicineId, pageable);
+        List<MedicineReviewResponse> reviewDtos = reviews.stream()
+                .map(reviewMapper::toResponseDto)
+                .collect(Collectors.toList());
+
+        PagingResponse pagingResponse = PagingResponse.from(reviews);
+        MedicineReviewResponse.PagedMedicineReviewResponse response = MedicineReviewResponse.PagedMedicineReviewResponse.builder()
+                .data(reviewDtos)
+                .paging(pagingResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
 }

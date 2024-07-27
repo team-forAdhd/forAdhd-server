@@ -15,5 +15,6 @@ public interface MedicineReviewService {
     void deleteReview(Long id);
     Page<MedicineReview> findReviews(Pageable pageable);
     Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable);
+    Page<MedicineReview> findReviewsByMedicineId(Long medicineId, Pageable pageable);
 }
 
