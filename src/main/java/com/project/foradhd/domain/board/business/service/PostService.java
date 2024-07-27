@@ -29,8 +29,9 @@ public interface PostService {
     // 모든 게시글 목록 조회
     Page<Post> getAllPosts(Pageable pageable);
 
-    // 특정 사용자가 작성한 게시글 목록 조회, 정렬 옵션 추가
+    // 사용자가 작성한 게시글 목록 조회, 정렬 옵션 추가
     Page<Post> getUserPosts(String userId, Pageable pageable, SortOption sortOption);
+    Page<Post> getUserPostsByCategory(String userId, CategoryName category, Pageable pageable, SortOption sortOption);
 
     // 글 조회수 증가
     Post getAndIncrementViewCount(Long postId);

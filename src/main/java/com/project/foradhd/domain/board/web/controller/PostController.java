@@ -126,8 +126,8 @@ public class PostController {
 
     // 내가 작성한 게시글 조회 api
     @GetMapping("/{userId}/my-posts")
-    public ResponseEntity<PostResponseDto> getUserPosts(@AuthUserId String userId, Pageable pageable, @RequestParam SortOption sortOption) {
-        Page<Post> userPosts = postService.getUserPosts(userId, pageable, sortOption);
+    public ResponseEntity<PostResponseDto> getUserPostsByCategory(@AuthUserId String userId, @RequestParam CategoryName category, Pageable pageable, @RequestParam SortOption sortOption) {
+        Page<Post> userPosts = postService.getUserPostsByCategory(userId, category, pageable, sortOption);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = userPosts.getContent().stream()
                 .map(post -> postMapper.toPostListResponseDto(post, userProfileRepository))
                 .collect(Collectors.toList());

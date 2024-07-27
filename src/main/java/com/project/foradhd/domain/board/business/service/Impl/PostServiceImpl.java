@@ -75,6 +75,12 @@ public class PostServiceImpl implements PostService {
         return postRepository.findByUserId(userId, pageable);
     }
 
+    @Override
+    public Page<Post> getUserPostsByCategory(String userId, CategoryName category, Pageable pageable, SortOption sortOption) {
+        pageable = applySorting(pageable, sortOption);
+        return postRepository.findByUserIdAndCategory(userId, category, pageable);
+    }
+
     // 글 카테고리별 정렬
     @Override
     public Page<Post> listByCategory(CategoryName category, Pageable pageable) {
