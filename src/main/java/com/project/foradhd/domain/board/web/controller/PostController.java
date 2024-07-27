@@ -2,6 +2,7 @@ package com.project.foradhd.domain.board.web.controller;
 
 import com.project.foradhd.domain.board.business.service.PostLikeFilterService;
 import com.project.foradhd.domain.board.business.service.PostScrapFilterService;
+import com.project.foradhd.domain.board.business.service.PostSearchHistoryService;
 import com.project.foradhd.domain.board.business.service.PostService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
@@ -41,6 +42,7 @@ public class PostController {
     private final PostScrapFilterService postScrapFilterService;
     private final PostScrapFilterMapper postScrapFilterMapper;
     private final PostLikeFilterService postLikeFilterService;
+    private final PostSearchHistoryService searchHistoryService;
 
     // 게시글 개별 조회 api
     @GetMapping("/{postId}")
@@ -243,5 +245,12 @@ public class PostController {
     public ResponseEntity<List<String>> getRecentSearchTerms(@AuthUserId String userId) {
         List<String> recentSearchTerms = postService.getRecentSearchTerms(userId);
         return ResponseEntity.ok(recentSearchTerms);
+    }
+
+    // 특정 검색어 삭제 API
+    @DeleteMapping("/recent-searches/{id}")
+    public ResponseEntity<Void> deleteSearchTermById(@PathVariable Long id) {
+        searchHistoryService.deleteSearchTermById(id);
+        return ResponseEntity.noContent().build();
     }
 }

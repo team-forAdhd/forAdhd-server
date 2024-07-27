@@ -33,4 +33,9 @@ public class PostSearchHistoryServiceImpl implements PostSearchHistoryService {
                 .map(PostSearchHistory::getTerm)
                 .collect(Collectors.toList());
     }
+    @Override
+    @Transactional
+    public void deleteSearchTermById(Long id) {
+        searchHistoryRepository.deleteById(id);
+    }
 }
