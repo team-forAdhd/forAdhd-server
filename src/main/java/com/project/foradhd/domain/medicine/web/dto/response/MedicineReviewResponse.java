@@ -2,6 +2,7 @@ package com.project.foradhd.domain.medicine.web.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
+import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
 import lombok.*;
 
@@ -9,9 +10,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-@Builder(toBuilder = true)
+@AllArgsConstructor
 public class MedicineReviewResponse {
     private Long id;
     private Long medicineId;
@@ -29,4 +30,13 @@ public class MedicineReviewResponse {
     private LocalDateTime createdAt;
     @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
     private LocalDateTime lastModifiedAt;
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PagedMedicineReviewResponse {
+        private List<MedicineReviewResponse> data;
+        private PagingResponse paging;
+    }
 }

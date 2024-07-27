@@ -10,6 +10,7 @@ import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
 import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
 import com.project.foradhd.global.AuthUserId;
+import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,6 +21,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -52,13 +56,21 @@ public class MedicineReviewController {
         return ResponseEntity.ok(response);
     }
 
-
     @GetMapping("")
-    public ResponseEntity<Page<MedicineReviewResponse>> getReviews(
+    public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getReviews(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<MedicineReview> reviews = reviewService.findReviews(pageable);
-        Page<MedicineReviewResponse> reviewDtos = reviews.map(reviewMapper::toResponseDto);
-        return ResponseEntity.ok(reviewDtos);
+        List<MedicineReviewResponse> reviewDtos = reviews.stream()
+                .map(reviewMapper::toResponseDto)
+                .collect(Collectors.toList());
+
+        PagingResponse pagingResponse = PagingResponse.from(reviews);
+        MedicineReviewResponse.PagedMedicineReviewResponse response = MedicineReviewResponse.PagedMedicineReviewResponse.builder()
+                .data(reviewDtos)
+                .paging(pagingResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
@@ -68,9 +80,18 @@ public class MedicineReviewController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<MedicineReviewResponse>> getUserReviews(@AuthUserId String userId, Pageable pageable) {
+    public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getUserReviews(@AuthUserId String userId, Pageable pageable) {
         Page<MedicineReview> reviews = reviewService.findReviewsByUserId(userId, pageable);
-        Page<MedicineReviewResponse> reviewDtos = reviews.map(reviewMapper::toResponseDto);
-        return ResponseEntity.ok(reviewDtos);
+        List<MedicineReviewResponse> reviewDtos = reviews.stream()
+                .map(reviewMapper::toResponseDto)
+                .collect(Collectors.toList());
+
+        PagingResponse pagingResponse = PagingResponse.from(reviews);
+        MedicineReviewResponse.PagedMedicineReviewResponse response = MedicineReviewResponse.PagedMedicineReviewResponse.builder()
+                .data(reviewDtos)
+                .paging(pagingResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 }
