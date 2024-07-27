@@ -1,7 +1,11 @@
 package com.project.foradhd.domain.medicine.web.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
+import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -21,4 +25,8 @@ public class MedicineReviewResponse {
     private String ageRange;
     private Gender gender;
     private double averageGrade;
+    @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
+    private LocalDateTime createdAt;
+    @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
+    private LocalDateTime lastModifiedAt;
 }
