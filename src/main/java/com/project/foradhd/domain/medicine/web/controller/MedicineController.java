@@ -8,8 +8,10 @@ import com.project.foradhd.domain.medicine.web.dto.response.MedicineSearchRespon
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineSortedResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
 import com.project.foradhd.global.AuthUserId;
+import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/medicines")
@@ -26,6 +29,7 @@ public class MedicineController {
     private final MedicineService medicineService;
     private final MedicineMapper medicineMapper;
     private final MedicineSearchHistoryService medicineSearchHistoryService;
+
 
    // 의약품 데이터를 가져와 저장하는 API
     @GetMapping("/fetch-and-save")
@@ -57,25 +61,37 @@ public class MedicineController {
 
     // 약 모양, 색상, 제형 검색 api
     @GetMapping("/search")
-    public ResponseEntity<List<MedicineSearchResponse>> searchMedicines(
+    public ResponseEntity<MedicineSearchResponse> searchMedicines(
             @RequestParam(required = false) String shape,
             @RequestParam(required = false) String color1,
             @RequestParam(required = false) String formCodeName,
             @RequestParam(required = false) String itemName,
             @RequestParam(required = false) Integer tabletType,
-            @AuthUserId String userId) {
+            @AuthUserId String userId,
+            Pageable pageable) {
 
         List<Medicine> medicines;
 
         if (itemName != null) {
             medicines = medicineService.searchByItemName(itemName, userId);
+            medicineSearchHistoryService.saveSearchTerm(userId, itemName); // 검색어 저장
         } else if (shape != null || color1 != null || formCodeName != null || tabletType != null) {
             medicines = medicineService.searchByFormCodeNameShapeColorAndTabletType(formCodeName, shape, color1, tabletType);
         } else {
             return ResponseEntity.badRequest().build();
         }
 
-        List<MedicineSearchResponse> response = medicineMapper.toResponseDtoList(medicines);
+        List<MedicineSearchResponse.MedicineSearchListResponse> responseDtoList = medicines.stream()
+                .map(medicineMapper::toMedicineSearchListResponse)
+                .collect(Collectors.toList());
+
+        PagingResponse pagingResponse = PagingResponse.from(pageable.getPageNumber(), pageable.getPageSize(), responseDtoList.size(), medicines.size());
+
+        MedicineSearchResponse response = MedicineSearchResponse.builder()
+                .data(responseDtoList)
+                .paging(pagingResponse)
+                .build();
+
         return ResponseEntity.ok(response);
     }
 
