@@ -20,6 +20,7 @@ import com.project.foradhd.domain.user.persistence.repository.UserProfileReposit
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MedicineReviewServiceImpl implements MedicineReviewService {
     private final MedicineReviewRepository reviewRepository;
     private final MedicineRepository medicineRepository;
+    @Qualifier("medicineReviewMapper")
     private final MedicineReviewMapper reviewMapper;
     private final MedicineReviewLikeRepository reviewLikeRepository;
     private final UserService userService;
@@ -68,8 +70,14 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
                 .gender(userPrivacy.getGender())
                 .build();
 
-        return reviewRepository.save(review);
+        MedicineReview savedReview = reviewRepository.save(review);
+
+        // 약의 평균 별점을 업데이트
+        updateMedicineRating(medicine);
+
+        return savedReview;
     }
+
 
     @Override
     @Transactional
@@ -110,8 +118,14 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
                 .grade(request.getGrade())
                 .build();
 
-        return reviewRepository.save(updatedReview);
+        MedicineReview savedReview = reviewRepository.save(updatedReview);
+
+        // 약의 평균 별점을 업데이트
+        updateMedicineRating(medicine);
+
+        return savedReview;
     }
+
 
     @Override
     public void deleteReview(Long id) {
@@ -130,4 +144,13 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable) {
         return reviewRepository.findByUserId(userId, pageable);
     }
+
+    private void updateMedicineRating(Medicine medicine) {
+        double averageGrade = medicine.calculateAverageGrade();
+        Medicine updatedMedicine = medicine.toBuilder()
+                .rating(averageGrade)
+                .build();
+        medicineRepository.save(updatedMedicine);
+    }
+
 }

@@ -13,4 +13,5 @@ public interface MedicineService {
     List<MedicineDto> getSortedMedicines(String sortOption);
     List<Medicine> searchByFormCodeNameAndShapeAndColor(String formCodeName, String shape, String color1);
     List<Medicine> searchByItemName(String itemName);
+    MedicineDto getMedicineById(Long id);
 }

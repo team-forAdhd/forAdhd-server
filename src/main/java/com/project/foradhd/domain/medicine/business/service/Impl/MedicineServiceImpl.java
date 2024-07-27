@@ -138,12 +138,18 @@ public class MedicineServiceImpl implements MedicineService {
     @Override
     public List<Medicine> searchByFormCodeNameAndShapeAndColor(String formCodeName, String shape, String color1) {
         List<Medicine> medicines = medicineRepository.findAllByFormCodeNameOrDrugShapeOrColorClass1(formCodeName, shape, color1);
-        log.info("Search by formCodeName: {}, shape: {}, color1: {}, result size: {}", formCodeName, shape, color1, medicines.size());
         return medicines;
     }
 
     @Override
     public List<Medicine> searchByItemName(String itemName) {
         return medicineRepository.findByItemNameContaining(itemName);
+    }
+
+    @Override
+    public MedicineDto getMedicineById(Long id) {
+        Medicine medicine = medicineRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE));
+        return medicineMapper.toDto(medicine);
     }
 }

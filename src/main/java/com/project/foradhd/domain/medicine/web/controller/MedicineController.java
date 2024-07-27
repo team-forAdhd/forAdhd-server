@@ -77,4 +77,11 @@ public class MedicineController {
         List<MedicineSearchResponse> response = medicineMapper.toResponseDtoList(medicines);
         return ResponseEntity.ok(response);
     }
+
+    // 개별 약 조회 API
+    @GetMapping("/{id}")
+    public ResponseEntity<MedicineDto> getMedicineById(@PathVariable Long id) {
+        MedicineDto medicine = medicineService.getMedicineById(id);
+        return ResponseEntity.ok(medicine);
+    }
 }
