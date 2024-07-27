@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.medicine.business.service.Impl;
 
+import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.medicine.business.service.MedicineReviewService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
@@ -22,7 +23,9 @@ import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -156,7 +159,25 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     }
 
     @Override
-    public Page<MedicineReview> findReviewsByMedicineId(Long medicineId, Pageable pageable) {
-        return reviewRepository.findByMedicineId(medicineId, pageable);
+    public Page<MedicineReview> findReviewsByMedicineId(Long medicineId, Pageable pageable, SortOption sortOption) {
+        Sort sort = getSortByOption(sortOption);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        return reviewRepository.findByMedicineId(medicineId, sortedPageable);
+    }
+    private Sort getSortByOption(SortOption sortOption) {
+        switch (sortOption) {
+            case NEWEST_FIRST:
+                return Sort.by(Sort.Direction.DESC, "createdAt");
+            case OLDEST_FIRST:
+                return Sort.by(Sort.Direction.ASC, "createdAt");
+            case MOST_VIEWED:
+                return Sort.by(Sort.Direction.DESC, "views"); // Assuming 'views' field exists
+            case MOST_COMMENTED:
+                return Sort.by(Sort.Direction.DESC, "commentsCount"); // Assuming 'commentsCount' field exists
+            case MOST_LIKED:
+                return Sort.by(Sort.Direction.DESC, "helpCount");
+            default:
+                return Sort.by(Sort.Direction.DESC, "createdAt");
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.medicine.web.controller;
 
+import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.medicine.business.service.MedicineReviewService;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
@@ -98,8 +99,9 @@ public class MedicineReviewController {
     @GetMapping("/medicine/{medicineId}")
     public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getReviewsByMedicineId(
             @PathVariable Long medicineId,
+            @RequestParam(defaultValue = "NEWEST_FIRST") SortOption sortOption,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<MedicineReview> reviews = reviewService.findReviewsByMedicineId(medicineId, pageable);
+        Page<MedicineReview> reviews = reviewService.findReviewsByMedicineId(medicineId, pageable, sortOption);
         List<MedicineReviewResponse> reviewDtos = reviews.stream()
                 .map(reviewMapper::toResponseDto)
                 .collect(Collectors.toList());
