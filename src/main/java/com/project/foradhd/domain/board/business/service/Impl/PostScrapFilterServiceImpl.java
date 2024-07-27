@@ -3,6 +3,7 @@ package com.project.foradhd.domain.board.business.service.Impl;
 import com.project.foradhd.domain.board.business.service.PostScrapFilterService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
+import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
@@ -55,9 +56,9 @@ public class PostScrapFilterServiceImpl implements PostScrapFilterService {
     }
 
     @Override
-    public Page<PostScrapFilter> getScrapsByUser(String userId, Pageable pageable, SortOption sortOption) {
+    public Page<PostScrapFilter> getScrapsByUserAndCategory(String userId, CategoryName category, Pageable pageable, SortOption sortOption) {
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), getSortByOption(sortOption));
-        return postScrapFilterRepository.findByUserId(userId, sortedPageable);
+        return postScrapFilterRepository.findByUserIdAndCategory(userId, category, sortedPageable);
     }
 
     @Override

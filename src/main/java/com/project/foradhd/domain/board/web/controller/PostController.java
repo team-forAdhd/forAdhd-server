@@ -143,12 +143,13 @@ public class PostController {
     }
 
     // 내가 스크랩한 게시글 조회 api
-    @GetMapping("/{userId}/scrap")
-    public ResponseEntity<PostScrapFilterResponseDto> getScrapsByUser(
+    @GetMapping("/{userId}/scraps")
+    public ResponseEntity<PostScrapFilterResponseDto> getScrapsByUserAndCategory(
             @AuthUserId String userId,
+            @RequestParam CategoryName category,
             Pageable pageable,
             @RequestParam(required = false, defaultValue = "NEWEST_FIRST") SortOption sortOption) {
-        Page<PostScrapFilter> scraps = postScrapFilterService.getScrapsByUser(userId, pageable, sortOption);
+        Page<PostScrapFilter> scraps = postScrapFilterService.getScrapsByUserAndCategory(userId, category, pageable, sortOption);
         List<PostScrapFilterResponseDto.PostScrapFilterListResponseDto> postScrapFilterResponseDtoList = scraps.getContent().stream()
                 .map(scrap -> postScrapFilterMapper.toListResponseDto(scrap, postScrapFilterService))
                 .collect(Collectors.toList());
