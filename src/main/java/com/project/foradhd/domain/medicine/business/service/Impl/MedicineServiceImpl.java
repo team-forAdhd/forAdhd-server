@@ -102,6 +102,7 @@ public class MedicineServiceImpl implements MedicineService {
         }
     }
 
+    // 약 정렬
     @Override
     public List<MedicineDto> getSortedMedicines(String sortOption) {
         List<Medicine> medicines;
@@ -135,21 +136,33 @@ public class MedicineServiceImpl implements MedicineService {
         }
     }
 
+    // 약 모양 or 색상으로 검색
     @Override
     public List<Medicine> searchByFormCodeNameAndShapeAndColor(String formCodeName, String shape, String color1) {
         List<Medicine> medicines = medicineRepository.findAllByFormCodeNameOrDrugShapeOrColorClass1(formCodeName, shape, color1);
         return medicines;
     }
 
+    // 약 이름으로 검색
     @Override
     public List<Medicine> searchByItemName(String itemName) {
         return medicineRepository.findByItemNameContaining(itemName);
     }
 
+    // 개별 약 조회
     @Override
     public MedicineDto getMedicineById(Long id) {
         Medicine medicine = medicineRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE));
         return medicineMapper.toDto(medicine);
+    }
+
+    // 약 성분별 정렬
+    @Override
+    public List<MedicineDto> getMedicinesByIngredientType(int ingredientType) {
+        List<Medicine> medicines = medicineRepository.findAllByIngredientTypeOrderByItemNameAsc(ingredientType);
+        return medicines.stream()
+                .map(medicineMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

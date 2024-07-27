@@ -16,4 +16,5 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
     List<Medicine> findAllByFormCodeNameOrDrugShapeOrColorClass1(String formCodeName, String drugShape, String color1);
     List<Medicine> findByItemNameContaining(String itemName);
     MedicineDto getMedicineById(Long id);
+    List<Medicine> findAllByIngredientTypeOrderByItemNameAsc(int ingredientType);
 }

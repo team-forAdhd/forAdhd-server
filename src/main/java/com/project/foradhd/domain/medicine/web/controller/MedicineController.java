@@ -84,4 +84,20 @@ public class MedicineController {
         MedicineDto medicine = medicineService.getMedicineById(id);
         return ResponseEntity.ok(medicine);
     }
+
+    // 약 성분별 조회
+    @GetMapping("/sorted-by-ingredient")
+    public ResponseEntity<MedicineSortedResponse> getMedicinesByIngredientType(
+            @RequestParam int ingredientType) {
+        try {
+            List<MedicineDto> medicines = medicineService.getMedicinesByIngredientType(ingredientType);
+            MedicineSortedResponse response = MedicineSortedResponse.builder()
+                    .kind("종류")
+                    .medicineList(medicines)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
 }
