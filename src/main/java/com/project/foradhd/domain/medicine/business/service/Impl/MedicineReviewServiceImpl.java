@@ -71,8 +71,6 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         return reviewRepository.save(review);
     }
 
-
-
     @Override
     @Transactional
     public void toggleHelpCount(Long reviewId, String userId) {
@@ -129,7 +127,7 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     }
 
     @Override
-    public Page<MedicineReviewResponse> findReviewsByUserId(String userId, Pageable pageable) {
+    public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable) {
         return reviewRepository.findByUserId(userId, pageable);
     }
 }

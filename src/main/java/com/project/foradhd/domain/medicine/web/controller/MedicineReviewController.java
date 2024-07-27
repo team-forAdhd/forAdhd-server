@@ -31,8 +31,6 @@ public class MedicineReviewController {
 
     @Qualifier("medicineReviewMapper")
     private final MedicineReviewMapper reviewMapper;
-    private final UserProfileRepository userProfileRepository;
-    private final UserPrivacyRepository userPrivacyRepository;
 
     @PostMapping
     public ResponseEntity<MedicineReviewResponse> createReview(@RequestBody MedicineReviewRequest request, @AuthUserId String userId) {
@@ -40,7 +38,6 @@ public class MedicineReviewController {
         MedicineReviewResponse response = reviewMapper.toResponseDto(review);
         return ResponseEntity.ok(response);
     }
-
 
     @PostMapping("/{id}/help")
     public ResponseEntity<Void> toggleHelpCount(@PathVariable Long id, @AuthUserId String userId) {
@@ -72,7 +69,8 @@ public class MedicineReviewController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<MedicineReviewResponse>> getUserReviews(@AuthUserId String userId, Pageable pageable) {
-        Page<MedicineReviewResponse> reviewDtos = reviewService.findReviewsByUserId(userId, pageable);
+        Page<MedicineReview> reviews = reviewService.findReviewsByUserId(userId, pageable);
+        Page<MedicineReviewResponse> reviewDtos = reviews.map(reviewMapper::toResponseDto);
         return ResponseEntity.ok(reviewDtos);
     }
 }

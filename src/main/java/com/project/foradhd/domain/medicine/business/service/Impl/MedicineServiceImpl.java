@@ -34,7 +34,7 @@ public class MedicineServiceImpl implements MedicineService {
     private final MedicineMapper medicineMapper;
 
     private static final String SERVICE_URL = "http://apis.data.go.kr/1471000/MdcinGrnIdntfcInfoService01/getMdcinGrnIdntfcInfoList01";
-    private static final String SERVICE_KEY = "rzJVpYr3DAwYcKr+SyRZ5K0lIxsMeO5OdiaJrlGZ2O8C+B7oqEGRd96NskmVrzYItbIwhSD/Z2Y+ifVDTPlFkQ==";
+    private static final String SERVICE_KEY = "rzJVpYr3DAwYcKr%2BSyRZ5K0lIxsMeO5OdiaJrlGZ2O8C%2BB7oqEGRd96NskmVrzYItbIwhSD%2FZ2Y%2BifVDTPlFkQ%3D%3D";
 
     private static final Logger log = LoggerFactory.getLogger(MedicineServiceImpl.class);
 
