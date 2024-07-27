@@ -44,7 +44,6 @@ public class PostController {
     private final PostScrapFilterService postScrapFilterService;
     private final PostScrapFilterMapper postScrapFilterMapper;
     private final PostLikeFilterService postLikeFilterService;
-    @Qualifier
     private final PostSearchHistoryService searchHistoryService;
 
     // 게시글 개별 조회 api
