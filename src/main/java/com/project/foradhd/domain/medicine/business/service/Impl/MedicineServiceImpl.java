@@ -104,27 +104,32 @@ public class MedicineServiceImpl implements MedicineService {
 
     // 약 정렬
     @Override
-    public List<MedicineDto> getSortedMedicines(String sortOption) {
+    public List<MedicineDto> getSortedMedicines(String sortOption, String userId) {
         List<Medicine> medicines;
-        switch (sortOption) {
-            case "nameAsc":
-                medicines = medicineRepository.findAllByOrderByItemNameAsc();
-                break;
-            case "ratingDesc":
-                medicines = medicineRepository.findAllByOrderByRatingDesc();
-                break;
-            case "ratingAsc":
-                medicines = medicineRepository.findAllByOrderByRatingAsc();
-                break;
-            case "ingredientAsc": // 성분 순 정렬
-                List<Medicine> result = new ArrayList<>();
-                result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("메틸페니데이트"));
-                result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("아토목세틴"));
-                result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("클로니딘"));
-                medicines = result;
-                break;
-            default:
-                medicines = medicineRepository.findAll();
+
+        if (sortOption.equalsIgnoreCase("MY_FAVORITES")) {
+            medicines = medicineRepository.findMedicinesByUserFavorites(userId);
+        } else {
+            switch (sortOption) {
+                case "nameAsc":
+                    medicines = medicineRepository.findAllByOrderByItemNameAsc();
+                    break;
+                case "ratingDesc":
+                    medicines = medicineRepository.findAllByOrderByRatingDesc();
+                    break;
+                case "ratingAsc":
+                    medicines = medicineRepository.findAllByOrderByRatingAsc();
+                    break;
+                case "ingredientAsc":
+                    List<Medicine> result = new ArrayList<>();
+                    result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("메틸페니데이트"));
+                    result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("아토목세틴"));
+                    result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("클로니딘"));
+                    medicines = result;
+                    break;
+                default:
+                    medicines = medicineRepository.findAll();
+            }
         }
 
         if (medicines.isEmpty()) {
@@ -160,6 +165,15 @@ public class MedicineServiceImpl implements MedicineService {
     @Override
     public List<MedicineDto> getMedicinesByIngredientType(int ingredientType) {
         List<Medicine> medicines = medicineRepository.findAllByIngredientTypeOrderByItemNameAsc(ingredientType);
+        return medicines.stream()
+                .map(medicineMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    // 즐겨찾기한 약
+    @Override
+    public List<MedicineDto> getFavoritesMedicines(String userId) {
+        List<Medicine> medicines = medicineRepository.findMedicinesByUserFavorites(userId);
         return medicines.stream()
                 .map(medicineMapper::toDto)
                 .collect(Collectors.toList());

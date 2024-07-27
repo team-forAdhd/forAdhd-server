@@ -1,6 +1,5 @@
 package com.project.foradhd.domain.medicine.web.controller;
 
-import com.project.foradhd.domain.medicine.business.service.Impl.MedicineServiceImpl;
 import com.project.foradhd.domain.medicine.business.service.MedicineService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
@@ -8,8 +7,6 @@ import com.project.foradhd.domain.medicine.web.dto.response.MedicineSearchRespon
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineSortedResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +40,10 @@ public class MedicineController {
     // 의약품 목록을 정렬 옵션에 따라 조회하는 API
     @GetMapping("/sorted")
     public ResponseEntity<MedicineSortedResponse> getSortedMedicines(
-            @RequestParam(defaultValue = "nameAsc") String sortOption) {
+            @RequestParam(defaultValue = "nameAsc") String sortOption,
+            @RequestParam String userId) {
         try {
-            List<MedicineDto> medicines = medicineService.getSortedMedicines(sortOption);
+            List<MedicineDto> medicines = medicineService.getSortedMedicines(sortOption, userId);
             MedicineSortedResponse response = MedicineSortedResponse.builder()
                     .kind("종류")
                     .medicineList(medicines)
@@ -55,6 +53,7 @@ public class MedicineController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 
     // 약 모양, 색상, 제형 검색 api
     @GetMapping("/search")
