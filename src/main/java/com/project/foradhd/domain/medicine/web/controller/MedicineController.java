@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.medicine.web.controller;
 
+import com.project.foradhd.domain.medicine.business.service.MedicineSearchHistoryService;
 import com.project.foradhd.domain.medicine.business.service.MedicineService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
@@ -22,10 +23,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MedicineController {
 
-    @Autowired
     private final MedicineService medicineService;
-    @Autowired
     private final MedicineMapper medicineMapper;
+    private final MedicineSearchHistoryService medicineSearchHistoryService;
 
    // 의약품 데이터를 가져와 저장하는 API
     @GetMapping("/fetch-and-save")
@@ -107,5 +107,12 @@ public class MedicineController {
     public ResponseEntity<List<String>> getRecentSearchTerms(@AuthUserId String userId) {
         List<String> recentSearchTerms = medicineService.getRecentSearchTerms(userId);
         return ResponseEntity.ok(recentSearchTerms);
+    }
+
+    // 특정 검색어 삭제
+    @DeleteMapping("/recent-searches/{id}")
+    public ResponseEntity<Void> deleteSearchTermById(@PathVariable Long id) {
+        medicineSearchHistoryService.deleteSearchTermById(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -20,6 +20,7 @@ public class MedicineSearchHistoryServiceImpl implements MedicineSearchHistorySe
     private final MedicineSearchHistoryRepository searchHistoryRepository;
 
     @Override
+    @Transactional
     public void saveSearchTerm(String userId, String term) {
         MedicineSearchHistory searchHistory = MedicineSearchHistory.builder()
                 .userId(userId)
@@ -35,5 +36,11 @@ public class MedicineSearchHistoryServiceImpl implements MedicineSearchHistorySe
                 .stream()
                 .map(MedicineSearchHistory::getTerm)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteSearchTermById(Long id) {
+        searchHistoryRepository.deleteById(id);
     }
 }
