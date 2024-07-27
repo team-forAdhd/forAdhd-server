@@ -78,8 +78,11 @@ public class CommentController {
 
     // 나의 댓글
     @GetMapping("/{userId}/my-comments")
-    public ResponseEntity<PostResponseDto> getMyCommentedPosts(@AuthUserId String userId, Pageable pageable) {
-        Page<PostResponseDto.PostListResponseDto> posts = commentService.getMyCommentedPosts(userId, pageable);
+    public ResponseEntity<PostResponseDto> getMyCommentedPosts(
+            @AuthUserId String userId,
+            Pageable pageable,
+            @RequestParam(defaultValue = "NEWEST_FIRST") SortOption sortOption) {
+        Page<PostResponseDto.PostListResponseDto> posts = commentService.getMyCommentedPosts(userId, pageable, sortOption);
         List<PostResponseDto.PostListResponseDto> postList = posts.getContent();
 
         PagingResponse pagingResponse = PagingResponse.from(posts);
@@ -91,7 +94,6 @@ public class CommentController {
 
         return ResponseEntity.ok(response);
     }
-
     // 글별 댓글 모아보기
     @GetMapping("/posts/{postId}")
     public ResponseEntity<CommentResponseDto> getCommentsByPost(

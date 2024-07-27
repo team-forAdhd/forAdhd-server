@@ -121,8 +121,15 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Page<PostResponseDto.PostListResponseDto> getMyCommentedPosts(String userId, Pageable pageable) {
-        Page<Comment> userComments = commentRepository.findByUserId(userId, pageable);
+    public Page<PostResponseDto.PostListResponseDto> getMyCommentedPosts(String userId, Pageable pageable, SortOption sortOption) {
+        Sort sort = switch (sortOption) {
+            case OLDEST_FIRST -> Sort.by(Sort.Direction.ASC, "createdAt");
+            case NEWEST_FIRST -> Sort.by(Sort.Direction.DESC, "createdAt");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+        Page<Comment> userComments = commentRepository.findByUserId(userId, sortedPageable);
         List<PostResponseDto.PostListResponseDto> posts = userComments.stream()
                 .map(Comment::getPost)
                 .distinct()
@@ -133,7 +140,7 @@ public class CommentServiceImpl implements CommentService {
                         .createdAt(post.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
-        return new PageImpl<>(posts, pageable, posts.size());
+        return new PageImpl<>(posts, sortedPageable, userComments.getTotalElements());
     }
 
     @Override
