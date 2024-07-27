@@ -146,8 +146,10 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     }
 
     @Override
-    public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable) {
-        return reviewRepository.findByUserId(userId, pageable);
+    public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable, SortOption sortOption) {
+        Sort sort = getSortByOption(sortOption);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        return reviewRepository.findByUserId(userId, sortedPageable);
     }
 
     private void updateMedicineRating(Medicine medicine) {
@@ -170,12 +172,10 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
                 return Sort.by(Sort.Direction.DESC, "createdAt");
             case OLDEST_FIRST:
                 return Sort.by(Sort.Direction.ASC, "createdAt");
-            case MOST_VIEWED:
-                return Sort.by(Sort.Direction.DESC, "views"); // Assuming 'views' field exists
-            case MOST_COMMENTED:
-                return Sort.by(Sort.Direction.DESC, "commentsCount"); // Assuming 'commentsCount' field exists
-            case MOST_LIKED:
-                return Sort.by(Sort.Direction.DESC, "helpCount");
+            case HIGHEST_GRADE:
+                return Sort.by(Sort.Direction.DESC, "grade");
+            case LOWEST_GRADE:
+                return Sort.by(Sort.Direction.ASC, "grade");
             default:
                 return Sort.by(Sort.Direction.DESC, "createdAt");
         }

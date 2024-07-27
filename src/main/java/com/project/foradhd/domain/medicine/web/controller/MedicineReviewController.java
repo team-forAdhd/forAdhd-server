@@ -81,8 +81,11 @@ public class MedicineReviewController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getUserReviews(@AuthUserId String userId, Pageable pageable) {
-        Page<MedicineReview> reviews = reviewService.findReviewsByUserId(userId, pageable);
+    public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getUserReviews(
+            @AuthUserId String userId,
+            @RequestParam(defaultValue = "NEWEST_FIRST") SortOption sortOption,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<MedicineReview> reviews = reviewService.findReviewsByUserId(userId, pageable, sortOption);
         List<MedicineReviewResponse> reviewDtos = reviews.stream()
                 .map(reviewMapper::toResponseDto)
                 .collect(Collectors.toList());
