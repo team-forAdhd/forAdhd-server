@@ -15,7 +15,5 @@ public interface MedicineService {
     MedicineDto getMedicineById(Long id);
     List<MedicineDto> getMedicinesByIngredientType(int ingredientType);
     List<Medicine> searchByFormCodeNameShapeColorAndTabletType(String formCodeName, String shape, String color1, int tabletType);
-    List<MedicineDto> getFavoritesMedicines(String userId);
-    void saveSearchTerm(String userId, String term);
     List<String> getRecentSearchTerms(String userId);
 }

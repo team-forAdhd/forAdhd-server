@@ -4,7 +4,6 @@ import com.project.foradhd.domain.medicine.business.service.MedicineSearchHistor
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineSearchHistory;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineSearchHistoryRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
