@@ -6,6 +6,7 @@ import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineSearchResponse;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineSortedResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
+import com.project.foradhd.global.AuthUserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,7 +42,7 @@ public class MedicineController {
     @GetMapping("/sorted")
     public ResponseEntity<MedicineSortedResponse> getSortedMedicines(
             @RequestParam(defaultValue = "nameAsc") String sortOption,
-            @RequestParam String userId) {
+            @AuthUserId String userId) {
         try {
             List<MedicineDto> medicines = medicineService.getSortedMedicines(sortOption, userId);
             MedicineSortedResponse response = MedicineSortedResponse.builder()
@@ -54,7 +55,6 @@ public class MedicineController {
         }
     }
 
-
     // 약 모양, 색상, 제형 검색 api
     @GetMapping("/search")
     public ResponseEntity<List<MedicineSearchResponse>> searchMedicines(
@@ -62,12 +62,13 @@ public class MedicineController {
             @RequestParam(required = false) String color1,
             @RequestParam(required = false) String formCodeName,
             @RequestParam(required = false) String itemName,
-            @RequestParam(required = false) Integer tabletType) {
+            @RequestParam(required = false) Integer tabletType,
+            @AuthUserId String userId) {
 
         List<Medicine> medicines;
 
         if (itemName != null) {
-            medicines = medicineService.searchByItemName(itemName);
+            medicines = medicineService.searchByItemName(itemName, userId);
         } else if (shape != null || color1 != null || formCodeName != null || tabletType != null) {
             medicines = medicineService.searchByFormCodeNameShapeColorAndTabletType(formCodeName, shape, color1, tabletType);
         } else {
@@ -99,5 +100,12 @@ public class MedicineController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    // 최근 검색어 조회 API
+    @GetMapping("/recent-searches")
+    public ResponseEntity<List<String>> getRecentSearchTerms(@AuthUserId String userId) {
+        List<String> recentSearchTerms = medicineService.getRecentSearchTerms(userId);
+        return ResponseEntity.ok(recentSearchTerms);
     }
 }

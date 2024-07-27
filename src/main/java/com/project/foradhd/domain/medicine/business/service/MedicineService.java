@@ -11,9 +11,11 @@ public interface MedicineService {
     String fetchMedicineInfo(String itemname) throws IOException;
     MedicineDto parseMedicine(String json);
     List<MedicineDto> getSortedMedicines(String sortOption, String userId);
-    List<Medicine> searchByItemName(String itemName);
+    List<Medicine> searchByItemName(String itemName, String userId);
     MedicineDto getMedicineById(Long id);
     List<MedicineDto> getMedicinesByIngredientType(int ingredientType);
     List<Medicine> searchByFormCodeNameShapeColorAndTabletType(String formCodeName, String shape, String color1, int tabletType);
     List<MedicineDto> getFavoritesMedicines(String userId);
+    void saveSearchTerm(String userId, String term);
+    List<String> getRecentSearchTerms(String userId);
 }

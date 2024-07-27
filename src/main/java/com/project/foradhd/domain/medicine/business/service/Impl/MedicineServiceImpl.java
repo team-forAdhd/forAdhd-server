@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.medicine.business.service.Impl;
 
 import com.nimbusds.jose.shaded.gson.*;
+import com.project.foradhd.domain.medicine.business.service.MedicineSearchHistoryService;
 import com.project.foradhd.domain.medicine.business.service.MedicineService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
@@ -32,6 +33,7 @@ public class MedicineServiceImpl implements MedicineService {
 
     private final MedicineRepository medicineRepository;
     private final MedicineMapper medicineMapper;
+    private final MedicineSearchHistoryService searchHistoryService;
 
     private static final String SERVICE_URL = "http://apis.data.go.kr/1471000/MdcinGrnIdntfcInfoService01/getMdcinGrnIdntfcInfoList01";
     private static final String SERVICE_KEY = "rzJVpYr3DAwYcKr%2BSyRZ5K0lIxsMeO5OdiaJrlGZ2O8C%2BB7oqEGRd96NskmVrzYItbIwhSD%2FZ2Y%2BifVDTPlFkQ%3D%3D";
@@ -149,7 +151,10 @@ public class MedicineServiceImpl implements MedicineService {
 
     // 약 이름으로 검색
     @Override
-    public List<Medicine> searchByItemName(String itemName) {
+    @Transactional
+    public List<Medicine> searchByItemName(String itemName, String userId) {
+        // 검색어 저장 로직 추가
+        searchHistoryService.saveSearchTerm(userId, itemName);
         return medicineRepository.findByItemNameContaining(itemName);
     }
 
@@ -177,5 +182,16 @@ public class MedicineServiceImpl implements MedicineService {
         return medicines.stream()
                 .map(medicineMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void saveSearchTerm(String userId, String term) {
+        searchHistoryService.saveSearchTerm(userId, term);
+    }
+
+    @Override
+    public List<String> getRecentSearchTerms(String userId) {
+        return searchHistoryService.getRecentSearchTerms(userId);
     }
 }
