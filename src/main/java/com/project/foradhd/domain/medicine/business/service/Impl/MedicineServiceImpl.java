@@ -175,21 +175,6 @@ public class MedicineServiceImpl implements MedicineService {
                 .collect(Collectors.toList());
     }
 
-    // 즐겨찾기한 약
-    @Override
-    public List<MedicineDto> getFavoritesMedicines(String userId) {
-        List<Medicine> medicines = medicineRepository.findMedicinesByUserFavorites(userId);
-        return medicines.stream()
-                .map(medicineMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public void saveSearchTerm(String userId, String term) {
-        searchHistoryService.saveSearchTerm(userId, term);
-    }
-
     @Override
     public List<String> getRecentSearchTerms(String userId) {
         return searchHistoryService.getRecentSearchTerms(userId);
