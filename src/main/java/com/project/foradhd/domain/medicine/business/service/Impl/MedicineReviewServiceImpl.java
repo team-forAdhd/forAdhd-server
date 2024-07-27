@@ -64,6 +64,8 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
                 .user(user)
                 .content(request.getContent())
                 .grade(request.getGrade())
+                .images(request.getImages())
+                .coMedications(request.getCoMedications())
                 .nickname(userProfile.getNickname())
                 .profileImage(userProfile.getProfileImage())
                 .ageRange(userPrivacy.getAgeRange())
