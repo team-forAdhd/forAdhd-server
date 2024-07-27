@@ -56,20 +56,21 @@ public class MedicineController {
         }
     }
 
-    // 의약품을 검색하는 API
+    // 약 모양, 색상, 제형 검색 api
     @GetMapping("/search")
     public ResponseEntity<List<MedicineSearchResponse>> searchMedicines(
             @RequestParam(required = false) String shape,
             @RequestParam(required = false) String color1,
             @RequestParam(required = false) String formCodeName,
-            @RequestParam(required = false) String itemName) {
+            @RequestParam(required = false) String itemName,
+            @RequestParam(required = false) Integer tabletType) {
 
         List<Medicine> medicines;
 
         if (itemName != null) {
             medicines = medicineService.searchByItemName(itemName);
-        } else if (shape != null || color1 != null || formCodeName != null) {
-            medicines = medicineService.searchByFormCodeNameAndShapeAndColor(formCodeName, shape, color1);
+        } else if (shape != null || color1 != null || formCodeName != null || tabletType != null) {
+            medicines = medicineService.searchByFormCodeNameShapeColorAndTabletType(formCodeName, shape, color1, tabletType);
         } else {
             return ResponseEntity.badRequest().build();
         }

@@ -32,6 +32,7 @@ public class Medicine {
     private double rating; // 별점
     private boolean isFavorite; // 즐겨찾기 여부
     private int ingredientType; // 성분 타입 (1: 메틸페니데이트 염산염, 2: 아토목세틴 염산염, 3: 클로니딘 염산염)
+    private int tabletType; // 제형 타입 (1: 정제, 2: 경질캡슐, 3: 연질캡슐)
 
     @OneToMany(mappedBy = "medicine")
     private List<MedicineReview> reviews;

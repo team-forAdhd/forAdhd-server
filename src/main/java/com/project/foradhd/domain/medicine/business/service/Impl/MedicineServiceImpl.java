@@ -136,11 +136,10 @@ public class MedicineServiceImpl implements MedicineService {
         }
     }
 
-    // 약 모양 or 색상으로 검색
+    // 약 모양 or 색상 or 제형으로 검색
     @Override
-    public List<Medicine> searchByFormCodeNameAndShapeAndColor(String formCodeName, String shape, String color1) {
-        List<Medicine> medicines = medicineRepository.findAllByFormCodeNameOrDrugShapeOrColorClass1(formCodeName, shape, color1);
-        return medicines;
+    public List<Medicine> searchByFormCodeNameShapeColorAndTabletType(String formCodeName, String shape, String color1, int tabletType) {
+        return medicineRepository.findAllByFormCodeNameOrDrugShapeOrColorClass1OrTabletType(formCodeName, shape, color1, tabletType);
     }
 
     // 약 이름으로 검색
