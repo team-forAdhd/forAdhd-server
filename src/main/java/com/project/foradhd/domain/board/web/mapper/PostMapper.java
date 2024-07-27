@@ -7,6 +7,7 @@ import com.project.foradhd.domain.board.web.dto.request.PostRequestDto;
 import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.PostSearchResponseDto;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
@@ -90,4 +91,12 @@ public interface PostMapper {
     @Mapping(source = "category", target = "category")
     @Mapping(source = "user.id", target = "userId")
     PostRankingResponseDto toPostRankingResponseDto(Post post, @Context UserProfileRepository userProfileRepository);
+
+    @Mapping(source = "title", target = "title")
+    @Mapping(source = "viewCount", target = "viewCount")
+    @Mapping(source = "likeCount", target = "likeCount")
+    @Mapping(source = "commentCount", target = "commentCount")
+    @Mapping(source = "images", target = "images")
+    @Mapping(source = "createdAt", target = "createdAt")
+    PostSearchResponseDto.PostSearchListResponseDto toPostSearchListResponseDto(Post post);
 }

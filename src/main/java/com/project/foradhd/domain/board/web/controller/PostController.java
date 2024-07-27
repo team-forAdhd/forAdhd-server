@@ -13,6 +13,7 @@ import com.project.foradhd.domain.board.web.dto.request.PostRequestDto;
 import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostScrapFilterResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.PostSearchResponseDto;
 import com.project.foradhd.domain.board.web.mapper.PostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapFilterMapper;
 import com.project.foradhd.domain.user.persistence.entity.User;
@@ -21,6 +22,7 @@ import com.project.foradhd.global.AuthUserId;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +44,7 @@ public class PostController {
     private final PostScrapFilterService postScrapFilterService;
     private final PostScrapFilterMapper postScrapFilterMapper;
     private final PostLikeFilterService postLikeFilterService;
+    @Qualifier
     private final PostSearchHistoryService searchHistoryService;
 
     // 게시글 개별 조회 api
@@ -227,16 +230,22 @@ public class PostController {
 
     // 게시글 검색 api
     @GetMapping("/search")
-    public ResponseEntity<Page<PostResponseDto.PostListResponseDto>> searchPostsByTitle(
+    public ResponseEntity<PostSearchResponseDto> searchPostsByTitle(
             @RequestParam String title,
             @AuthUserId String userId,
             Pageable pageable) {
         Page<Post> posts = postService.searchPostsByTitle(title, userId, pageable);
-        List<PostResponseDto.PostListResponseDto> postResponseDtoList = posts.getContent().stream()
-                .map(post -> postMapper.toPostListResponseDto(post, userProfileRepository))
+        List<PostSearchResponseDto.PostSearchListResponseDto> postResponseDtoList = posts.getContent().stream()
+                .map(postMapper::toPostSearchListResponseDto)
                 .collect(Collectors.toList());
 
-        Page<PostResponseDto.PostListResponseDto> response = new PageImpl<>(postResponseDtoList, pageable, posts.getTotalElements());
+        PagingResponse pagingResponse = PagingResponse.from(posts);
+
+        PostSearchResponseDto response = PostSearchResponseDto.builder()
+                .data(postResponseDtoList)
+                .paging(pagingResponse)
+                .build();
+
         return ResponseEntity.ok(response);
     }
 
