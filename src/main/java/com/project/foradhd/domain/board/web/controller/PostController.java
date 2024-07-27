@@ -21,6 +21,7 @@ import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -220,5 +221,27 @@ public class PostController {
             Pageable pageable) {
         List<PostRankingResponseDto> topPosts = postService.getTopPostsByCategory(category, pageable);
         return ResponseEntity.ok(topPosts);
+    }
+
+    // 게시글 검색 api
+    @GetMapping("/search")
+    public ResponseEntity<Page<PostResponseDto.PostListResponseDto>> searchPostsByTitle(
+            @RequestParam String title,
+            @AuthUserId String userId,
+            Pageable pageable) {
+        Page<Post> posts = postService.searchPostsByTitle(title, userId, pageable);
+        List<PostResponseDto.PostListResponseDto> postResponseDtoList = posts.getContent().stream()
+                .map(post -> postMapper.toPostListResponseDto(post, userProfileRepository))
+                .collect(Collectors.toList());
+
+        Page<PostResponseDto.PostListResponseDto> response = new PageImpl<>(postResponseDtoList, pageable, posts.getTotalElements());
+        return ResponseEntity.ok(response);
+    }
+
+    // 최근 검색어 조회 API
+    @GetMapping("/recent-searches")
+    public ResponseEntity<List<String>> getRecentSearchTerms(@AuthUserId String userId) {
+        List<String> recentSearchTerms = postService.getRecentSearchTerms(userId);
+        return ResponseEntity.ok(recentSearchTerms);
     }
 }

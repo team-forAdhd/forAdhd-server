@@ -41,4 +41,6 @@ public interface PostService {
     List<PostRankingResponseDto> getTopPostsByCategory(CategoryName category, Pageable pageable);
     // SSE 알림 관련 설정
     void addComment(Long postId, String commentContent, String userId);
+    List<String> getRecentSearchTerms(String userId);
+    Page<Post> searchPostsByTitle(String title, String userId, Pageable pageable);
 }

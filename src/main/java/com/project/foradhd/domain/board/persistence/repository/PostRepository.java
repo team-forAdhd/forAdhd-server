@@ -21,4 +21,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findTopPosts(Pageable pageable);
     @Query("SELECT p FROM Post p WHERE p.category = :category ORDER BY p.viewCount DESC")
     List<Post> findTopPostsByCategory(@Param("category") CategoryName category, Pageable pageable);
+    Page<Post> findByTitleContaining(String title, Pageable pageable);
 }

@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.board.business.service.Impl;
 
 import com.project.foradhd.domain.board.business.service.NotificationService;
+import com.project.foradhd.domain.board.business.service.PostSearchHistoryService;
 import com.project.foradhd.domain.board.business.service.PostService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
@@ -28,6 +29,7 @@ import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final PostSearchHistoryService searchHistoryService;
     private final NotificationService notificationService;
     private final SseEmitters sseEmitters;
 
@@ -169,5 +171,18 @@ public class PostServiceImpl implements PostService {
                 break;
         }
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+    }
+
+    @Override
+    public List<String> getRecentSearchTerms(String userId) {
+        return searchHistoryService.getRecentSearchTerms(userId);
+    }
+
+    @Override
+    @Transactional
+    public Page<Post> searchPostsByTitle(String title, String userId, Pageable pageable) {
+        // 검색어 저장 로직 추가
+        searchHistoryService.saveSearchTerm(userId, title);
+        return postRepository.findByTitleContaining(title, pageable);
     }
 }
