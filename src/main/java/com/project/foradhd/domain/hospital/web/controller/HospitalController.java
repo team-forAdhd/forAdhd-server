@@ -2,9 +2,12 @@ package com.project.foradhd.domain.hospital.web.controller;
 
 import com.project.foradhd.domain.hospital.business.dto.in.*;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
+import com.project.foradhd.domain.hospital.business.service.HospitalOperationService;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
+import com.project.foradhd.domain.hospital.persistence.entity.Hospital;
 import com.project.foradhd.domain.hospital.web.dto.request.*;
 import com.project.foradhd.domain.hospital.web.dto.response.*;
+import com.project.foradhd.domain.hospital.web.enums.HospitalOperationStatus;
 import com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter;
 import com.project.foradhd.domain.hospital.web.mapper.HospitalMapper;
 import com.project.foradhd.global.AuthUserId;
@@ -15,12 +18,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/hospitals")
 @RestController
 public class HospitalController {
 
     private final HospitalService hospitalService;
+    private final HospitalOperationService hospitalOperationService;
     private final HospitalMapper hospitalMapper;
 
     @GetMapping("/nearby")
@@ -30,6 +37,15 @@ public class HospitalController {
         HospitalListNearbySearchCond searchCond = hospitalMapper.mapToSearchCond(request);
         HospitalListNearbyData hospitalListNearbyData = hospitalService.getHospitalListNearby(userId, searchCond, pageable);
         HospitalListNearbyResponse hospitalListNearbyResponse = hospitalMapper.toHospitalListNearbyResponse(hospitalListNearbyData);
+
+        Map<String, String> placeIdByHospital = hospitalListNearbyData.getHospitalList().stream()
+                .map(HospitalListNearbyData.HospitalNearbyData::getHospital)
+                .filter(hospital -> hospital.getPlaceId() != null)
+                .collect(Collectors.toMap(Hospital::getId, Hospital::getPlaceId));
+        Map<String, HospitalOperationStatus> operationStatusByHospital =
+                hospitalOperationService.getHospitalOperationStatus(placeIdByHospital);
+        hospitalMapper.synchronizeOperationStatus(hospitalListNearbyResponse, operationStatusByHospital);
+
         return ResponseEntity.ok(hospitalListNearbyResponse);
     }
 
