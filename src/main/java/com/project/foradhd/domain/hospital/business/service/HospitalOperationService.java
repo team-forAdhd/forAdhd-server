@@ -22,19 +22,27 @@ public class HospitalOperationService {
         return placeIdByHospital.keySet().stream()
                 .collect(Collectors.toMap(hospitalId -> hospitalId, hospitalId -> {
                     String placeId = placeIdByHospital.get(hospitalId);
-                    GooglePlaceOpeningHoursResponse response = googlePlacesClient.getPlaceOpeningHours(placeId);
-                    return getOpenNow(response)
+                    return googlePlacesClient.getPlaceOpeningHours(placeId)
+                            .filter(response -> response.getCurrentOpeningHours() != null)
+                            .map(this::getOpenNow)
                             .map(HospitalOperationStatus::from)
                             .orElse(HospitalOperationStatus.UNKNOWN);
                 }));
     }
 
     public HospitalOperationDetailsData getHospitalOperationDetails(String placeId) {
-        GooglePlaceOpeningHoursResponse response = googlePlacesClient.getPlaceOpeningHours(placeId);
-        HospitalOperationStatus operationStatus = getOpenNow(response)
+        Optional<GooglePlaceOpeningHoursResponse> googlePlaceOpeningHoursResponseOptional =
+                googlePlacesClient.getPlaceOpeningHours(placeId);
+
+        HospitalOperationStatus operationStatus = googlePlaceOpeningHoursResponseOptional
+                .filter(response -> response.getCurrentOpeningHours() != null)
+                .map(this::getOpenNow)
                 .map(HospitalOperationStatus::from)
                 .orElse(HospitalOperationStatus.UNKNOWN);
-        GooglePlaceOpeningHoursResponse.Period todayOpeningPeriod = getTodayOpeningPeriod(response);
+        GooglePlaceOpeningHoursResponse.Period todayOpeningPeriod = googlePlaceOpeningHoursResponseOptional
+                .filter(response -> response.getCurrentOpeningHours() != null)
+                .map(this::getTodayOpeningPeriod)
+                .orElse(new GooglePlaceOpeningHoursResponse.Period());
         return HospitalOperationDetailsData.builder()
                 .operationStatus(operationStatus)
                 .operationStartHour(todayOpeningPeriod.getOpen().getHour())
@@ -45,7 +53,6 @@ public class HospitalOperationService {
     }
 
     private GooglePlaceOpeningHoursResponse.Period getTodayOpeningPeriod(GooglePlaceOpeningHoursResponse response) {
-        if (response.getCurrentOpeningHours() == null) return new GooglePlaceOpeningHoursResponse.Period();
         LocalDate now = LocalDate.now();
         return response.getCurrentOpeningHours().getPeriods().stream()
                 .filter(period -> {
@@ -58,8 +65,7 @@ public class HospitalOperationService {
                 .orElse(new GooglePlaceOpeningHoursResponse.Period());
     }
 
-    private Optional<Boolean> getOpenNow(GooglePlaceOpeningHoursResponse response) {
-        if (response.getCurrentOpeningHours() == null) return Optional.empty();
-        return Optional.of(response.getCurrentOpeningHours().isOpenNow());
+    private boolean getOpenNow(GooglePlaceOpeningHoursResponse response) {
+        return response.getCurrentOpeningHours().isOpenNow();
     }
 }
