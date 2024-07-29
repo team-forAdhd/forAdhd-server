@@ -168,4 +168,14 @@ public interface HospitalMapper {
                     hospital.synchronizeOperationStatus(operationStatus);
                 });
     }
+
+    default void synchronizeOperationStatus(HospitalListBookmarkResponse hospitalListBookmarkResponse,
+                                            Map<String, HospitalOperationStatus> operationStatusByHospital) {
+        hospitalListBookmarkResponse.getHospitalList()
+                .forEach(hospital -> {
+                    String hospitalId = hospital.getHospitalId();
+                    HospitalOperationStatus operationStatus = operationStatusByHospital.getOrDefault(hospitalId, HospitalOperationStatus.UNKNOWN);
+                    hospital.synchronizeOperationStatus(operationStatus);
+                });
+    }
 }

@@ -65,6 +65,15 @@ public class HospitalController {
                                                                                 Pageable pageable) {
         HospitalListBookmarkData hospitalListBookmarkData = hospitalService.getHospitalListBookmark(userId, pageable);
         HospitalListBookmarkResponse hospitalListBookmarkResponse = hospitalMapper.toHospitalListBookmarkResponse(hospitalListBookmarkData);
+
+        Map<String, String> placeIdByHospital = hospitalListBookmarkData.getHospitalList().stream()
+                .map(HospitalListBookmarkData.HospitalBookmarkData::getHospital)
+                .filter(hospital -> hospital.getPlaceId() != null)
+                .collect(Collectors.toMap(Hospital::getId, Hospital::getPlaceId));
+        Map<String, HospitalOperationStatus> operationStatusByHospital =
+                hospitalOperationService.getHospitalOperationStatus(placeIdByHospital);
+        hospitalMapper.synchronizeOperationStatus(hospitalListBookmarkResponse, operationStatusByHospital);
+
         return ResponseEntity.ok(hospitalListBookmarkResponse);
     }
 
