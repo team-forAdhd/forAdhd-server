@@ -32,6 +32,8 @@ public class Hospital extends BaseTimeEntity {
     @Column(length = 11)
     private String phone;
 
+    private String placeId;
+
     @Builder.Default
     @ColumnDefault("0")
     @Column(nullable = false)
