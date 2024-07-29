@@ -98,6 +98,11 @@ public class HospitalController {
                                                                     @PathVariable String hospitalId) {
         HospitalDetailsData hospitalDetailsData = hospitalService.getHospitalDetails(userId, hospitalId);
         HospitalDetailsResponse hospitalDetailsResponse = hospitalMapper.toHospitalDetailsResponse(hospitalDetailsData);
+
+        String placeId = hospitalDetailsData.getHospital().getPlaceId();
+        HospitalOperationDetailsData hospitalOperationDetails = hospitalOperationService.getHospitalOperationDetails(placeId);
+        hospitalMapper.synchronizeOperationDetails(hospitalDetailsResponse, hospitalOperationDetails);
+
         return ResponseEntity.ok(hospitalDetailsResponse);
     }
 

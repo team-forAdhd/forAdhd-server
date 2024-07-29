@@ -178,4 +178,14 @@ public interface HospitalMapper {
                     hospital.synchronizeOperationStatus(operationStatus);
                 });
     }
+
+    default void synchronizeOperationDetails(HospitalDetailsResponse hospitalDetailsResponse, HospitalOperationDetailsData hospitalOperationDetails) {
+        HospitalOperationStatus operationStatus = hospitalOperationDetails.getOperationStatus();
+        Integer operationStartHour = hospitalOperationDetails.getOperationStartHour();
+        Integer operationStartMin = hospitalOperationDetails.getOperationStartMin();
+        Integer operationEndHour = hospitalOperationDetails.getOperationEndHour();
+        Integer operationEndMin = hospitalOperationDetails.getOperationEndMin();
+        hospitalDetailsResponse.synchronizeOperationDetails(operationStatus, operationStartHour, operationStartMin,
+                operationEndHour, operationEndMin);
+    }
 }

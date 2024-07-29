@@ -30,6 +30,15 @@ public class HospitalDetailsResponse {
     private Integer operationEndMin;
     private List<DoctorResponse> doctorList;
 
+    public void synchronizeOperationDetails(HospitalOperationStatus operationStatus, Integer operationStartHour, Integer operationStartMin,
+                                            Integer operationEndHour, Integer operationEndMin) {
+        this.operationStatus = operationStatus;
+        this.operationStartHour = operationStartHour;
+        this.operationStartMin = operationStartMin;
+        this.operationEndHour = operationEndHour;
+        this.operationEndMin = operationEndMin;
+    }
+
     @Getter
     @Builder
     public static class DoctorResponse {
