@@ -1,11 +1,9 @@
 package com.project.foradhd.domain.board.persistence.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -22,7 +20,9 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String message;
 
