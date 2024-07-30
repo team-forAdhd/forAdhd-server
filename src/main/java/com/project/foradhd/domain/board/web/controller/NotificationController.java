@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.board.web.controller;
 
 import com.project.foradhd.domain.board.business.service.NotificationService;
+import com.project.foradhd.global.AuthUserId;
 import com.project.foradhd.global.util.SseEmitters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ public class NotificationController {
     private final SseEmitters sseEmitters;
 
     @GetMapping("/sse")
-    public SseEmitter streamSseMvc(@RequestParam String userId) {
+    public SseEmitter streamSseMvc(@AuthUserId String userId) {
         SseEmitter emitter = new SseEmitter(0L);
         sseEmitters.addEmitter(userId, emitter);
         emitter.onCompletion(() -> sseEmitters.removeEmitter(userId, emitter));
