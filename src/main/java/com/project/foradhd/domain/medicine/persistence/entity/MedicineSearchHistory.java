@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
+import com.project.foradhd.domain.user.persistence.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -16,7 +17,10 @@ public class MedicineSearchHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private String term;
     private LocalDateTime searchedAt;
 }

@@ -120,7 +120,7 @@ public class MedicineController {
     // 최근 검색어 조회 API
     @GetMapping("/recent-searches")
     public ResponseEntity<List<String>> getRecentSearchTerms(@AuthUserId String userId) {
-        List<String> recentSearchTerms = medicineService.getRecentSearchTerms(userId);
+        List<String> recentSearchTerms = medicineSearchHistoryService.getRecentSearchTerms(userId);
         return ResponseEntity.ok(recentSearchTerms);
     }
 

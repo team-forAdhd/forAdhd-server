@@ -3,7 +3,18 @@ package com.project.foradhd.domain.medicine.business.service.Impl;
 import com.project.foradhd.domain.medicine.business.service.MedicineSearchHistoryService;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineSearchHistory;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineSearchHistoryRepository;
+import com.project.foradhd.domain.user.business.service.UserService;
+import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.exception.ErrorCode;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +28,17 @@ import java.util.stream.Collectors;
 public class MedicineSearchHistoryServiceImpl implements MedicineSearchHistoryService {
 
     private final MedicineSearchHistoryRepository searchHistoryRepository;
+    private final UserService userService;
 
     @Override
     @Transactional
     public void saveSearchTerm(String userId, String term) {
+        User user = userService.getUser(userId);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_USER);
+        }
         MedicineSearchHistory searchHistory = MedicineSearchHistory.builder()
-                .userId(userId)
+                .user(user)
                 .term(term)
                 .searchedAt(LocalDateTime.now())
                 .build();
@@ -31,7 +47,11 @@ public class MedicineSearchHistoryServiceImpl implements MedicineSearchHistorySe
 
     @Override
     public List<String> getRecentSearchTerms(String userId) {
-        return searchHistoryRepository.findTop10ByUserIdOrderBySearchedAtDesc(userId)
+        User user = userService.getUser(userId);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_USER);
+        }
+        return searchHistoryRepository.findTop10ByUserOrderBySearchedAtDesc(user)
                 .stream()
                 .map(MedicineSearchHistory::getTerm)
                 .collect(Collectors.toList());
