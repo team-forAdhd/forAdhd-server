@@ -251,7 +251,7 @@ public class PostController {
     // 최근 검색어 조회 API
     @GetMapping("/recent-searches")
     public ResponseEntity<List<String>> getRecentSearchTerms(@AuthUserId String userId) {
-        List<String> recentSearchTerms = postService.getRecentSearchTerms(userId);
+        List<String> recentSearchTerms = searchHistoryService.getRecentSearchTerms(userId);
         return ResponseEntity.ok(recentSearchTerms);
     }
 

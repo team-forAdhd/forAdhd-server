@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.board.persistence.entity;
 
+import com.project.foradhd.domain.user.persistence.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +18,9 @@ public class PostSearchHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String term;
 
