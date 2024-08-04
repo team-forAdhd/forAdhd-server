@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class HospitalOperationDetailsData {
 
-    private HospitalOperationStatus operationStatus;
-    private Integer operationStartHour;
-    private Integer operationStartMin;
-    private Integer operationEndHour;
-    private Integer operationEndMin;
+    private HospitalOperationStatus operationStatus = HospitalOperationStatus.UNKNOWN;
+    private int operationStartHour;
+    private int operationStartMin;
+    private int operationEndHour;
+    private int operationEndMin;
 }

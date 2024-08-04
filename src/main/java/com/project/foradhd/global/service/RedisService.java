@@ -1,6 +1,7 @@
 package com.project.foradhd.global.service;
 
 import com.project.foradhd.global.enums.RedisKeyType;
+import com.project.foradhd.global.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -30,25 +31,30 @@ public class RedisService {
         return getValue(redisKeyType.getKey(id));
     }
 
-    @Transactional
-    public void setValue(String key, String value, long timeout, TimeUnit unit) {
-        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
-        operations.set(key, value, timeout, unit);
+    public <T> Optional<T> getValue(RedisKeyType redisKeyType, String id, Class<T> clazz) {
+        return getValue(redisKeyType, id)
+                .map(obj -> JsonUtil.readValue(obj.toString(), clazz));
     }
 
     @Transactional
-    public void setValue(RedisKeyType redisKeyType, String id, String value, long timeout, TimeUnit unit) {
+    public void setValue(String key, Object value, long timeout, TimeUnit unit) {
+        ValueOperations<String, Object> operations = redisTemplate.opsForValue();
+        operations.set(key, JsonUtil.writeValueAsString(value), timeout, unit);
+    }
+
+    @Transactional
+    public void setValue(RedisKeyType redisKeyType, String id, Object value, long timeout, TimeUnit unit) {
         setValue(redisKeyType.getKey(id), value, timeout, unit);
     }
 
     @Transactional
-    public void setValue(String key, String value, Duration timeout) {
+    public void setValue(String key, Object value, Duration timeout) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
-        operations.set(key, value, timeout);
+        operations.set(key, JsonUtil.writeValueAsString(value), timeout);
     }
 
     @Transactional
-    public void setValue(RedisKeyType redisKeyType, String id, String value, Duration timeout) {
+    public void setValue(RedisKeyType redisKeyType, String id, Object value, Duration timeout) {
         setValue(redisKeyType.getKey(id), value, timeout);
     }
 
