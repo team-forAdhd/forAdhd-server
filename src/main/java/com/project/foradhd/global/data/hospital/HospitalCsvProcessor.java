@@ -4,6 +4,8 @@ import com.project.foradhd.domain.hospital.persistence.entity.Doctor;
 import com.project.foradhd.domain.hospital.persistence.entity.Hospital;
 import com.project.foradhd.domain.hospital.persistence.repository.DoctorRepository;
 import com.project.foradhd.domain.hospital.persistence.repository.HospitalRepository;
+import com.project.foradhd.global.client.GooglePlacesClient;
+import com.project.foradhd.global.client.dto.response.GooglePlaceListResponse;
 import com.project.foradhd.global.util.CSVUtil;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
@@ -11,7 +13,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,6 +39,7 @@ public class HospitalCsvProcessor implements CommandLineRunner {
     private static final int HOSPITAL_LATITUDE_IDX = 4;
     private static final int HOSPITAL_LONGITUDE_IDX = 5;
     private static final int HOSPITAL_DELETED_IDX = 6;
+    private static final int HOSPITAL_PLACE_ID_IDX = 7;
 
     private static final int DOCTOR_ID_IDX = 1;
     private static final int DOCTOR_NAME_IDX = 2;
@@ -48,8 +51,8 @@ public class HospitalCsvProcessor implements CommandLineRunner {
 
     private final HospitalRepository hospitalRepository;
     private final DoctorRepository doctorRepository;
+    private final GooglePlacesClient googlePlacesClient;
 
-    @Transactional
     @Override
     public void run(String... args) throws Exception {
         List<String[]> hospitalCsvInputList = CSVUtil.readAll(HOSPITAL_CSV_INPUT_PATH);
@@ -69,6 +72,8 @@ public class HospitalCsvProcessor implements CommandLineRunner {
                     String address = strip(hospital[HOSPITAL_ADDRESS_IDX]);
                     String phone = strip(hospital[HOSPITAL_PHONE_IDX]).replace("-", "");
                     boolean deleted = Boolean.parseBoolean(strip(hospital[HOSPITAL_DELETED_IDX]));
+                    String placeId = StringUtils.hasText(strip(hospital[HOSPITAL_PLACE_ID_IDX])) ?
+                            strip(hospital[HOSPITAL_PLACE_ID_IDX]) : requestPlaceId(name);
 
                     return Hospital.builder()
                             .id(hospitalId.matches(UUID_REGEX) ? hospitalId : null) //UUID 포맷인지 확인(DB에 저장된 경우인지)
@@ -76,6 +81,7 @@ public class HospitalCsvProcessor implements CommandLineRunner {
                             .location(geometryFactory.createPoint(coordinate))
                             .address(address)
                             .phone(phone)
+                            .placeId(placeId)
                             .deleted(deleted)
                             .build();
                     }, (e1, e2) -> e1, LinkedHashMap::new));
@@ -108,7 +114,7 @@ public class HospitalCsvProcessor implements CommandLineRunner {
         List<String[]> hospitalCsvOutputList = hospitalList.stream()
                 .map(hospital -> new String[]{hospital.getId(), hospital.getName(), hospital.getPhone(), hospital.getAddress(),
                         String.valueOf(hospital.getLocation().getY()), String.valueOf(hospital.getLocation().getX()),
-                        String.valueOf(hospital.getDeleted() ? 1 : 0)})
+                        String.valueOf(hospital.getDeleted() ? 1 : 0), hospital.getPlaceId()})
                 .toList();
         List<String[]> doctorCsvOutputList = doctorList.stream()
                 .map(doctor -> new String[]{doctor.getHospital().getId(), doctor.getId(), doctor.getName(),
@@ -117,5 +123,13 @@ public class HospitalCsvProcessor implements CommandLineRunner {
 
         CSVUtil.writeAll(HOSPITAL_CSV_OUTPUT_PATH, hospitalCsvHeader, hospitalCsvOutputList);
         CSVUtil.writeAll(DOCTOR_CSV_OUTPUT_PATH, doctorCsvHeader, doctorCsvOutputList);
+    }
+
+    private String requestPlaceId(String name) {
+        GooglePlaceListResponse googlePlaceListResponse = googlePlacesClient.searchPlaces(name);
+        if (googlePlaceListResponse.getPlaces().size() == 1) {
+            return googlePlaceListResponse.getPlaces().get(0).getId();
+        }
+        return null;
     }
 }
