@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -40,7 +41,7 @@ public class HospitalController {
 
         Map<String, String> placeIdByHospital = hospitalListNearbyData.getHospitalList().stream()
                 .map(HospitalListNearbyData.HospitalNearbyData::getHospital)
-                .filter(hospital -> hospital.getPlaceId() != null)
+                .filter(hospital -> StringUtils.hasText(hospital.getPlaceId()))
                 .collect(Collectors.toMap(Hospital::getId, Hospital::getPlaceId));
         Map<String, HospitalOperationStatus> operationStatusByHospital =
                 hospitalOperationService.getHospitalOperationStatus(placeIdByHospital);
@@ -68,7 +69,7 @@ public class HospitalController {
 
         Map<String, String> placeIdByHospital = hospitalListBookmarkData.getHospitalList().stream()
                 .map(HospitalListBookmarkData.HospitalBookmarkData::getHospital)
-                .filter(hospital -> hospital.getPlaceId() != null)
+                .filter(hospital -> StringUtils.hasText(hospital.getPlaceId()))
                 .collect(Collectors.toMap(Hospital::getId, Hospital::getPlaceId));
         Map<String, HospitalOperationStatus> operationStatusByHospital =
                 hospitalOperationService.getHospitalOperationStatus(placeIdByHospital);
