@@ -45,6 +45,11 @@ cloud:
     cloud-front:
       deploy-domain: ${CLOUD_FRONT_DEPLOY_DOMAIN}
 
+google:
+  places:
+    api-key: ${GOOGLE_PLACES_API_KEY}
+    url: ${GOOGLE_PLACES_URL}
+
 ---
 spring:
   config:
@@ -52,7 +57,7 @@ spring:
       on-profile: init
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         highlight_sql: true
