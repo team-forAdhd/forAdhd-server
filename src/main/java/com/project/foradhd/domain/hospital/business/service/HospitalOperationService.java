@@ -90,7 +90,7 @@ public class HospitalOperationService {
                 .withSecond(0);
         if (now.isBefore(operationStartTime)) return Duration.between(now, operationStartTime).getSeconds();
         else if (now.isBefore(operationEndTime)) return Duration.between(now, operationEndTime).getSeconds();
-        return Duration.between(now, operationStartTime.plusDays(1)).getSeconds();
+        return Duration.between(now, now.plusDays(1).toLocalDate().atStartOfDay()).getSeconds();
     }
 
     private GooglePlaceOpeningHoursResponse.Period getTodayOpeningPeriod(GooglePlaceOpeningHoursResponse response) {
