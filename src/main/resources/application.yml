@@ -45,6 +45,11 @@ cloud:
     cloud-front:
       deploy-domain: ${CLOUD_FRONT_DEPLOY_DOMAIN}
 
+google:
+  places:
+    api-key: ${GOOGLE_PLACES_API_KEY}
+    url: ${GOOGLE_PLACES_URL}
+
 ---
 spring:
   config:
@@ -71,11 +76,6 @@ logging:
     org.hibernate.sql: info
     org.hibernate.type.descriptor.sql: trace
     com.project.foradhd: debug
-
-google:
-  places:
-    api-key: ${GOOGLE_PLACES_API_KEY}
-    url: ${GOOGLE_PLACES_URL}
 
 ---
 spring:
