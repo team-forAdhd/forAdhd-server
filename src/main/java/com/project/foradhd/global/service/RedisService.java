@@ -1,7 +1,6 @@
 package com.project.foradhd.global.service;
 
 import com.project.foradhd.global.enums.RedisKeyType;
-import com.project.foradhd.global.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -33,13 +32,13 @@ public class RedisService {
 
     public <T> Optional<T> getValue(RedisKeyType redisKeyType, String id, Class<T> clazz) {
         return getValue(redisKeyType, id)
-                .map(obj -> JsonUtil.readValue(obj.toString(), clazz));
+                .map(obj -> clazz.isInstance(obj) ? clazz.cast(obj) : null);
     }
 
     @Transactional
     public void setValue(String key, Object value, long timeout, TimeUnit unit) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
-        operations.set(key, JsonUtil.writeValueAsString(value), timeout, unit);
+        operations.set(key, value, timeout, unit);
     }
 
     @Transactional
@@ -50,7 +49,7 @@ public class RedisService {
     @Transactional
     public void setValue(String key, Object value, Duration timeout) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
-        operations.set(key, JsonUtil.writeValueAsString(value), timeout);
+        operations.set(key, value, timeout);
     }
 
     @Transactional
