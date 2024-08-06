@@ -100,7 +100,8 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Page<Post> getTopPosts(Pageable pageable) {
-        Page<Post> topPosts = postRepository.findTopPosts(pageable);
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), 10);
+        Page<Post> topPosts = postRepository.findTopPosts(pageRequest);
         notifyUsersAboutTopPosts(topPosts.getContent());
         return topPosts;
     }
@@ -108,7 +109,8 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Page<Post> getTopPostsByCategory(CategoryName category, Pageable pageable) {
-        Page<Post> topPosts = postRepository.findTopPostsByCategory(category, pageable);
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), 10);
+        Page<Post> topPosts = postRepository.findTopPostsByCategory(category, pageRequest);
         notifyUsersAboutTopPosts(topPosts.getContent());
         return topPosts;
     }
