@@ -37,7 +37,7 @@ public class PostResponseDto {
         private long scrapCount;
         private long viewCount;
         private CategoryName category;
-        private List<CommentResponseDto.CommentListResponseDto> comments; // 수정된 부분
+        private List<CommentResponseDto.CommentListResponseDto> comments;
         private String nickname;
         private String profileImage;
 

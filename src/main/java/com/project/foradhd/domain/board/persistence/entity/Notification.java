@@ -2,6 +2,7 @@ package com.project.foradhd.domain.board.persistence.entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.global.audit.BaseTimeEntity;
 import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Table(name = "notification")
-public class Notification {
+public class Notification extends BaseTimeEntity {
     @jakarta.persistence.Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
