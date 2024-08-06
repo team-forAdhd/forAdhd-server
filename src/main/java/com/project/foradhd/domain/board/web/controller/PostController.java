@@ -179,14 +179,8 @@ public class PostController {
     // 게시글 좋아요 토글 api
     @PostMapping("/{postId}/like")
     public ResponseEntity<?> toggleLike(@AuthUserId String userId, @PathVariable Long postId) {
-        try {
-            postLikeFilterService.toggleLike(userId, postId);
-            return ResponseEntity.ok().build();
-        } catch (BusinessException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request.");
-        }
+        postLikeFilterService.toggleLike(userId, postId);
+        return ResponseEntity.ok().build();
     }
 
     // 내가 좋아요한 게시글 조회 api
