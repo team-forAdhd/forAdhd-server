@@ -215,9 +215,9 @@ public class PostController {
     }
 
     // 메인홈 - 카테고리별 랭킹순
-    @GetMapping("/main/top/{category}")
+    @GetMapping("/main/top")
     public ResponseEntity<List<PostRankingResponseDto>> getTopPostsByCategory(
-            @PathVariable CategoryName category,
+            @RequestParam("category") CategoryName category,
             Pageable pageable) {
         List<PostRankingResponseDto> topPosts = postService.getTopPostsByCategory(category, pageable);
         return ResponseEntity.ok(topPosts);
