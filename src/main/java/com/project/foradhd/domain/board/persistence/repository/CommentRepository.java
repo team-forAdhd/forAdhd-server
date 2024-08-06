@@ -42,4 +42,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("select pc from Comment pc join fetch pc.childComments where pc.id = :commentId")
     Optional<Comment> findByIdFetch(Long commentId);
+
+    @Modifying
+    @Query("UPDATE Comment c SET c.parentComment = null WHERE c.parentComment.id = :parentId")
+    void detachChildComments(Long parentId);
+
+    @Modifying
+    @Query("DELETE FROM Comment c WHERE c.id = :id")
+    void deleteCommentById(Long id);
 }

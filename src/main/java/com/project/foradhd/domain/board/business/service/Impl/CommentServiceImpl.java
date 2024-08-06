@@ -86,15 +86,11 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_COMMENT));
 
-        // 원댓글에 연결된 대댓글의 부모 참조를 null로 설정
-        List<Comment> childComments = commentRepository.findByParentCommentId(commentId);
-        for (Comment childComment : childComments) {
-            childComment.setParentComment(null);
-            commentRepository.save(childComment);
-        }
+        // 대댓글의 부모 참조를 한 번의 배치 업데이트로 null 처리
+        commentRepository.detachChildComments(commentId);
 
-        // 원 댓글 삭제
-        commentRepository.deleteById(commentId);
+        // 원댓글 삭제
+        commentRepository.deleteCommentById(commentId);
     }
 
     @Transactional
