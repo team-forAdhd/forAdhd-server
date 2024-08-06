@@ -172,12 +172,8 @@ public class PostController {
     // 게시글 스크랩 토글 api
     @PostMapping("/{postId}/scrap")
     public ResponseEntity<?> toggleScrap(@PathVariable Long postId, @AuthUserId String userId) {
-        try {
-            postScrapFilterService.toggleScrap(postId, userId);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+        postScrapFilterService.toggleScrap(postId, userId);
+        return ResponseEntity.ok().build();
     }
 
     // 게시글 좋아요 토글 api
