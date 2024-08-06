@@ -207,20 +207,46 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    // 메인홈 - 실시간 랭킹순
+    // 메인홈 - 실시간 랭킹
     @GetMapping("/main/top")
-    public ResponseEntity<List<PostRankingResponseDto>> getTopPosts(Pageable pageable) {
-        List<PostRankingResponseDto> topPosts = postService.getTopPosts(pageable);
-        return ResponseEntity.ok(topPosts);
+    public ResponseEntity<PostRankingResponseDto.PagedPostRankingResponseDto> getTopPosts(Pageable pageable) {
+        Page<Post> postPage = postService.getTopPosts(pageable);
+
+        List<PostRankingResponseDto> postList = postPage.getContent().stream()
+                .map(post -> postMapper.toPostRankingResponseDto(post, userProfileRepository))
+                .collect(Collectors.toList());
+
+        PagingResponse pagingResponse = PagingResponse.from(postPage);
+
+        PostRankingResponseDto.PagedPostRankingResponseDto response = PostRankingResponseDto.PagedPostRankingResponseDto.builder()
+                .category(null) // 실시간 랭킹이므로 특정 카테고리가 없음
+                .postList(postList)
+                .paging(pagingResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
-    // 메인홈 - 카테고리별 랭킹순
-    @GetMapping("/main/top")
-    public ResponseEntity<List<PostRankingResponseDto>> getTopPostsByCategory(
+    // 메인홈 - 카테고리별 실시간 랭킹
+    @GetMapping("/main/top/category")
+    public ResponseEntity<PostRankingResponseDto.PagedPostRankingResponseDto> getTopPostsByCategory(
             @RequestParam("category") CategoryName category,
             Pageable pageable) {
-        List<PostRankingResponseDto> topPosts = postService.getTopPostsByCategory(category, pageable);
-        return ResponseEntity.ok(topPosts);
+        Page<Post> postPage = postService.getTopPostsByCategory(category, pageable);
+
+        List<PostRankingResponseDto> postList = postPage.getContent().stream()
+                .map(post -> postMapper.toPostRankingResponseDto(post, userProfileRepository))
+                .collect(Collectors.toList());
+
+        PagingResponse pagingResponse = PagingResponse.from(postPage);
+
+        PostRankingResponseDto.PagedPostRankingResponseDto response = PostRankingResponseDto.PagedPostRankingResponseDto.builder()
+                .category(category.name()) // 요청된 카테고리 이름
+                .postList(postList)
+                .paging(pagingResponse)
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 
     // 게시글 검색 api

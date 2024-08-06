@@ -36,9 +36,10 @@ public interface PostService {
     // 글 조회수 증가
     Post getAndIncrementViewCount(Long postId);
     // 메인홈 - 실시간 랭킹
-    List<PostRankingResponseDto> getTopPosts(Pageable pageable);
+    Page<Post> getTopPosts(Pageable pageable);
+
     // 메인홈 - 카테고리별 실시간 랭킹
-    List<PostRankingResponseDto> getTopPostsByCategory(CategoryName category, Pageable pageable);
+    Page<Post> getTopPostsByCategory(CategoryName category, Pageable pageable);
     // SSE 알림 관련 설정
     void addComment(Long postId, String commentContent, String userId);
     List<String> getRecentSearchTerms(String userId);

@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 
@@ -100,38 +99,18 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public List<PostRankingResponseDto> getTopPosts(Pageable pageable) {
-        List<Post> topPosts = postRepository.findTopPosts(pageable);
-        notifyUsersAboutTopPosts(topPosts);
-        return topPosts.stream()
-                .map(post -> PostRankingResponseDto.builder()
-                        .id(post.getId())
-                        .title(post.getTitle())
-                        .category(post.getCategory())
-                        .viewCount(post.getViewCount())
-                        .likeCount(post.getLikeCount())
-                        .createdAt(post.getCreatedAt())
-                        .images(post.getImages())
-                        .build())
-                .collect(Collectors.toList());
+    public Page<Post> getTopPosts(Pageable pageable) {
+        Page<Post> topPosts = postRepository.findTopPosts(pageable);
+        notifyUsersAboutTopPosts(topPosts.getContent());
+        return topPosts;
     }
 
     @Override
     @Transactional
-    public List<PostRankingResponseDto> getTopPostsByCategory(CategoryName category, Pageable pageable) {
-        List<Post> topPosts = postRepository.findTopPostsByCategory(category, pageable);
-        notifyUsersAboutTopPosts(topPosts);
-        return topPosts.stream()
-                .map(post -> PostRankingResponseDto.builder()
-                        .id(post.getId())
-                        .title(post.getTitle())
-                        .category(post.getCategory())
-                        .viewCount(post.getViewCount())
-                        .likeCount(post.getLikeCount())
-                        .createdAt(post.getCreatedAt())
-                        .images(post.getImages())
-                        .build())
-                .collect(Collectors.toList());
+    public Page<Post> getTopPostsByCategory(CategoryName category, Pageable pageable) {
+        Page<Post> topPosts = postRepository.findTopPostsByCategory(category, pageable);
+        notifyUsersAboutTopPosts(topPosts.getContent());
+        return topPosts;
     }
 
     private void notifyUsersAboutTopPosts(List<Post> topPosts) {

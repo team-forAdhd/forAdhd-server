@@ -3,6 +3,7 @@ package com.project.foradhd.domain.board.business.service.Impl;
 import com.project.foradhd.domain.board.business.service.NotificationService;
 import com.project.foradhd.domain.board.persistence.entity.Notification;
 import com.project.foradhd.domain.board.persistence.repository.NotificationRepository;
+import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.global.exception.BusinessException;
@@ -19,13 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final SseEmitters sseEmitters;
 
     @Override
     public void createNotification(String userId, String message) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
+        User user = userService.getUser(userId);
 
         Notification notification = Notification.builder()
                 .user(user)
@@ -39,8 +39,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<Notification> getNotifications(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
+        User user = userService.getUser(userId); // UserService를 사용하여 유저 조회
 
         return notificationRepository.findByUserOrderByCreatedAtDesc(user);
     }
@@ -58,3 +57,4 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(updatedNotification);
     }
 }
+
