@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.board.persistence.entity;
 
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostSearchHistory {
+public class PostSearchHistory extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -37,14 +37,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment getComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
+        Comment comment = commentRepository.findByIdFetch(commentId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_COMMENT));
 
-        int childCommentCount = commentRepository.countByParentCommentId(commentId);
-        List<Comment> childComments = new ArrayList<>();
-        if (childCommentCount > 0) {
-            childComments = commentRepository.findByParentCommentId(commentId);
-        }
+        List<Comment> childComments = comment.getChildComments();
 
         return Comment.builder()
                 .id(comment.getId())
@@ -59,7 +55,6 @@ public class CommentServiceImpl implements CommentService {
                 .childComments(childComments)
                 .build();
     }
-
     @Override
     @Transactional
     public Comment createComment(Comment comment, String userId) {

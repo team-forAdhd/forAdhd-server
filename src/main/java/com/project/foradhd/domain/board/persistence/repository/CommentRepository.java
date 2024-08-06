@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
@@ -38,4 +39,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     long countByPostIdAndAnonymous(Long postId, boolean anonymous);
     List<Comment> findByPostIdAndUserIdAndAnonymous(Long postId, String userId, boolean anonymous);
+
+    @Query("select pc from Comment pc join fetch pc.childComments where pc.id = :commentId")
+    Optional<Comment> findByIdFetch(Long commentId);
 }

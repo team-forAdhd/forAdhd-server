@@ -27,7 +27,6 @@ public class Notification {
     private String message;
 
     private boolean isRead;
-
-    @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
+    
     private LocalDateTime createdAt;
 }
