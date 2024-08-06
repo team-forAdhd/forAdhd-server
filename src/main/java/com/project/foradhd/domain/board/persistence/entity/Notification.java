@@ -27,6 +27,10 @@ public class Notification {
     private String message;
 
     private boolean isRead;
-    
+
     private LocalDateTime createdAt;
+
+    public void setRead(boolean isRead) {
+        this.isRead = isRead;
+    }
 }

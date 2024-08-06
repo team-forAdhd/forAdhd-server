@@ -33,13 +33,13 @@ public class NotificationServiceImpl implements NotificationService {
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build();
-        notificationRepository.save(notification);
+        notificationRepository.save(notification); // 새로운 엔티티는 여전히 저장해야 함
         sseEmitters.sendNotification(userId, message);
     }
 
     @Override
     public List<Notification> getNotifications(String userId) {
-        User user = userService.getUser(userId); // UserService를 사용하여 유저 조회
+        User user = userService.getUser(userId);
 
         return notificationRepository.findByUserOrderByCreatedAtDesc(user);
     }
@@ -49,12 +49,6 @@ public class NotificationServiceImpl implements NotificationService {
     public void markAsRead(Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_NOTIFICATION));
-
-        Notification updatedNotification = notification.toBuilder()
-                .isRead(true)
-                .build();
-
-        notificationRepository.save(updatedNotification);
+        notification.setRead(true);
     }
 }
-
