@@ -77,7 +77,7 @@ public class CommentController {
     }
 
     // 나의 댓글
-    @GetMapping("/{userId}/my-comments")
+    @GetMapping("/my-comments")
     public ResponseEntity<PostResponseDto> getMyCommentedPosts(
             @AuthUserId String userId,
             Pageable pageable,

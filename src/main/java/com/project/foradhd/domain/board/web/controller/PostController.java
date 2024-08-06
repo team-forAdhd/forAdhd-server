@@ -130,7 +130,7 @@ public class PostController {
     }
 
     // 내가 작성한 게시글 조회 api
-    @GetMapping("/{userId}/my-posts")
+    @GetMapping("/my-posts")
     public ResponseEntity<PostResponseDto> getUserPostsByCategory(@AuthUserId String userId, @RequestParam CategoryName category, Pageable pageable, @RequestParam SortOption sortOption) {
         Page<Post> userPosts = postService.getUserPostsByCategory(userId, category, pageable, sortOption);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = userPosts.getContent().stream()
@@ -148,7 +148,7 @@ public class PostController {
     }
 
     // 내가 스크랩한 게시글 조회 api
-    @GetMapping("/{userId}/scraps")
+    @GetMapping("/scraps")
     public ResponseEntity<PostScrapFilterResponseDto> getScrapsByUserAndCategory(
             @AuthUserId String userId,
             @RequestParam CategoryName category,
@@ -194,7 +194,7 @@ public class PostController {
     }
 
     // 내가 좋아요한 게시글 조회 api
-    @GetMapping("/{userId}/liked")
+    @GetMapping("/liked")
     public ResponseEntity<PostResponseDto> getLikedPostsByUser(@AuthUserId String userId, Pageable pageable) {
         Page<Post> likedPosts = postLikeFilterService.getLikedPostsByUser(userId, pageable);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = likedPosts.getContent().stream()
