@@ -26,14 +26,13 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void createNotification(String userId, String message) {
         User user = userService.getUser(userId);
-
         Notification notification = Notification.builder()
                 .user(user)
                 .message(message)
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build();
-        notificationRepository.save(notification); // 새로운 엔티티는 여전히 저장해야 함
+        notificationRepository.save(notification);
         sseEmitters.sendNotification(userId, message);
     }
 
