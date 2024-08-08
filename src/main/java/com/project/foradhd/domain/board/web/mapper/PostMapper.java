@@ -30,10 +30,10 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", uses = {CommentMapper.class})
 public interface PostMapper {
 
-    PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
-
     @Mapping(source = "category", target = "category")
     @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.userProfile.nickname", target = "nickname")
+    @Mapping(source = "user.userProfile.profileImage", target = "profileImage")
     PostDto toDto(Post post);
 
     @Mapping(source = "category", target = "category")
@@ -56,22 +56,20 @@ public interface PostMapper {
     @Mapping(target = "comments", expression = "java(mapCommentList(post.getComments()))")
     @Mapping(target = "commentCount", expression = "java(calculateCommentCount(post.getComments()))")
     @Mapping(source = "user.id", target = "userId")
-    PostResponseDto.PostListResponseDto toPostListResponseDto(Post post, @Context UserProfileRepository userProfileRepository);
+    @Mapping(source = "user.userProfile.nickname", target = "nickname")
+    @Mapping(source = "user.userProfile.profileImage", target = "profileImage")
+    PostResponseDto.PostListResponseDto toPostListResponseDto(Post post);
 
     @AfterMapping
-    default void setUserProfile(@MappingTarget PostResponseDto.PostListResponseDto.PostListResponseDtoBuilder dto, Post post, @Context UserProfileRepository userProfileRepository) {
+    default void setAnonymousOrUserProfile(@MappingTarget PostResponseDto.PostListResponseDto.PostListResponseDtoBuilder dto, Post post) {
         if (post.isAnonymous()) {
             dto.nickname("익명");
             dto.profileImage("http://example.com/default-profile.png");
-        } else if (post.getUser() != null) {
-            Optional<UserProfile> userProfileOptional = userProfileRepository.findByUserId(post.getUser().getId());
-            userProfileOptional.ifPresent(userProfile -> {
-                dto.nickname(userProfile.getNickname());
-                dto.profileImage(userProfile.getProfileImage());
-            });
+        } else if (post.getUser() != null && post.getUser().getUserProfile() != null) {
+            dto.nickname(post.getUser().getUserProfile().getNickname());
+            dto.profileImage(post.getUser().getUserProfile().getProfileImage());
         }
     }
-
 
     default List<CommentResponseDto.CommentListResponseDto> mapCommentList(List<Comment> comments) {
         if (comments == null) return null;
@@ -90,7 +88,7 @@ public interface PostMapper {
 
     @Mapping(source = "category", target = "category")
     @Mapping(source = "user.id", target = "userId")
-    PostRankingResponseDto toPostRankingResponseDto(Post post, @Context UserProfileRepository userProfileRepository);
+    PostRankingResponseDto toPostRankingResponseDto(Post post);
 
     @Mapping(source = "title", target = "title")
     @Mapping(source = "viewCount", target = "viewCount")

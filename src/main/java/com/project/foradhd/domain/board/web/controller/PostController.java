@@ -40,7 +40,6 @@ public class PostController {
 
     private final PostService postService;
     private final PostMapper postMapper;
-    private final UserProfileRepository userProfileRepository;
     private final PostScrapFilterService postScrapFilterService;
     private final PostScrapFilterMapper postScrapFilterMapper;
     private final PostLikeFilterService postLikeFilterService;
@@ -50,7 +49,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto.PostListResponseDto> getPost(@PathVariable Long postId) {
         Post post = postService.getPost(postId);
-        PostResponseDto.PostListResponseDto response = postMapper.toPostListResponseDto(post, userProfileRepository);
+        PostResponseDto.PostListResponseDto response = postMapper.toPostListResponseDto(post);
         return ResponseEntity.ok(response);
     }
 
@@ -59,7 +58,7 @@ public class PostController {
     public ResponseEntity<PostResponseDto.PostListResponseDto> createPost(@RequestBody PostRequestDto postRequestDto, @AuthUserId String userId) {
         Post post = postMapper.toEntity(postRequestDto, userId);
         Post createdPost = postService.createPost(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(postMapper.toPostListResponseDto(createdPost, userProfileRepository));
+        return ResponseEntity.status(HttpStatus.CREATED).body(postMapper.toPostListResponseDto(createdPost));
     }
 
     // 게시글 수정 api
@@ -73,7 +72,7 @@ public class PostController {
                 .comments(existingPost.getComments())
                 .title(postRequestDto.getTitle())
                 .content(postRequestDto.getContent())
-                .anonymous(existingPost.isAnonymous())
+                .anonymous(postRequestDto.isAnonymous())
                 .images(postRequestDto.getImages())
                 .likeCount(existingPost.getLikeCount())
                 .commentCount(existingPost.getCommentCount())
@@ -81,7 +80,7 @@ public class PostController {
                 .viewCount(existingPost.getViewCount())
                 .build();
         Post savedPost = postService.updatePost(updatedPost);
-        return ResponseEntity.ok(postMapper.toPostListResponseDto(savedPost, userProfileRepository));
+        return ResponseEntity.ok(postMapper.toPostListResponseDto(savedPost));
     }
 
     // 게시글 삭제 api
@@ -96,7 +95,7 @@ public class PostController {
     public ResponseEntity<PostResponseDto> getAllPosts(Pageable pageable) {
         Page<Post> postPage = postService.getAllPosts(pageable);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = postPage.getContent().stream()
-                .map(post -> postMapper.toPostListResponseDto(post, userProfileRepository))
+                .map(postMapper::toPostListResponseDto)
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(postPage);
@@ -116,7 +115,7 @@ public class PostController {
             Pageable pageable) {
         Page<Post> postPage = postService.listByCategory(category, pageable);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = postPage.getContent().stream()
-                .map(post -> postMapper.toPostListResponseDto(post, userProfileRepository))
+                .map(postMapper::toPostListResponseDto)
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(postPage);
@@ -134,7 +133,7 @@ public class PostController {
     public ResponseEntity<PostResponseDto> getUserPostsByCategory(@AuthUserId String userId, @RequestParam CategoryName category, Pageable pageable, @RequestParam SortOption sortOption) {
         Page<Post> userPosts = postService.getUserPostsByCategory(userId, category, pageable, sortOption);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = userPosts.getContent().stream()
-                .map(post -> postMapper.toPostListResponseDto(post, userProfileRepository))
+                .map(postMapper::toPostListResponseDto)
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(userPosts);
@@ -188,7 +187,7 @@ public class PostController {
     public ResponseEntity<PostResponseDto> getLikedPostsByUser(@AuthUserId String userId, Pageable pageable) {
         Page<Post> likedPosts = postLikeFilterService.getLikedPostsByUser(userId, pageable);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = likedPosts.getContent().stream()
-                .map(post -> postMapper.toPostListResponseDto(post, userProfileRepository))
+                .map(postMapper::toPostListResponseDto)
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(likedPosts);
@@ -207,13 +206,13 @@ public class PostController {
         Page<Post> postPage = postService.getTopPosts(pageable);
 
         List<PostRankingResponseDto> postList = postPage.getContent().stream()
-                .map(post -> postMapper.toPostRankingResponseDto(post, userProfileRepository))
+                .map(postMapper::toPostRankingResponseDto)
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(postPage);
 
         PostRankingResponseDto.PagedPostRankingResponseDto response = PostRankingResponseDto.PagedPostRankingResponseDto.builder()
-                .category(null) // 실시간 랭킹이므로 특정 카테고리가 없음
+                .category(null)
                 .postList(postList)
                 .paging(pagingResponse)
                 .build();
@@ -229,13 +228,13 @@ public class PostController {
         Page<Post> postPage = postService.getTopPostsByCategory(category, pageable);
 
         List<PostRankingResponseDto> postList = postPage.getContent().stream()
-                .map(post -> postMapper.toPostRankingResponseDto(post, userProfileRepository))
+                .map(postMapper::toPostRankingResponseDto)
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(postPage);
 
         PostRankingResponseDto.PagedPostRankingResponseDto response = PostRankingResponseDto.PagedPostRankingResponseDto.builder()
-                .category(category.name()) // 요청된 카테고리 이름
+                .category(category.name())
                 .postList(postList)
                 .paging(pagingResponse)
                 .build();
