@@ -64,6 +64,8 @@ public class SecurityConfig {
     private static final String SNS_SIGN_UP_API_PATH = "/api/v1/user/sns-sign-up";
     private static final String LOGOUT_API_PATH = "/api/v1/auth/logout";
 
+    private static final String CORS_ALLOWED_ORIGINS = "http://localhost:3000,http://localhost:8080";
+
     private static final RequestMatcher loginMatcher = new AntPathRequestMatcher(LOGIN_API_PATH, POST.name());
     private static final RequestMatcher logoutMatcher = new AntPathRequestMatcher(LOGOUT_API_PATH, DELETE.name());
 
@@ -158,7 +160,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
+        configuration.setAllowedOriginPatterns(Arrays.asList(CORS_ALLOWED_ORIGINS.split(",")));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
