@@ -43,8 +43,6 @@ public class MedicineServiceImpl implements MedicineService {
     @Value("${service.medicine.key}")
     private String SERVICE_KEY;
 
-    private static final Logger log = LoggerFactory.getLogger(MedicineServiceImpl.class);
-
     @Override
     @Transactional
     public void saveMedicine(String itemname) throws IOException {
@@ -104,8 +102,7 @@ public class MedicineServiceImpl implements MedicineService {
             }
             return null;
         } catch (JsonSyntaxException e) {
-            log.error("JSON parsing error: {}", e.getMessage());
-            return null;
+            throw new BusinessException(ErrorCode.JSON_PARSE_ERROR);
         }
     }
 

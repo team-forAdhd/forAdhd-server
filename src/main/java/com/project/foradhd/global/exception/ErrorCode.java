@@ -40,6 +40,7 @@ public enum ErrorCode {
 
     //medicine
     NOT_FOUND_MEDICINE(NOT_FOUND, "존재하지 않는 약입니다."),
+    JSON_PARSE_ERROR(BAD_REQUEST,"파싱 에러가 발생했습니다"),
 
     //medicine_review
     NOT_FOUND_MEDICINE_REVIEW(NOT_FOUND, "존재하지 않는 약 리뷰입니다."),
@@ -67,8 +68,7 @@ public enum ErrorCode {
     ALREADY_LIKED_COMMENT(CONFLICT, "이미 좋아요한 댓글입니다."),
 
     // notification
-    NOT_FOUND_NOTIFICATION(NOT_FOUND, "존재하지 않는 알림입니다."),;
-
+    NOT_FOUND_NOTIFICATION(NOT_FOUND, "존재하지 않는 알림입니다.");
     private final HttpStatus status;
     private final String message;
 }
