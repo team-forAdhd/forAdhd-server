@@ -8,6 +8,7 @@ import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostSearchResponseDto;
+import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
@@ -22,6 +23,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Context;
 
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,8 +34,8 @@ public interface PostMapper {
 
     @Mapping(source = "category", target = "category")
     @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "user.userProfile.nickname", target = "nickname")
-    @Mapping(source = "user.userProfile.profileImage", target = "profileImage")
+    @Mapping(source = "nickname", target = "nickname")
+    @Mapping(source = "profileImage", target = "profileImage")
     PostDto toDto(Post post);
 
     @Mapping(source = "category", target = "category")
@@ -44,30 +46,54 @@ public interface PostMapper {
     @Mapping(target = "scrapCount", ignore = true)
     @Mapping(target = "viewCount", ignore = true)
     @Mapping(target = "comments", ignore = true)
-    Post toEntity(PostRequestDto dto, @Context String userId);
+    Post toEntity(PostRequestDto dto, @Context String userId, @Context UserService userService);
 
     @AfterMapping
-    default void setUser(@MappingTarget Post.PostBuilder postBuilder, @Context String userId) {
+    default void setUser(@MappingTarget Post.PostBuilder postBuilder, @Context String userId, @Context UserService userService) {
         if (userId != null) {
-            postBuilder.user(User.builder().id(userId).build());
+            User user = userService.getUser(userId);
+            UserProfile userProfile = userService.getUserProfile(userId);
+
+            postBuilder.user(user);
+            if (userProfile != null) {
+                postBuilder.nickname(userProfile.getNickname());
+                postBuilder.profileImage(userProfile.getProfileImage());
+            }
         }
     }
 
     @Mapping(target = "comments", expression = "java(mapCommentList(post.getComments()))")
     @Mapping(target = "commentCount", expression = "java(calculateCommentCount(post.getComments()))")
     @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "user.userProfile.nickname", target = "nickname")
-    @Mapping(source = "user.userProfile.profileImage", target = "profileImage")
+    @Mapping(source = "nickname", target = "nickname")
+    @Mapping(source = "profileImage", target = "profileImage")
     PostResponseDto.PostListResponseDto toPostListResponseDto(Post post);
 
     @AfterMapping
-    default void setAnonymousOrUserProfile(@MappingTarget PostResponseDto.PostListResponseDto.PostListResponseDtoBuilder dto, Post post) {
+    default void setUsers(@MappingTarget Post.PostBuilder postBuilder, @Context String userId, @Context UserService userService) {
+        if (userId != null) {
+            User user = userService.getUser(userId);
+            UserProfile userProfile = userService.getUserProfile(userId);
+
+            postBuilder.user(user);
+            if (userProfile != null) {
+                postBuilder.nickname(userProfile.getNickname());
+                postBuilder.profileImage(userProfile.getProfileImage());
+            }
+        }
+    }
+
+    @AfterMapping
+    default void setAnonymousOrUserProfile(@MappingTarget PostResponseDto.PostListResponseDto.PostListResponseDtoBuilder dto, Post post, @Context UserService userService) {
         if (post.isAnonymous()) {
             dto.nickname("익명");
             dto.profileImage("http://example.com/default-profile.png");
-        } else if (post.getUser() != null && post.getUser().getUserProfile() != null) {
-            dto.nickname(post.getUser().getUserProfile().getNickname());
-            dto.profileImage(post.getUser().getUserProfile().getProfileImage());
+        } else if (post.getUser() != null) {
+            UserProfile userProfile = userService.getUserProfile(post.getUser().getId());
+            if (userProfile != null) {
+                dto.nickname(userProfile.getNickname());
+                dto.profileImage(userProfile.getProfileImage());
+            }
         }
     }
 

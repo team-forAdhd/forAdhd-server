@@ -45,12 +45,6 @@ public class User extends BaseTimeEntity {
         this.email = email;
     }
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private UserProfile userProfile;
-
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private UserPrivacy userPrivacy;
-
     public void updateAsUserRole(boolean hasProfile) {
         if (hasProfile && isVerifiedEmail) {
             this.role = Role.USER;

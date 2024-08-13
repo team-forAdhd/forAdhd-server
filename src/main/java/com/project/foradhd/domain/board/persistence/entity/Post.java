@@ -40,6 +40,10 @@ public class Post extends BaseTimeEntity {
 
     private String content;
 
+    private String nickname;
+
+    private String profileImage;
+
     private boolean anonymous;
 
     @Builder.Default

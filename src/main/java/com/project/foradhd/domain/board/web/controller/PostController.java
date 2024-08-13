@@ -16,6 +16,7 @@ import com.project.foradhd.domain.board.web.dto.response.PostScrapFilterResponse
 import com.project.foradhd.domain.board.web.dto.response.PostSearchResponseDto;
 import com.project.foradhd.domain.board.web.mapper.PostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapFilterMapper;
+import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
 import com.project.foradhd.global.AuthUserId;
@@ -44,6 +45,7 @@ public class PostController {
     private final PostScrapFilterMapper postScrapFilterMapper;
     private final PostLikeFilterService postLikeFilterService;
     private final PostSearchHistoryService searchHistoryService;
+    private final UserService userService;
 
     // 게시글 개별 조회 api
     @GetMapping("/{postId}")
@@ -56,7 +58,7 @@ public class PostController {
     // 게시글 작성 api
     @PostMapping
     public ResponseEntity<PostResponseDto.PostListResponseDto> createPost(@RequestBody PostRequestDto postRequestDto, @AuthUserId String userId) {
-        Post post = postMapper.toEntity(postRequestDto, userId);
+        Post post = postMapper.toEntity(postRequestDto, userId, userService);
         Post createdPost = postService.createPost(post);
         return ResponseEntity.status(HttpStatus.CREATED).body(postMapper.toPostListResponseDto(createdPost));
     }
