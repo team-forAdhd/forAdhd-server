@@ -43,6 +43,7 @@ public enum ErrorCode {
 
     //medicine_review
     NOT_FOUND_MEDICINE_REVIEW(NOT_FOUND, "존재하지 않는 약 리뷰입니다."),
+    FORBIDDEN_MEDICINE_REVIEW(FORBIDDEN, "약 리뷰에 접근할 수 있는 권한이 없습니다."),
     //S3
     EMPTY_FILE(BAD_REQUEST, "유효한 파일이어야 합니다."),
     NOT_FOUND_FILE_EXTENSION(BAD_REQUEST, "파일 확장자가 존재하지 않습니다."),

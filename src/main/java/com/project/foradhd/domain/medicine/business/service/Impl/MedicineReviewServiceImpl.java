@@ -107,6 +107,11 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         MedicineReview existingReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW));
 
+        // 리뷰 작성자와 요청한 유저가 같은지 확인
+        if (!existingReview.getUser().getId().equals(userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_MEDICINE_REVIEW);
+        }
+
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE));
 
