@@ -38,8 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MedicineReviewServiceImpl implements MedicineReviewService {
     private final MedicineReviewRepository reviewRepository;
     private final MedicineRepository medicineRepository;
-    @Qualifier("medicineReviewMapper")
-    private final MedicineReviewMapper reviewMapper;
     private final MedicineReviewLikeRepository reviewLikeRepository;
     private final UserService userService;
     private final UserProfileRepository userProfileRepository;
@@ -49,9 +47,6 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     @Transactional
     public MedicineReview createReview(MedicineReviewRequest request, String userId) {
         User user = userService.getUser(userId);
-        if (user == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_USER);
-        }
 
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE));

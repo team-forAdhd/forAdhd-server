@@ -34,9 +34,6 @@ public class MedicineSearchHistoryServiceImpl implements MedicineSearchHistorySe
     @Transactional
     public void saveSearchTerm(String userId, String term) {
         User user = userService.getUser(userId);
-        if (user == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_USER);
-        }
         MedicineSearchHistory searchHistory = MedicineSearchHistory.builder()
                 .user(user)
                 .term(term)
@@ -48,9 +45,6 @@ public class MedicineSearchHistoryServiceImpl implements MedicineSearchHistorySe
     @Override
     public List<String> getRecentSearchTerms(String userId) {
         User user = userService.getUser(userId);
-        if (user == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_USER);
-        }
         return searchHistoryRepository.findTop10ByUserOrderBySearchedAtDesc(user)
                 .stream()
                 .map(MedicineSearchHistory::getTerm)
