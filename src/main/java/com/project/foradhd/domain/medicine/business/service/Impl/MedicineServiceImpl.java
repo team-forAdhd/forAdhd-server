@@ -12,6 +12,7 @@ import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,8 +36,12 @@ public class MedicineServiceImpl implements MedicineService {
     private final MedicineMapper medicineMapper;
     private final MedicineSearchHistoryService searchHistoryService;
 
-    private static final String SERVICE_URL = "http://apis.data.go.kr/1471000/MdcinGrnIdntfcInfoService01/getMdcinGrnIdntfcInfoList01";
-    private static final String SERVICE_KEY = "rzJVpYr3DAwYcKr%2BSyRZ5K0lIxsMeO5OdiaJrlGZ2O8C%2BB7oqEGRd96NskmVrzYItbIwhSD%2FZ2Y%2BifVDTPlFkQ%3D%3D";
+
+    @Value("${service.medicine.url}")
+    private String SERVICE_URL;
+
+    @Value("${service.medicine.key}")
+    private String SERVICE_KEY;
 
     private static final Logger log = LoggerFactory.getLogger(MedicineServiceImpl.class);
 
