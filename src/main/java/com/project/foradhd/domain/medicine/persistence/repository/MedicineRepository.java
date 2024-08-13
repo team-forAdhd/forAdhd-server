@@ -26,4 +26,6 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
     );
     @Query("SELECT m FROM Medicine m JOIN MedicineBookmark mb ON m.id = mb.medicine.id WHERE mb.user.id = :userId AND mb.deleted = false")
     List<Medicine> findMedicinesByUserFavorites(@Param("userId") String userId);
+    @Query("SELECT m FROM Medicine m WHERE m.itemName IN :ingredientNames ORDER BY m.itemName ASC")
+    List<Medicine> findByIngredientNames(@Param("ingredientNames") List<String> ingredientNames);
 }

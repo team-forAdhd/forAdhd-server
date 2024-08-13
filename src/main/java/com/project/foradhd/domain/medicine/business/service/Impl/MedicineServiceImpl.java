@@ -12,8 +12,6 @@ import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -127,11 +125,8 @@ public class MedicineServiceImpl implements MedicineService {
                     medicines = medicineRepository.findAllByOrderByRatingAsc();
                     break;
                 case "ingredientAsc":
-                    List<Medicine> result = new ArrayList<>();
-                    result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("메틸페니데이트"));
-                    result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("아토목세틴"));
-                    result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("클로니딘"));
-                    medicines = result;
+                    List<String> ingredientNames = List.of("메틸페니데이트", "아토목세틴", "클로니딘");
+                    medicines = medicineRepository.findByIngredientNames(ingredientNames);
                     break;
                 default:
                     medicines = medicineRepository.findAll();
