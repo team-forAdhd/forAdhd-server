@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
+import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_USER_PROFILE;
 
 @Service
 @Transactional(readOnly=true)
@@ -100,15 +101,27 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment updateComment(Long commentId, String content) {
+    public Comment updateComment(Long commentId, String content, boolean anonymous, String userId) {
         Comment existingComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
 
-        Comment updatedComment = existingComment.toBuilder()
+        // 댓글 수정
+        Comment.CommentBuilder updatedCommentBuilder = existingComment.toBuilder()
                 .content(content)
-                .build();
+                .anonymous(anonymous);
 
-        return updatedComment;
+        if (!anonymous) {
+            UserProfile userProfile = userProfileRepository.findByUserId(userId)
+                    .orElseThrow(() -> new BusinessException(NOT_FOUND_USER_PROFILE));
+            updatedCommentBuilder.nickname(userProfile.getNickname())
+                    .profileImage(userProfile.getProfileImage());
+        } else {
+            updatedCommentBuilder.nickname(null) // 익명일 경우 닉네임 초기화
+                    .profileImage(null); // 익명일 경우 프로필 이미지 초기화
+        }
+
+        Comment updatedComment = updatedCommentBuilder.build();
+        return commentRepository.save(updatedComment);
     }
 
     @Override

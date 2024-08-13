@@ -69,10 +69,20 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    // 댓글 수정 API
     @PutMapping("/{commentId}")
-    public ResponseEntity<CommentResponseDto.CommentListResponseDto> updateComment(@PathVariable Long commentId, @RequestBody CreateCommentRequestDto createCommentRequest) {
-        Comment updatedComment = commentService.updateComment(commentId, createCommentRequest.getContent());
+    public ResponseEntity<CommentResponseDto.CommentListResponseDto> updateComment(
+            @PathVariable Long commentId,
+            @RequestBody CreateCommentRequestDto createCommentRequest,
+            @AuthUserId String userId) {
+
+        // 서비스 호출하여 댓글 수정
+        Comment updatedComment = commentService.updateComment(
+                commentId,
+                createCommentRequest.getContent(),
+                createCommentRequest.isAnonymous(),
+                userId);
+
+        // 매퍼를 이용해 엔티티를 DTO로 변환하여 반환
         return ResponseEntity.ok(commentMapper.commentToCommentListResponseDto(updatedComment));
     }
 
