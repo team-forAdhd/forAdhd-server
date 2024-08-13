@@ -3,6 +3,8 @@ package com.project.foradhd.domain.medicine.web.controller;
 import com.project.foradhd.domain.medicine.business.service.MedicineSearchHistoryService;
 import com.project.foradhd.domain.medicine.business.service.MedicineService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
+import com.project.foradhd.domain.medicine.persistence.enums.IngredientType;
+import com.project.foradhd.domain.medicine.persistence.enums.TabletType;
 import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineSearchResponse;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineSortedResponse;
@@ -65,7 +67,7 @@ public class MedicineController {
             @RequestParam(required = false) String color1,
             @RequestParam(required = false) String formCodeName,
             @RequestParam(required = false) String itemName,
-            @RequestParam(required = false) Integer tabletType,
+            @RequestParam(required = false) TabletType tabletType,
             @AuthUserId String userId,
             Pageable pageable) {
 
@@ -104,7 +106,7 @@ public class MedicineController {
     // 약 성분별 조회
     @GetMapping("/sorted-by-ingredient")
     public ResponseEntity<MedicineSortedResponse> getMedicinesByIngredientType(
-            @RequestParam int ingredientType) {
+            @RequestParam IngredientType ingredientType) {
         try {
             List<MedicineDto> medicines = medicineService.getMedicinesByIngredientType(ingredientType);
             MedicineSortedResponse response = MedicineSortedResponse.builder()

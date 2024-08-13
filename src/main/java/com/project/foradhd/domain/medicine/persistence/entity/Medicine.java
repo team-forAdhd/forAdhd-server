@@ -1,5 +1,7 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
+import com.project.foradhd.domain.medicine.persistence.enums.IngredientType;
+import com.project.foradhd.domain.medicine.persistence.enums.TabletType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,8 +33,10 @@ public class Medicine {
     private String itemEngName; //제품영문명
     private double rating; // 별점
     private boolean isFavorite; // 즐겨찾기 여부
-    private int ingredientType; // 성분 타입 (1: 메틸페니데이트 염산염, 2: 아토목세틴 염산염, 3: 클로니딘 염산염)
-    private int tabletType; // 제형 타입 (1: 정제, 2: 경질캡슐, 3: 연질캡슐)
+    @Enumerated(EnumType.STRING)
+    private IngredientType ingredientType; // 성분 타입 (Enum)
+    @Enumerated(EnumType.STRING)
+    private TabletType tabletType; // 제형 타입 (Enum)
 
     @OneToMany(mappedBy = "medicine")
     private List<MedicineReview> reviews;
@@ -46,5 +50,4 @@ public class Medicine {
                 .average()
                 .orElse(0.0);
     }
-
 }

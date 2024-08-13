@@ -4,6 +4,8 @@ import com.nimbusds.jose.shaded.gson.*;
 import com.project.foradhd.domain.medicine.business.service.MedicineSearchHistoryService;
 import com.project.foradhd.domain.medicine.business.service.MedicineService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
+import com.project.foradhd.domain.medicine.persistence.enums.IngredientType;
+import com.project.foradhd.domain.medicine.persistence.enums.TabletType;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
 import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
@@ -147,7 +149,7 @@ public class MedicineServiceImpl implements MedicineService {
 
     // 약 모양 or 색상 or 제형으로 검색
     @Override
-    public List<Medicine> searchByFormCodeNameShapeColorAndTabletType(String formCodeName, String shape, String color1, int tabletType) {
+    public List<Medicine> searchByFormCodeNameShapeColorAndTabletType(String formCodeName, String shape, String color1, TabletType tabletType) {
         return medicineRepository.findAllByFormCodeNameOrDrugShapeOrColorClass1OrTabletType(formCodeName, shape, color1, tabletType);
     }
 
@@ -170,7 +172,7 @@ public class MedicineServiceImpl implements MedicineService {
 
     // 약 성분별 정렬
     @Override
-    public List<MedicineDto> getMedicinesByIngredientType(int ingredientType) {
+    public List<MedicineDto> getMedicinesByIngredientType(IngredientType ingredientType) {
         List<Medicine> medicines = medicineRepository.findAllByIngredientTypeOrderByItemNameAsc(ingredientType);
         return medicines.stream()
                 .map(medicineMapper::toDto)
