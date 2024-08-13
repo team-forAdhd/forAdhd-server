@@ -45,6 +45,11 @@ cloud:
     cloud-front:
       deploy-domain: ${CLOUD_FRONT_DEPLOY_DOMAIN}
 
+service:
+  medicine:
+    url: http://apis.data.go.kr/1471000/MdcinGrnIdntfcInfoService01/getMdcinGrnIdntfcInfoList01
+    key: rzJVpYr3DAwYcKr%2BSyRZ5K0lIxsMeO5OdiaJrlGZ2O8C%2BB7oqEGRd96NskmVrzYItbIwhSD%2FZ2Y%2BifVDTPlFkQ%3D%3D
+
 ---
 spring:
   config:
