@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
 
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {UserService.class, MedicineService.class})
+@Mapper(componentModel = "spring")
 public interface MedicineReviewMapper {
     @Mapping(target = "medicine.id", source = "medicineId")
     @Mapping(target = "nickname", ignore = true)
