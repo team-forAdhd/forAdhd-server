@@ -40,8 +40,6 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     private final MedicineRepository medicineRepository;
     private final MedicineReviewLikeRepository reviewLikeRepository;
     private final UserService userService;
-    private final UserProfileRepository userProfileRepository;
-    private final UserPrivacyRepository userPrivacyRepository;
 
     @Override
     @Transactional
@@ -51,12 +49,6 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE));
 
-        // 사용자 상세 정보 조회
-        UserProfile userProfile = userProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER_PROFILE));
-        UserPrivacy userPrivacy = userPrivacyRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
-
         MedicineReview review = MedicineReview.builder()
                 .medicine(medicine)
                 .user(user)
@@ -64,10 +56,6 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
                 .grade(request.getGrade())
                 .images(request.getImages())
                 .coMedications(request.getCoMedications())
-                .nickname(userProfile.getNickname())
-                .profileImage(userProfile.getProfileImage())
-                .ageRange(userPrivacy.getAgeRange())
-                .gender(userPrivacy.getGender())
                 .build();
 
         MedicineReview savedReview = reviewRepository.save(review);
