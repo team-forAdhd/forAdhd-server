@@ -47,8 +47,8 @@ cloud:
 
 service:
   medicine:
-    url: ${MEDICINE_URL}
-    key: ${MEDICINE_URL_KEY}
+    url: ${MEDICINE_SERVICE_URL}
+    key: ${MEDICINE_SERVICE_KEY}
 
 ---
 spring:
