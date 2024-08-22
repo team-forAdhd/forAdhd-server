@@ -51,7 +51,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto.PostListResponseDto> getPost(@PathVariable Long postId) {
         Post post = postService.getPost(postId);
-        PostResponseDto.PostListResponseDto response = postMapper.toPostListResponseDto(post);
+        PostResponseDto.PostListResponseDto response = postMapper.toPostListResponseDto(post, userService);
         return ResponseEntity.ok(response);
     }
 
@@ -60,7 +60,7 @@ public class PostController {
     public ResponseEntity<PostResponseDto.PostListResponseDto> createPost(@RequestBody PostRequestDto postRequestDto, @AuthUserId String userId) {
         Post post = postMapper.toEntity(postRequestDto, userId, userService);
         Post createdPost = postService.createPost(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(postMapper.toPostListResponseDto(createdPost));
+        return ResponseEntity.status(HttpStatus.CREATED).body(postMapper.toPostListResponseDto(createdPost, userService));
     }
 
     // 게시글 수정 api
@@ -82,7 +82,7 @@ public class PostController {
                 .viewCount(existingPost.getViewCount())
                 .build();
         Post savedPost = postService.updatePost(updatedPost);
-        return ResponseEntity.ok(postMapper.toPostListResponseDto(savedPost));
+        return ResponseEntity.ok(postMapper.toPostListResponseDto(savedPost, userService));
     }
 
     // 게시글 삭제 api
@@ -97,7 +97,7 @@ public class PostController {
     public ResponseEntity<PostResponseDto> getAllPosts(Pageable pageable) {
         Page<Post> postPage = postService.getAllPosts(pageable);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = postPage.getContent().stream()
-                .map(postMapper::toPostListResponseDto)
+                .map(post -> postMapper.toPostListResponseDto(post, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(postPage);
@@ -117,7 +117,7 @@ public class PostController {
             Pageable pageable) {
         Page<Post> postPage = postService.listByCategory(category, pageable);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = postPage.getContent().stream()
-                .map(postMapper::toPostListResponseDto)
+                .map(post -> postMapper.toPostListResponseDto(post, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(postPage);
@@ -135,7 +135,7 @@ public class PostController {
     public ResponseEntity<PostResponseDto> getUserPostsByCategory(@AuthUserId String userId, @RequestParam CategoryName category, Pageable pageable, @RequestParam SortOption sortOption) {
         Page<Post> userPosts = postService.getUserPostsByCategory(userId, category, pageable, sortOption);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = userPosts.getContent().stream()
-                .map(postMapper::toPostListResponseDto)
+                .map(post -> postMapper.toPostListResponseDto(post, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(userPosts);
@@ -189,7 +189,7 @@ public class PostController {
     public ResponseEntity<PostResponseDto> getLikedPostsByUser(@AuthUserId String userId, Pageable pageable) {
         Page<Post> likedPosts = postLikeFilterService.getLikedPostsByUser(userId, pageable);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = likedPosts.getContent().stream()
-                .map(postMapper::toPostListResponseDto)
+                .map(post -> postMapper.toPostListResponseDto(post, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(likedPosts);

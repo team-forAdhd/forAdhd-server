@@ -67,7 +67,7 @@ public interface PostMapper {
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "nickname", target = "nickname")
     @Mapping(source = "profileImage", target = "profileImage")
-    PostResponseDto.PostListResponseDto toPostListResponseDto(Post post);
+    PostResponseDto.PostListResponseDto toPostListResponseDto(Post post, @Context UserService userService);
 
     @AfterMapping
     default void setUsers(@MappingTarget Post.PostBuilder postBuilder, @Context String userId, @Context UserService userService) {
