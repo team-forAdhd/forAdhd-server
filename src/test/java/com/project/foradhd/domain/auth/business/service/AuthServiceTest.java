@@ -12,6 +12,7 @@ import static org.mockito.Mockito.times;
 import static org.springframework.security.core.authority.AuthorityUtils.createAuthorityList;
 
 import com.project.foradhd.domain.auth.business.dto.out.AuthTokenData;
+import com.project.foradhd.domain.auth.business.service.impl.AuthServiceImpl;
 import com.project.foradhd.domain.auth.business.service.impl.JwtServiceImpl;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
@@ -59,7 +60,7 @@ class AuthServiceTest {
     void init() {
         MockitoAnnotations.openMocks(this);
         this.jwtService = new JwtServiceImpl(redisService, accessTokenExpiry, refreshTokenExpiry, secretKey);
-        this.authService = new AuthService(jwtService, userService);
+        this.authService = new AuthServiceImpl(jwtService, userService);
     }
 
     @DisplayName("AT 만료 시 토큰 재발급 테스트")
