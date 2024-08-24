@@ -23,5 +23,9 @@ public class HospitalListBookmarkResponse {
         private Integer totalReceiptReviewCount;
         private Integer totalEvaluationReviewCount;
         private HospitalOperationStatus operationStatus;
+
+        public void synchronizeOperationStatus(HospitalOperationStatus operationStatus) {
+            this.operationStatus = operationStatus;
+        }
     }
 }
