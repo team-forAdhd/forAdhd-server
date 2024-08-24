@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.user.business.service;
 
 import com.project.foradhd.domain.user.business.dto.in.EmailAuthValidationData;
+import com.project.foradhd.domain.user.business.service.impl.UserEmailAuthServiceImpl;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.service.AwsSesService;
 import com.project.foradhd.global.service.RedisService;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.never;
 class UserEmailAuthServiceTest {
 
     @InjectMocks
-    UserEmailAuthService userEmailAuthService;
+    UserEmailAuthServiceImpl userEmailAuthService;
 
     @Mock
     UserService userService;
