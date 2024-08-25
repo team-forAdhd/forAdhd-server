@@ -1,7 +1,7 @@
 package com.project.foradhd.domain.auth.business.service;
 
 import static com.project.foradhd.domain.user.fixtures.UserFixtures.toUser;
-import static com.project.foradhd.global.enums.RedisKeyType.USER_REFRESH_TOKEN;
+import static com.project.foradhd.global.enums.CacheKeyType.USER_REFRESH_TOKEN;
 import static com.project.foradhd.global.exception.ErrorCode.INVALID_AUTH_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,7 +17,7 @@ import com.project.foradhd.domain.auth.business.service.impl.JwtServiceImpl;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
-import com.project.foradhd.global.service.RedisService;
+import com.project.foradhd.global.service.CacheService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class AuthServiceTest {
     JwtService jwtService;
 
     @Mock
-    RedisService redisService;
+    CacheService cacheService;
 
     @Value("${jwt.expiry.access-token}")
     Long accessTokenExpiry;
@@ -59,7 +59,7 @@ class AuthServiceTest {
     @BeforeEach
     void init() {
         MockitoAnnotations.openMocks(this);
-        this.jwtService = new JwtServiceImpl(redisService, accessTokenExpiry, refreshTokenExpiry, secretKey);
+        this.jwtService = new JwtServiceImpl(cacheService, accessTokenExpiry, refreshTokenExpiry, secretKey);
         this.authService = new AuthServiceImpl(jwtService, userService);
     }
 
@@ -72,7 +72,7 @@ class AuthServiceTest {
         String accessToken = jwtService.generateAccessToken(userId, email, createAuthorityList("ROLE_USER"));
         String refreshToken = jwtService.generateRefreshToken(userId);
         User user = toUser().build();
-        given(redisService.getValue(USER_REFRESH_TOKEN, userId)).willReturn(Optional.of(refreshToken));
+        given(cacheService.getValue(USER_REFRESH_TOKEN, userId)).willReturn(Optional.of(refreshToken));
         given(userService.getUser(userId)).willReturn(user);
 
         //when
@@ -82,7 +82,7 @@ class AuthServiceTest {
         //then
         assertThat(authTokenData.getAccessToken()).isNotEqualTo(accessToken);
         assertThat(authTokenData.getRefreshToken()).isNotEqualTo(refreshToken);
-        then(redisService).should(times(1)).getValue(USER_REFRESH_TOKEN, userId);
+        then(cacheService).should(times(1)).getValue(USER_REFRESH_TOKEN, userId);
         then(userService).should(times(1)).getUser(userId);
     }
 
@@ -129,14 +129,14 @@ class AuthServiceTest {
         String accessToken = jwtService.generateAccessToken(userId, email, createAuthorityList("ROLE_USER"));
         String refreshToken = jwtService.generateRefreshToken(userId);
         String savedRefreshToken = "savedRefreshToken";
-        given(redisService.getValue(USER_REFRESH_TOKEN, userId)).willReturn(Optional.of(savedRefreshToken));
+        given(cacheService.getValue(USER_REFRESH_TOKEN, userId)).willReturn(Optional.of(savedRefreshToken));
 
         //when, then
         assertThatThrownBy(() -> authService.reissue(accessToken, refreshToken))
                 .isInstanceOf(BusinessException.class)
                 .extracting("errorCode")
                 .isEqualTo(INVALID_AUTH_TOKEN);
-        then(redisService).should(times(1)).getValue(USER_REFRESH_TOKEN, userId);
+        then(cacheService).should(times(1)).getValue(USER_REFRESH_TOKEN, userId);
         then(userService).should(never()).getUser(userId);
     }
 }

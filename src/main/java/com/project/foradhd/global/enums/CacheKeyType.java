@@ -3,7 +3,7 @@ package com.project.foradhd.global.enums;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum RedisKeyType {
+public enum CacheKeyType {
 
     USER_REFRESH_TOKEN("user", "refresh-token"),
     USER_EMAIL_AUTH_CODE("user", "email-auth-code"),

@@ -1,10 +1,10 @@
 package com.project.foradhd.domain.auth.business.service.impl;
 
-import static com.project.foradhd.global.enums.RedisKeyType.USER_REFRESH_TOKEN;
+import static com.project.foradhd.global.enums.CacheKeyType.USER_REFRESH_TOKEN;
 import static org.springframework.util.StringUtils.collectionToCommaDelimitedString;
 
 import com.project.foradhd.domain.auth.business.service.JwtService;
-import com.project.foradhd.global.service.RedisService;
+import com.project.foradhd.global.service.CacheService;
 import com.project.foradhd.global.util.JsonUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -39,16 +39,16 @@ public class JwtServiceImpl implements JwtService {
     private static final String EMAIL_CLAIM_NAME = "email";
     private static final String AUTHORITIES_CLAIM_NAME = "authorities";
     private static final String JWT_SEPARATOR = "\\.";
-    private final RedisService redisService;
+    private final CacheService cacheService;
     private final Long accessTokenExpiry;
     private final Long refreshTokenExpiry;
     private final Key key;
 
-    public JwtServiceImpl(RedisService redisService,
+    public JwtServiceImpl(CacheService cacheService,
         @Value("${jwt.expiry.access-token}") Long accessTokenExpiry,
         @Value("${jwt.expiry.refresh-token}") Long refreshTokenExpiry,
         @Value("${jwt.secret-key}") String secretKey) {
-        this.redisService = redisService;
+        this.cacheService = cacheService;
         this.accessTokenExpiry = accessTokenExpiry;
         this.refreshTokenExpiry = refreshTokenExpiry;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
@@ -199,17 +199,17 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public void saveRefreshToken(String userId, String refreshToken) {
-        redisService.setValue(USER_REFRESH_TOKEN, userId, refreshToken, refreshTokenExpiry, TimeUnit.MILLISECONDS);
+        cacheService.setValue(USER_REFRESH_TOKEN, userId, refreshToken, refreshTokenExpiry, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void deleteRefreshToken(String userId) {
-        redisService.deleteValue(USER_REFRESH_TOKEN, userId);
+        cacheService.deleteValue(USER_REFRESH_TOKEN, userId);
     }
 
     @Override
     public boolean existsSavedRefreshToken(String userId, String refreshToken) {
-        return redisService.getValue(USER_REFRESH_TOKEN, userId)
+        return cacheService.getValue(USER_REFRESH_TOKEN, userId)
                 .filter(savedRefreshToken -> savedRefreshToken.equals(refreshToken))
                 .isPresent();
     }

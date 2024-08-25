@@ -1,4 +1,4 @@
-package com.project.foradhd.global.service;
+package com.project.foradhd.global.service.impl;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import com.project.foradhd.global.image.web.enums.ImagePathPrefix;
+import com.project.foradhd.global.service.FileStorageService;
 import com.project.foradhd.global.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,7 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Service
-public class AwsS3Service {
+public class AwsS3Service implements FileStorageService {
 
     private static final String FILE_EXTENSION_SEPARATOR = ".";
     private static final List<String> ALLOWED_IMAGE_FILE_EXTENSION_LIST = Arrays.asList("jpg", "jpeg", "png", "gif");
@@ -28,12 +29,14 @@ public class AwsS3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Override
     public List<String> uploadImages(ImagePathPrefix imagePathPrefix, List<MultipartFile> images) {
         return images.stream()
                 .map(image -> uploadImage(imagePathPrefix, image))
                 .toList();
     }
 
+    @Override
     public void deleteImages(List<String> imagePaths) {
         imagePaths.forEach(this::deleteImage);
     }

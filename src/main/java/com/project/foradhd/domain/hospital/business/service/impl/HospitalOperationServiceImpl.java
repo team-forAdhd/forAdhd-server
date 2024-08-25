@@ -5,8 +5,8 @@ import com.project.foradhd.domain.hospital.business.service.HospitalOperationSer
 import com.project.foradhd.domain.hospital.web.enums.HospitalOperationStatus;
 import com.project.foradhd.global.client.GooglePlacesClient;
 import com.project.foradhd.global.client.dto.response.GooglePlaceOpeningHoursResponse;
-import com.project.foradhd.global.enums.RedisKeyType;
-import com.project.foradhd.global.service.RedisService;
+import com.project.foradhd.global.enums.CacheKeyType;
+import com.project.foradhd.global.service.CacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class HospitalOperationServiceImpl implements HospitalOperationService {
 
     private final GooglePlacesClient googlePlacesClient;
-    private final RedisService redisService;
+    private final CacheService cacheService;
 
     @Override
     public Map<String, HospitalOperationStatus> getHospitalOperationStatus(Map<String, String> placeIdByHospital) {
@@ -75,12 +75,12 @@ public class HospitalOperationServiceImpl implements HospitalOperationService {
     }
 
     private Optional<HospitalOperationDetailsData> readHospitalOperationDetails(String placeId) {
-        return redisService.getValue(RedisKeyType.HOSPITAL_OPERATION_DETAILS, placeId, HospitalOperationDetailsData.class);
+        return cacheService.getValue(CacheKeyType.HOSPITAL_OPERATION_DETAILS, placeId, HospitalOperationDetailsData.class);
     }
 
     private void writeHospitalOperationDetails(HospitalOperationDetailsData hospitalOperationDetails, String placeId) {
         long timeout = calculateTimeout(hospitalOperationDetails);
-        redisService.setValue(RedisKeyType.HOSPITAL_OPERATION_DETAILS, placeId, hospitalOperationDetails, timeout, TimeUnit.SECONDS);
+        cacheService.setValue(CacheKeyType.HOSPITAL_OPERATION_DETAILS, placeId, hospitalOperationDetails, timeout, TimeUnit.SECONDS);
     }
 
     private long calculateTimeout(HospitalOperationDetailsData hospitalOperationDetails) {
