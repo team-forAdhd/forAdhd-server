@@ -18,11 +18,25 @@ public class NotificationController {
 
     @GetMapping("/sse")
     public SseEmitter streamSseMvc(@AuthUserId String userId) {
-        SseEmitter emitter = new SseEmitter(0L);
+        // 타임아웃을 1시간(3600000ms)으로 설정
+        SseEmitter emitter = new SseEmitter(3600000L);
         sseEmitters.addEmitter(userId, emitter);
+
+        // 첫 연결 시 더미 이벤트 전송
+        try {
+            emitter.send(SseEmitter.event()
+                    .name("dummy eventName")
+                    .data("dummy data")
+                    .reconnectTime(3000L));
+        } catch (Exception e) {
+            sseEmitters.removeEmitter(userId, emitter);
+        }
+
+        // SSE 연결의 상태를 확인하기 위해 각 이벤트 처리 콜백 설정
         emitter.onCompletion(() -> sseEmitters.removeEmitter(userId, emitter));
         emitter.onTimeout(() -> sseEmitters.removeEmitter(userId, emitter));
         emitter.onError((e) -> sseEmitters.removeEmitter(userId, emitter));
+
         return emitter;
     }
 
