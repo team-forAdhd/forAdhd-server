@@ -30,7 +30,7 @@ public interface MedicineReviewMapper {
     MedicineReviewResponse toResponseDto(MedicineReview review, @Context UserProfileRepository userProfileRepository,
                                          @Context UserPrivacyRepository userPrivacyRepository);
 
-    @AfterMapping
+   /* @AfterMapping
     default void setUserDetails(@MappingTarget MedicineReviewResponse.MedicineReviewResponseBuilder responseBuilder,
                                 MedicineReview review,
                                 @Context UserProfileRepository userProfileRepository,
@@ -54,7 +54,7 @@ public interface MedicineReviewMapper {
             responseBuilder.ageRange(userPrivacy.getAgeRange())
                     .gender(userPrivacy.getGender());
         }
-    }
+    }*/
 
     @AfterMapping
     default void setMedicineId(@MappingTarget MedicineReviewResponse.MedicineReviewResponseBuilder responseBuilder, MedicineReview review) {
