@@ -40,3 +40,9 @@ out/
 *.ppk
 
 src/main/resources/static/keys/**
+
+### .DS_Store 파일 ###
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store

@@ -50,6 +50,11 @@ service:
     url: ${MEDICINE_SERVICE_URL}
     key: ${MEDICINE_SERVICE_KEY}
 
+google:
+  places:
+    api-key: ${GOOGLE_PLACES_API_KEY}
+    url: ${GOOGLE_PLACES_URL}
+
 ---
 spring:
   config:

@@ -115,6 +115,7 @@ public class UserController {
 
     @DeleteMapping("/withdraw")
     public ResponseEntity<Void> withdraw(@AuthUserId String userId) {
+        userService.withdraw(userId);
         return ResponseEntity.ok().build();
     }
 }
