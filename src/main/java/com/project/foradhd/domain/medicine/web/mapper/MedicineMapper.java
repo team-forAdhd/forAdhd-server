@@ -29,4 +29,10 @@ public interface MedicineMapper {
     @Mapping(source = "bookmark.medicine.entpName", target = "manufacturer")
     @Mapping(source = "bookmark.medicine.itemImage", target = "images")
     MedicineBookmarkResponse toResponseDto(MedicineBookmark bookmark);
+
+    @Mapping(source = "itemImage", target = "itemImage")
+    @Mapping(source = "itemName", target = "itemName")
+    @Mapping(source = "itemEngName", target = "itemEngName")
+    @Mapping(source = "entpName", target = "entpName")
+    MedicineSearchResponse.MedicineSearchListResponse toMedicineSearchListResponse(Medicine medicine);
 }

@@ -1,64 +1,63 @@
 package com.project.foradhd.domain.medicine.web.mapper;
 
+import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
+import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
+import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
-import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
 import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
+import com.project.foradhd.domain.user.persistence.enums.Gender;
+import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.exception.ErrorCode;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
-import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import org.mapstruct.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-@Component
 @Mapper(componentModel = "spring")
-public abstract class MedicineReviewMapper {
+public interface MedicineReviewMapper {
+    @Mapping(target = "medicine.id", source = "medicineId")
+    @Mapping(target = "ageRange", ignore = true)
+    @Mapping(target = "gender", ignore = true)
+    MedicineReview toEntity(MedicineReviewRequest request, @Context User user, @Context Medicine medicine);
 
-    @Autowired
-    protected UserProfileRepository userProfileRepository;
-
-    @Autowired
-    protected UserPrivacyRepository userPrivacyRepository;
-
-    @Mapping(target = "nickname", source = "user.id", qualifiedByName = "getNickname")
-    @Mapping(target = "profileImage", source = "user.id", qualifiedByName = "getProfileImage")
-    @Mapping(target = "ageRange", source = "user.id", qualifiedByName = "getAgeRange")
-    @Mapping(target = "gender", source = "user.id", qualifiedByName = "getGender")
     @Mapping(target = "averageGrade", expression = "java(review.getMedicine().calculateAverageGrade())")
-    public abstract MedicineReviewResponse toResponseDto(MedicineReview review);
+    @Mapping(target = "images", source = "review.images")
+    @Mapping(target = "coMedications", source = "review.coMedications")
+    MedicineReviewResponse toResponseDto(MedicineReview review, @Context UserProfileRepository userProfileRepository,
+                                         @Context UserPrivacyRepository userPrivacyRepository);
 
-    @Named("getNickname")
-    protected String getNickname(String userId) {
-        return userProfileRepository.findByUserId(userId).map(UserProfile::getNickname).orElse(null);
-    }
+   /* @AfterMapping
+    default void setUserDetails(@MappingTarget MedicineReviewResponse.MedicineReviewResponseBuilder responseBuilder,
+                                MedicineReview review,
+                                @Context UserProfileRepository userProfileRepository,
+                                @Context UserPrivacyRepository userPrivacyRepository) {
 
-    @Named("getProfileImage")
-    protected String getProfileImage(String userId) {
-        return userProfileRepository.findByUserId(userId).map(UserProfile::getProfileImage).orElse(null);
-    }
+        String userId = review.getUser().getId();
 
-    @Named("getAgeRange")
-    protected String getAgeRange(String userId) {
-        return userPrivacyRepository.findByUserId(userId).map(UserPrivacy::getAgeRange).orElse(null);
-    }
+        // 최신 닉네임과 프로필 이미지 가져오기
+        UserProfile userProfile = userProfileRepository.findByUserId(userId).orElse(null);
+        if (userProfile != null) {
+            responseBuilder.nickname(userProfile.getNickname())
+                    .profileImage(userProfile.getProfileImage());
+        } else {
+            responseBuilder.nickname("Default Nickname")  // 기본 닉네임
+                    .profileImage("default-profile-image-url");  // 기본 프로필 이미지 URL
+        }
 
-    @Named("getGender")
-    protected Gender getGender(String userId) {
-        return userPrivacyRepository.findByUserId(userId).map(UserPrivacy::getGender).orElse(Gender.UNKNOWN);
+        // 최신 나이대와 성별 가져오기
+        UserPrivacy userPrivacy = userPrivacyRepository.findByUserId(userId).orElse(null);
+        if (userPrivacy != null) {
+            responseBuilder.ageRange(userPrivacy.getAgeRange())
+                    .gender(userPrivacy.getGender());
+        }
+    }*/
+
+    @AfterMapping
+    default void setMedicineId(@MappingTarget MedicineReviewResponse.MedicineReviewResponseBuilder responseBuilder, MedicineReview review) {
+        responseBuilder.medicineId(review.getMedicine().getId());
     }
 }

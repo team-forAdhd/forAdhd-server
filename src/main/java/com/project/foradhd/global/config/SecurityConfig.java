@@ -92,7 +92,6 @@ public class SecurityConfig {
                     AUTH_TOKEN_REISSUE_API_PATH, HEALTH_CHECK_API_PATH).permitAll()
                 .requestMatchers("/error", "/favicon.ico").permitAll()
                     .requestMatchers("/api/v1/notifications/sse").permitAll()
-                .requestMatchers(EMAIL_AUTH_API_PATH, SNS_SIGN_UP_API_PATH, LOGOUT_API_PATH).hasRole(Role.GUEST.name())
                 .requestMatchers(EMAIL_AUTH_API_PATH, SNS_SIGN_UP_API_PATH, WITHDRAW_API_PATH, LOGOUT_API_PATH).hasRole(Role.GUEST.name())
                 .anyRequest().hasRole(Role.USER.name()))
             .sessionManagement(config -> config

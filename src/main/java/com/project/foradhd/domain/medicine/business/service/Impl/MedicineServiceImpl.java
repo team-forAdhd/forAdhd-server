@@ -1,16 +1,18 @@
 package com.project.foradhd.domain.medicine.business.service.Impl;
 
 import com.nimbusds.jose.shaded.gson.*;
+import com.project.foradhd.domain.medicine.business.service.MedicineSearchHistoryService;
 import com.project.foradhd.domain.medicine.business.service.MedicineService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
+import com.project.foradhd.domain.medicine.persistence.enums.IngredientType;
+import com.project.foradhd.domain.medicine.persistence.enums.TabletType;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
 import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +34,14 @@ public class MedicineServiceImpl implements MedicineService {
 
     private final MedicineRepository medicineRepository;
     private final MedicineMapper medicineMapper;
+    private final MedicineSearchHistoryService searchHistoryService;
 
-    private static final String SERVICE_URL = "http://apis.data.go.kr/1471000/MdcinGrnIdntfcInfoService01/getMdcinGrnIdntfcInfoList01";
-    private static final String SERVICE_KEY = "rzJVpYr3DAwYcKr+SyRZ5K0lIxsMeO5OdiaJrlGZ2O8C+B7oqEGRd96NskmVrzYItbIwhSD/Z2Y+ifVDTPlFkQ==";
 
-    private static final Logger log = LoggerFactory.getLogger(MedicineServiceImpl.class);
+    @Value("${service.medicine.url}")
+    private String SERVICE_URL;
+
+    @Value("${service.medicine.key}")
+    private String SERVICE_KEY;
 
     @Override
     @Transactional
@@ -97,33 +102,35 @@ public class MedicineServiceImpl implements MedicineService {
             }
             return null;
         } catch (JsonSyntaxException e) {
-            log.error("JSON parsing error: {}", e.getMessage());
-            return null;
+            throw new BusinessException(ErrorCode.JSON_PARSE_ERROR);
         }
     }
 
+    // 약 정렬
     @Override
-    public List<MedicineDto> getSortedMedicines(String sortOption) {
+    public List<MedicineDto> getSortedMedicines(String sortOption, String userId) {
         List<Medicine> medicines;
-        switch (sortOption) {
-            case "nameAsc":
-                medicines = medicineRepository.findAllByOrderByItemNameAsc();
-                break;
-            case "ratingDesc":
-                medicines = medicineRepository.findAllByOrderByRatingDesc();
-                break;
-            case "ratingAsc":
-                medicines = medicineRepository.findAllByOrderByRatingAsc();
-                break;
-            case "ingredientAsc": // 성분 순 정렬
-                List<Medicine> result = new ArrayList<>();
-                result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("메틸페니데이트"));
-                result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("아토목세틴"));
-                result.addAll(medicineRepository.findByItemNameContainingOrderByItemNameAsc("클로니딘"));
-                medicines = result;
-                break;
-            default:
-                medicines = medicineRepository.findAll();
+
+        if (sortOption.equalsIgnoreCase("MY_FAVORITES")) {
+            medicines = medicineRepository.findMedicinesByUserFavorites(userId);
+        } else {
+            switch (sortOption) {
+                case "nameAsc":
+                    medicines = medicineRepository.findAllByOrderByItemNameAsc();
+                    break;
+                case "ratingDesc":
+                    medicines = medicineRepository.findAllByOrderByRatingDesc();
+                    break;
+                case "ratingAsc":
+                    medicines = medicineRepository.findAllByOrderByRatingAsc();
+                    break;
+                case "ingredientAsc":
+                    List<String> ingredientNames = List.of("메틸페니데이트", "아토목세틴", "클로니딘");
+                    medicines = medicineRepository.findByIngredientNames(ingredientNames);
+                    break;
+                default:
+                    medicines = medicineRepository.findAll();
+            }
         }
 
         if (medicines.isEmpty()) {
@@ -135,15 +142,40 @@ public class MedicineServiceImpl implements MedicineService {
         }
     }
 
+    // 약 모양 or 색상 or 제형으로 검색
     @Override
-    public List<Medicine> searchByFormCodeNameAndShapeAndColor(String formCodeName, String shape, String color1) {
-        List<Medicine> medicines = medicineRepository.findAllByFormCodeNameOrDrugShapeOrColorClass1(formCodeName, shape, color1);
-        log.info("Search by formCodeName: {}, shape: {}, color1: {}, result size: {}", formCodeName, shape, color1, medicines.size());
-        return medicines;
+    public List<Medicine> searchByFormCodeNameShapeColorAndTabletType(String formCodeName, String shape, String color1, TabletType tabletType) {
+        return medicineRepository.findAllByFormCodeNameOrDrugShapeOrColorClass1OrTabletType(formCodeName, shape, color1, tabletType);
+    }
+
+    // 약 이름으로 검색
+    @Override
+    @Transactional
+    public List<Medicine> searchByItemName(String itemName, String userId) {
+        // 검색어 저장 로직 추가
+        searchHistoryService.saveSearchTerm(userId, itemName);
+        return medicineRepository.findByItemNameContaining(itemName);
+    }
+
+    // 개별 약 조회
+    @Override
+    public MedicineDto getMedicineById(Long id) {
+        Medicine medicine = medicineRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE));
+        return medicineMapper.toDto(medicine);
+    }
+
+    // 약 성분별 정렬
+    @Override
+    public List<MedicineDto> getMedicinesByIngredientType(IngredientType ingredientType) {
+        List<Medicine> medicines = medicineRepository.findAllByIngredientTypeOrderByItemNameAsc(ingredientType);
+        return medicines.stream()
+                .map(medicineMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Medicine> searchByItemName(String itemName) {
-        return medicineRepository.findByItemNameContaining(itemName);
+    public List<String> getRecentSearchTerms(String userId) {
+        return searchHistoryService.getRecentSearchTerms(userId);
     }
 }
