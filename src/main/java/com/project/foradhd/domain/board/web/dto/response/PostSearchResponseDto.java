@@ -1,7 +1,6 @@
 package com.project.foradhd.domain.board.web.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
 import lombok.AllArgsConstructor;
@@ -16,34 +15,20 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostResponseDto {
-
-    private List<PostListResponseDto> postList;
+public class PostSearchResponseDto {
+    private List<PostSearchListResponseDto> data;
     private PagingResponse paging;
-
     @Getter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class PostListResponseDto {
-        private Long id;
-        private String userId;
+    public static class PostSearchListResponseDto {
         private String title;
-        private String content;
-        private boolean anonymous;
-        private List<String> images;
+        private long viewCount;
         private long likeCount;
         private long commentCount;
-        private long scrapCount;
-        private long viewCount;
-        private CategoryName category;
-        private List<CommentResponseDto.CommentListResponseDto> comments;
-        private String nickname;
-        private String profileImage;
-
         @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
         private LocalDateTime createdAt;
-        @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
-        private LocalDateTime lastModifiedAt;
+        private List<String> images;
     }
 }

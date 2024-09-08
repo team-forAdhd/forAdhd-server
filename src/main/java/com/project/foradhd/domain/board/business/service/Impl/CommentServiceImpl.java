@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
+import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_USER_PROFILE;
 
 @Service
 @Transactional(readOnly=true)
@@ -37,14 +38,10 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment getComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
+        Comment comment = commentRepository.findByIdFetch(commentId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_COMMENT));
 
-        int childCommentCount = commentRepository.countByParentCommentId(commentId);
-        List<Comment> childComments = new ArrayList<>();
-        if (childCommentCount > 0) {
-            childComments = commentRepository.findByParentCommentId(commentId);
-        }
+        List<Comment> childComments = comment.getChildComments();
 
         return Comment.builder()
                 .id(comment.getId())
@@ -59,7 +56,6 @@ public class CommentServiceImpl implements CommentService {
                 .childComments(childComments)
                 .build();
     }
-
     @Override
     @Transactional
     public Comment createComment(Comment comment, String userId) {
@@ -91,15 +87,11 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_COMMENT));
 
-        // 원댓글에 연결된 대댓글의 부모 참조를 null로 설정
-        List<Comment> childComments = commentRepository.findByParentCommentId(commentId);
-        for (Comment childComment : childComments) {
-            childComment.setParentComment(null);
-            commentRepository.save(childComment);
-        }
+        // 대댓글의 부모 참조를 한 번의 배치 업데이트로 null 처리
+        commentRepository.detachChildComments(commentId);
 
-        // 원 댓글 삭제
-        commentRepository.deleteById(commentId);
+        // 원댓글 삭제
+        commentRepository.deleteCommentById(commentId);
     }
 
     @Transactional
@@ -109,20 +101,39 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment updateComment(Long commentId, String content) {
+    public Comment updateComment(Long commentId, String content, boolean anonymous, String userId) {
         Comment existingComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
 
-        Comment updatedComment = existingComment.toBuilder()
+        // 댓글 수정
+        Comment.CommentBuilder updatedCommentBuilder = existingComment.toBuilder()
                 .content(content)
-                .build();
+                .anonymous(anonymous);
 
-        return updatedComment;
+        if (!anonymous) {
+            UserProfile userProfile = userProfileRepository.findByUserId(userId)
+                    .orElseThrow(() -> new BusinessException(NOT_FOUND_USER_PROFILE));
+            updatedCommentBuilder.nickname(userProfile.getNickname())
+                    .profileImage(userProfile.getProfileImage());
+        } else {
+            updatedCommentBuilder.nickname(null) // 익명일 경우 닉네임 초기화
+                    .profileImage(null); // 익명일 경우 프로필 이미지 초기화
+        }
+
+        Comment updatedComment = updatedCommentBuilder.build();
+        return commentRepository.save(updatedComment);
     }
 
     @Override
-    public Page<PostResponseDto.PostListResponseDto> getMyCommentedPosts(String userId, Pageable pageable) {
-        Page<Comment> userComments = commentRepository.findByUserId(userId, pageable);
+    public Page<PostResponseDto.PostListResponseDto> getMyCommentedPosts(String userId, Pageable pageable, SortOption sortOption) {
+        Sort sort = switch (sortOption) {
+            case OLDEST_FIRST -> Sort.by(Sort.Direction.ASC, "createdAt");
+            case NEWEST_FIRST -> Sort.by(Sort.Direction.DESC, "createdAt");
+            default -> Sort.by(Sort.Direction.DESC, "createdAt");
+        };
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+
+        Page<Comment> userComments = commentRepository.findByUserId(userId, sortedPageable);
         List<PostResponseDto.PostListResponseDto> posts = userComments.stream()
                 .map(Comment::getPost)
                 .distinct()
@@ -133,7 +144,7 @@ public class CommentServiceImpl implements CommentService {
                         .createdAt(post.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
-        return new PageImpl<>(posts, pageable, posts.size());
+        return new PageImpl<>(posts, sortedPageable, userComments.getTotalElements());
     }
 
     @Override

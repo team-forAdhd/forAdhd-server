@@ -69,17 +69,30 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    // 댓글 수정 API
     @PutMapping("/{commentId}")
-    public ResponseEntity<CommentResponseDto.CommentListResponseDto> updateComment(@PathVariable Long commentId, @RequestBody CreateCommentRequestDto createCommentRequest) {
-        Comment updatedComment = commentService.updateComment(commentId, createCommentRequest.getContent());
+    public ResponseEntity<CommentResponseDto.CommentListResponseDto> updateComment(
+            @PathVariable Long commentId,
+            @RequestBody CreateCommentRequestDto createCommentRequest,
+            @AuthUserId String userId) {
+
+        // 서비스 호출하여 댓글 수정
+        Comment updatedComment = commentService.updateComment(
+                commentId,
+                createCommentRequest.getContent(),
+                createCommentRequest.isAnonymous(),
+                userId);
+
+        // 매퍼를 이용해 엔티티를 DTO로 변환하여 반환
         return ResponseEntity.ok(commentMapper.commentToCommentListResponseDto(updatedComment));
     }
 
     // 나의 댓글
-    @GetMapping("/{userId}/my-comments")
-    public ResponseEntity<PostResponseDto> getMyCommentedPosts(@AuthUserId String userId, Pageable pageable) {
-        Page<PostResponseDto.PostListResponseDto> posts = commentService.getMyCommentedPosts(userId, pageable);
+    @GetMapping("/my-comments")
+    public ResponseEntity<PostResponseDto> getMyCommentedPosts(
+            @AuthUserId String userId,
+            Pageable pageable,
+            @RequestParam(defaultValue = "NEWEST_FIRST") SortOption sortOption) {
+        Page<PostResponseDto.PostListResponseDto> posts = commentService.getMyCommentedPosts(userId, pageable, sortOption);
         List<PostResponseDto.PostListResponseDto> postList = posts.getContent();
 
         PagingResponse pagingResponse = PagingResponse.from(posts);
@@ -91,7 +104,6 @@ public class CommentController {
 
         return ResponseEntity.ok(response);
     }
-
     // 글별 댓글 모아보기
     @GetMapping("/posts/{postId}")
     public ResponseEntity<CommentResponseDto> getCommentsByPost(

@@ -54,14 +54,6 @@ public class User extends BaseTimeEntity {
         this.email = email;
     }
 
-    //TODO: 양방향 연관관계 필요?
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private UserProfile userProfile;
-
-    //TODO: 양방향 연관관계 필요?
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private UserPrivacy userPrivacy;
-
     public void updateAsUserRole(boolean hasProfile) {
         if (hasProfile && isVerifiedEmail) {
             this.role = Role.USER;

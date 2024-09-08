@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.board.business.service.Impl;
 
 import com.project.foradhd.domain.board.business.service.NotificationService;
+import com.project.foradhd.domain.board.business.service.PostSearchHistoryService;
 import com.project.foradhd.domain.board.business.service.PostService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 
@@ -28,6 +28,7 @@ import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+    private final PostSearchHistoryService searchHistoryService;
     private final NotificationService notificationService;
     private final SseEmitters sseEmitters;
 
@@ -52,9 +53,10 @@ public class PostServiceImpl implements PostService {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .images(post.getImages())
+                .anonymous(post.isAnonymous())
                 .build();
 
-        return updatedPost;
+        return postRepository.save(updatedPost);
     }
 
     @Override
@@ -72,13 +74,19 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<Post> getUserPosts(String userId, Pageable pageable, SortOption sortOption) {
         pageable = applySorting(pageable, sortOption);
-        return postRepository.findByUserId(userId, pageable);
+        return postRepository.findByUserIdWithUserProfile(userId, pageable);
+    }
+
+    @Override
+    public Page<Post> getUserPostsByCategory(String userId, CategoryName category, Pageable pageable, SortOption sortOption) {
+        pageable = applySorting(pageable, sortOption);
+        return postRepository.findByUserIdAndCategoryWithUserProfile(userId, category, pageable);
     }
 
     // 글 카테고리별 정렬
     @Override
     public Page<Post> listByCategory(CategoryName category, Pageable pageable) {
-        return postRepository.findByCategory(category, pageable);
+        return postRepository.findByCategoryWithUserProfile(category, pageable);
     }
 
     // 글 조회수 증가
@@ -92,38 +100,20 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public List<PostRankingResponseDto> getTopPosts(Pageable pageable) {
-        List<Post> topPosts = postRepository.findTopPosts(pageable);
-        notifyUsersAboutTopPosts(topPosts);
-        return topPosts.stream()
-                .map(post -> PostRankingResponseDto.builder()
-                        .id(post.getId())
-                        .title(post.getTitle())
-                        .category(post.getCategory())
-                        .viewCount(post.getViewCount())
-                        .likeCount(post.getLikeCount())
-                        .createdAt(post.getCreatedAt())
-                        .images(post.getImages())
-                        .build())
-                .collect(Collectors.toList());
+    public Page<Post> getTopPosts(Pageable pageable) {
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), 10);
+        Page<Post> topPosts = postRepository.findTopPostsWithUserProfile(pageRequest);
+        notifyUsersAboutTopPosts(topPosts.getContent());
+        return topPosts;
     }
 
     @Override
     @Transactional
-    public List<PostRankingResponseDto> getTopPostsByCategory(CategoryName category, Pageable pageable) {
-        List<Post> topPosts = postRepository.findTopPostsByCategory(category, pageable);
-        notifyUsersAboutTopPosts(topPosts);
-        return topPosts.stream()
-                .map(post -> PostRankingResponseDto.builder()
-                        .id(post.getId())
-                        .title(post.getTitle())
-                        .category(post.getCategory())
-                        .viewCount(post.getViewCount())
-                        .likeCount(post.getLikeCount())
-                        .createdAt(post.getCreatedAt())
-                        .images(post.getImages())
-                        .build())
-                .collect(Collectors.toList());
+    public Page<Post> getTopPostsByCategory(CategoryName category, Pageable pageable) {
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), 10);
+        Page<Post> topPosts = postRepository.findTopPostsByCategoryWithUserProfile(category, pageRequest);
+        notifyUsersAboutTopPosts(topPosts.getContent());
+        return topPosts;
     }
 
     private void notifyUsersAboutTopPosts(List<Post> topPosts) {
@@ -163,5 +153,18 @@ public class PostServiceImpl implements PostService {
                 break;
         }
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+    }
+
+    @Override
+    public List<String> getRecentSearchTerms(String userId) {
+        return searchHistoryService.getRecentSearchTerms(userId);
+    }
+
+    @Override
+    @Transactional
+    public Page<Post> searchPostsByTitle(String title, String userId, Pageable pageable) {
+        // 검색어 저장 로직 추가
+        searchHistoryService.saveSearchTerm(userId, title);
+        return postRepository.findByTitleContainingWithUserProfile(title, pageable);
     }
 }

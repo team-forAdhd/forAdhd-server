@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.board.persistence.entity;
 
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
+import com.project.foradhd.domain.hospital.persistence.converter.StringListConverter;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.global.audit.BaseTimeEntity;
@@ -39,11 +40,16 @@ public class Post extends BaseTimeEntity {
 
     private String content;
 
+    private String nickname;
+
+    private String profileImage;
+
     private boolean anonymous;
 
-    @ElementCollection
-    @CollectionTable(name = "post_images", joinColumns = @JoinColumn(name = "post_id"))
-    private List<String> images;
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = "varchar(1000)")
+    private List<String> images = List.of();
 
     private long likeCount;
 

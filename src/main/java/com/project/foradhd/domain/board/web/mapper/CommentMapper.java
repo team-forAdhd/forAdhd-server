@@ -111,5 +111,4 @@ public interface CommentMapper {
                 .map(this::commentToCommentListResponseDto)
                 .collect(Collectors.toList());
     }
-
 }

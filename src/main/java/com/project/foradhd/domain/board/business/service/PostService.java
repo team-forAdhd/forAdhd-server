@@ -29,15 +29,19 @@ public interface PostService {
     // 모든 게시글 목록 조회
     Page<Post> getAllPosts(Pageable pageable);
 
-    // 특정 사용자가 작성한 게시글 목록 조회, 정렬 옵션 추가
+    // 사용자가 작성한 게시글 목록 조회, 정렬 옵션 추가
     Page<Post> getUserPosts(String userId, Pageable pageable, SortOption sortOption);
+    Page<Post> getUserPostsByCategory(String userId, CategoryName category, Pageable pageable, SortOption sortOption);
 
     // 글 조회수 증가
     Post getAndIncrementViewCount(Long postId);
     // 메인홈 - 실시간 랭킹
-    List<PostRankingResponseDto> getTopPosts(Pageable pageable);
+    Page<Post> getTopPosts(Pageable pageable);
+
     // 메인홈 - 카테고리별 실시간 랭킹
-    List<PostRankingResponseDto> getTopPostsByCategory(CategoryName category, Pageable pageable);
+    Page<Post> getTopPostsByCategory(CategoryName category, Pageable pageable);
     // SSE 알림 관련 설정
     void addComment(Long postId, String commentContent, String userId);
+    List<String> getRecentSearchTerms(String userId);
+    Page<Post> searchPostsByTitle(String title, String userId, Pageable pageable);
 }

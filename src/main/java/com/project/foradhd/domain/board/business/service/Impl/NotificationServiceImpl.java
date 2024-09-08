@@ -3,6 +3,9 @@ package com.project.foradhd.domain.board.business.service.Impl;
 import com.project.foradhd.domain.board.business.service.NotificationService;
 import com.project.foradhd.domain.board.persistence.entity.Notification;
 import com.project.foradhd.domain.board.persistence.repository.NotificationRepository;
+import com.project.foradhd.domain.user.business.service.UserService;
+import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import com.project.foradhd.global.util.SseEmitters;
@@ -17,12 +20,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
+    private final UserService userService;
     private final SseEmitters sseEmitters;
 
     @Override
     public void createNotification(String userId, String message) {
+        User user = userService.getUser(userId);
         Notification notification = Notification.builder()
-                .userId(userId)
+                .user(user)
                 .message(message)
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
@@ -33,7 +38,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<Notification> getNotifications(String userId) {
-        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        User user = userService.getUser(userId);
+
+        return notificationRepository.findByUserOrderByCreatedAtDesc(user);
     }
 
     @Override
@@ -41,11 +48,6 @@ public class NotificationServiceImpl implements NotificationService {
     public void markAsRead(Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_NOTIFICATION));
-
-        Notification updatedNotification = notification.toBuilder()
-                .isRead(true)
-                .build();
-
-        notificationRepository.save(updatedNotification);
+        notification.setRead(true);
     }
 }

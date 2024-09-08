@@ -15,6 +15,8 @@ public class PostDto {
     private String category;
     private String title;
     private String content;
+    private String nickname;
+    private String profileImage;
     private boolean anonymous;
     private List<String> images;
     private long likeCount;
