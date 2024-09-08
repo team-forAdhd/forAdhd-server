@@ -4,10 +4,13 @@ import com.project.foradhd.domain.board.business.service.PostScrapFilterService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
+import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
 import com.project.foradhd.domain.board.persistence.repository.PostScrapFilterRepository;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,23 +21,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PostScrapFilterServiceImpl implements PostScrapFilterService {
 
-    private final PostScrapFilterRepository scrapFilterRepository;
+    private final PostScrapFilterRepository postScrapFilterRepository;
     private final PostRepository postRepository;
     private final UserService userService;
+    private final CommentRepository commentRepository;
 
     @Override
+    @Transactional
     public void toggleScrap(Long postId, String userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
         User user = userService.getUser(userId);
 
-        scrapFilterRepository.findByPostIdAndUserId(postId, userId)
+        postScrapFilterRepository.findByPostIdAndUserId(postId, userId)
                 .ifPresentOrElse(
                         scrap -> {
-                            scrapFilterRepository.delete(scrap);
+                            postScrapFilterRepository.delete(scrap);
                             post.decrementScrapCount();
                         },
                         () -> {
@@ -42,15 +47,24 @@ public class PostScrapFilterServiceImpl implements PostScrapFilterService {
                                     .post(post)
                                     .user(user)
                                     .build();
-                            scrapFilterRepository.save(newScrap);
+                            postScrapFilterRepository.save(newScrap);
                             post.incrementScrapCount();
                         }
                 );
+        postRepository.save(post);
     }
 
+    @Override
     public Page<PostScrapFilter> getScrapsByUser(String userId, Pageable pageable, SortOption sortOption) {
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), getSortByOption(sortOption));
-        return scrapFilterRepository.findByUserId(userId, sortedPageable);
+        return postScrapFilterRepository.findByUserId(userId, sortedPageable);
+    }
+
+    @Override
+    public long getCommentCount(Long postId) {
+        long commentCount = commentRepository.countByPostId(postId);
+        long replyCount = commentRepository.countByParentCommentId(postId);
+        return commentCount + replyCount;
     }
 
     private Sort getSortByOption(SortOption option) {

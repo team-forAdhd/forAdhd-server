@@ -1,15 +1,18 @@
 package com.project.foradhd.domain.medicine.web.controller;
 
-import com.project.foradhd.domain.medicine.business.service.Impl.MedicineServiceImpl;
+import com.project.foradhd.domain.medicine.business.service.MedicineSearchHistoryService;
 import com.project.foradhd.domain.medicine.business.service.MedicineService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
+import com.project.foradhd.domain.medicine.persistence.enums.IngredientType;
+import com.project.foradhd.domain.medicine.persistence.enums.TabletType;
 import com.project.foradhd.domain.medicine.web.dto.MedicineDto;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineSearchResponse;
+import com.project.foradhd.domain.medicine.web.dto.response.MedicineSortedResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineMapper;
+import com.project.foradhd.global.AuthUserId;
+import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +20,19 @@ import org.springframework.http.ResponseEntity;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/medicines")
 @RequiredArgsConstructor
 public class MedicineController {
 
-    @Autowired
     private final MedicineService medicineService;
-    @Autowired
     private final MedicineMapper medicineMapper;
+    private final MedicineSearchHistoryService medicineSearchHistoryService;
 
-    private static final Logger log = LoggerFactory.getLogger(MedicineServiceImpl.class);
+
+   // 의약품 데이터를 가져와 저장하는 API
     @GetMapping("/fetch-and-save")
     public ResponseEntity<Object> fetchAndSaveMedicine(@RequestParam String itemname) {
         try {
@@ -41,37 +45,91 @@ public class MedicineController {
 
     // 의약품 목록을 정렬 옵션에 따라 조회하는 API
     @GetMapping("/sorted")
-    public ResponseEntity<List<MedicineDto>> getSortedMedicines(
-            @RequestParam(defaultValue = "nameAsc") String sortOption) {
+    public ResponseEntity<MedicineSortedResponse> getSortedMedicines(
+            @RequestParam(defaultValue = "nameAsc") String sortOption,
+            @AuthUserId String userId) {
         try {
-            List<MedicineDto> medicines = medicineService.getSortedMedicines(sortOption);
-            // 로그로 데이터 확인
-            System.out.println("Returned medicines: " + medicines);
-            return ResponseEntity.ok(medicines);
+            List<MedicineDto> medicines = medicineService.getSortedMedicines(sortOption, userId);
+            MedicineSortedResponse response = MedicineSortedResponse.builder()
+                    .kind("종류")
+                    .medicineList(medicines)
+                    .build();
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            System.out.println("Error retrieving sorted medicines: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
+    // 약 모양, 색상, 제형 검색 api
     @GetMapping("/search")
-    public ResponseEntity<List<MedicineSearchResponse>> searchMedicines(
+    public ResponseEntity<MedicineSearchResponse> searchMedicines(
             @RequestParam(required = false) String shape,
             @RequestParam(required = false) String color1,
             @RequestParam(required = false) String formCodeName,
-            @RequestParam(required = false) String itemName) {
+            @RequestParam(required = false) String itemName,
+            @RequestParam(required = false) TabletType tabletType,
+            @AuthUserId String userId,
+            Pageable pageable) {
 
         List<Medicine> medicines;
 
         if (itemName != null) {
-            medicines = medicineService.searchByItemName(itemName);
-        } else if (shape != null || color1 != null || formCodeName != null) {
-            medicines = medicineService.searchByFormCodeNameAndShapeAndColor(formCodeName, shape, color1);
+            medicines = medicineService.searchByItemName(itemName, userId);
+            medicineSearchHistoryService.saveSearchTerm(userId, itemName); // 검색어 저장
+        } else if (shape != null || color1 != null || formCodeName != null || tabletType != null) {
+            medicines = medicineService.searchByFormCodeNameShapeColorAndTabletType(formCodeName, shape, color1, tabletType);
         } else {
             return ResponseEntity.badRequest().build();
         }
 
-        List<MedicineSearchResponse> response = medicineMapper.toResponseDtoList(medicines);
+        List<MedicineSearchResponse.MedicineSearchListResponse> responseDtoList = medicines.stream()
+                .map(medicineMapper::toMedicineSearchListResponse)
+                .collect(Collectors.toList());
+
+        PagingResponse pagingResponse = PagingResponse.from(pageable.getPageNumber(), pageable.getPageSize(), responseDtoList.size(), medicines.size());
+
+        MedicineSearchResponse response = MedicineSearchResponse.builder()
+                .data(responseDtoList)
+                .paging(pagingResponse)
+                .build();
+
         return ResponseEntity.ok(response);
+    }
+
+    // 개별 약 조회 API
+    @GetMapping("/{id}")
+    public ResponseEntity<MedicineDto> getMedicineById(@PathVariable Long id) {
+        MedicineDto medicine = medicineService.getMedicineById(id);
+        return ResponseEntity.ok(medicine);
+    }
+
+    // 약 성분별 조회
+    @GetMapping("/sorted-by-ingredient")
+    public ResponseEntity<MedicineSortedResponse> getMedicinesByIngredientType(
+            @RequestParam IngredientType ingredientType) {
+        try {
+            List<MedicineDto> medicines = medicineService.getMedicinesByIngredientType(ingredientType);
+            MedicineSortedResponse response = MedicineSortedResponse.builder()
+                    .kind("종류")
+                    .medicineList(medicines)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // 최근 검색어 조회 API
+    @GetMapping("/recent-searches")
+    public ResponseEntity<List<String>> getRecentSearchTerms(@AuthUserId String userId) {
+        List<String> recentSearchTerms = medicineSearchHistoryService.getRecentSearchTerms(userId);
+        return ResponseEntity.ok(recentSearchTerms);
+    }
+
+    // 특정 검색어 삭제
+    @DeleteMapping("/recent-searches/{id}")
+    public ResponseEntity<Void> deleteSearchTermById(@PathVariable Long id) {
+        medicineSearchHistoryService.deleteSearchTermById(id);
+        return ResponseEntity.noContent().build();
     }
 }

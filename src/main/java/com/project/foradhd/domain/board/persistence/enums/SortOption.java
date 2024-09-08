@@ -6,4 +6,6 @@ public enum SortOption {
     MOST_VIEWED,
     MOST_COMMENTED,
     MOST_LIKED,
+    HIGHEST_GRADE,
+    LOWEST_GRADE, MY_FAVORITES
 }

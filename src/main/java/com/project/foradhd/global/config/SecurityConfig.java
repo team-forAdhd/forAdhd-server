@@ -2,6 +2,7 @@ package com.project.foradhd.global.config;
 
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.project.foradhd.domain.auth.converter.CustomOAuth2AuthorizationCodeGrantRequestEntityConverter;
 import com.project.foradhd.domain.auth.filter.JwtAuthenticationFilter;
@@ -40,6 +41,13 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -81,6 +89,7 @@ public class SecurityConfig {
                 .requestMatchers(NICKNAME_CHECK_API_PATH, SIGN_UP_API_PATH, LOGIN_API_PATH,
                     AUTH_TOKEN_REISSUE_API_PATH, HEALTH_CHECK_API_PATH).permitAll()
                 .requestMatchers("/error", "/favicon.ico").permitAll()
+                    .requestMatchers("/api/v1/notifications/sse").permitAll()
                 .requestMatchers(EMAIL_AUTH_API_PATH, SNS_SIGN_UP_API_PATH, WITHDRAW_API_PATH, LOGOUT_API_PATH).hasRole(Role.GUEST.name())
                 .anyRequest().hasRole(Role.USER.name()))
             .sessionManagement(config -> config
@@ -104,6 +113,7 @@ public class SecurityConfig {
             .exceptionHandling(config -> config
                 .authenticationEntryPoint(jwtAuthenticationFailureHandler)
                 .accessDeniedHandler(jwtAuthorizationFailureHandler))
+                .cors(withDefaults())
             .addFilter(loginAuthenticationFilter(authenticationManager(authenticationConfiguration)))
             .addFilterAfter(jwtAuthenticationFilter, LoginAuthenticationFilter.class);
         return http.build();
@@ -144,5 +154,17 @@ public class SecurityConfig {
         DefaultAuthorizationCodeTokenResponseClient oAuth2AccessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
         oAuth2AccessTokenResponseClient.setRequestEntityConverter(customOAuth2AuthorizationCodeGrantRequestEntityConverter);
         return oAuth2AccessTokenResponseClient;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

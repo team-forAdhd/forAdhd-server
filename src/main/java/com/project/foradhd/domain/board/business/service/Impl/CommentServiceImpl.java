@@ -3,82 +3,159 @@ package com.project.foradhd.domain.board.business.service.Impl;
 import com.project.foradhd.domain.board.business.service.CommentService;
 import com.project.foradhd.domain.board.persistence.entity.Comment;
 import com.project.foradhd.domain.board.persistence.entity.CommentLikeFilter;
+import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
+import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
+import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
+import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
+import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
 import com.project.foradhd.global.exception.BusinessException;
+import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
 
 @Service
-@Transactional
+@Transactional(readOnly=true)
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
-    private final CommentRepository repository;
+    private final CommentRepository commentRepository;
     private final CommentLikeFilterRepository commentLikeFilterRepository;
+    private final UserProfileRepository userProfileRepository;
 
     @Override
     public Comment getComment(Long commentId) {
-        return repository.findById(commentId)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_COMMENT));
+
+        int childCommentCount = commentRepository.countByParentCommentId(commentId);
+        List<Comment> childComments = new ArrayList<>();
+        if (childCommentCount > 0) {
+            childComments = commentRepository.findByParentCommentId(commentId);
+        }
+
+        return Comment.builder()
+                .id(comment.getId())
+                .post(comment.getPost())
+                .user(comment.getUser())
+                .content(comment.getContent())
+                .parentComment(comment.getParentComment())
+                .anonymous(comment.isAnonymous())
+                .likeCount(comment.getLikeCount())
+                .nickname(comment.getNickname())
+                .profileImage(comment.getProfileImage())
+                .childComments(childComments)
+                .build();
     }
 
     @Override
     @Transactional
-    public Comment createComment(Comment comment) {
-        return repository.save(comment);
+    public Comment createComment(Comment comment, String userId) {
+        UserProfile userProfile = userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
+
+        Comment.CommentBuilder commentBuilder = comment.toBuilder().user(User.builder().id(userId).build());
+
+        if (comment.isAnonymous()) {
+            String anonymousNickname = generateAnonymousNickname(comment.getPost().getId(), userId);
+            String anonymousProfileImage = "http://example.com/anonymous-profile.png"; // 지정한 URL
+
+            commentBuilder
+                    .nickname(anonymousNickname)
+                    .profileImage(anonymousProfileImage);
+        } else {
+            commentBuilder
+                    .nickname(userProfile.getNickname())
+                    .profileImage(userProfile.getProfileImage());
+        }
+
+        return commentRepository.save(commentBuilder.build());
     }
 
+
+    @Override
     @Transactional
     public void deleteComment(Long commentId) {
-        Comment comment = repository.findById(commentId)
-                .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_COMMENT));
 
-        // 원 댓글에 연결된 대댓글의 부모 ID를 null로 설정
-        for (Comment childComment : comment.getChildComments()) {
+        // 원댓글에 연결된 대댓글의 부모 참조를 null로 설정
+        List<Comment> childComments = commentRepository.findByParentCommentId(commentId);
+        for (Comment childComment : childComments) {
             childComment.setParentComment(null);
-            repository.save(childComment);
+            commentRepository.save(childComment);
         }
+
         // 원 댓글 삭제
-        repository.delete(comment);
+        commentRepository.deleteById(commentId);
+    }
+
+    @Transactional
+    public void deleteChildrenComment(Long commentId) {
+        commentRepository.deleteByParentId(commentId);
     }
 
     @Override
     @Transactional
-    public Comment updateComment(Comment comment) {
-        Comment existingComment = repository.findById(comment.getId())
+    public Comment updateComment(Long commentId, String content) {
+        Comment existingComment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new BusinessException(NOT_FOUND_COMMENT));
-        existingComment.setContent(comment.getContent());
-        return repository.save(existingComment);
+
+        Comment updatedComment = existingComment.toBuilder()
+                .content(content)
+                .build();
+
+        return updatedComment;
     }
 
     @Override
-    public Page<Comment> getMyComments(Long writerId, Pageable pageable) {
-        return repository.findByWriterId(writerId, pageable);
+    public Page<PostResponseDto.PostListResponseDto> getMyCommentedPosts(String userId, Pageable pageable) {
+        Page<Comment> userComments = commentRepository.findByUserId(userId, pageable);
+        List<PostResponseDto.PostListResponseDto> posts = userComments.stream()
+                .map(Comment::getPost)
+                .distinct()
+                .map(post -> PostResponseDto.PostListResponseDto.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .content(post.getContent())
+                        .createdAt(post.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+        return new PageImpl<>(posts, pageable, posts.size());
     }
 
     @Override
+    @Transactional
     public Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption) {
         pageable = applySorting(pageable, sortOption);
-        return repository.findByPostId(postId, pageable);
+        return commentRepository.findByPostId(postId, pageable);
     }
 
     @Override
+    @Transactional
     public void toggleCommentLike(Long commentId, String userId) {
         Optional<CommentLikeFilter> likeFilter = commentLikeFilterRepository.findByCommentIdAndUserId(commentId, userId);
         if (likeFilter.isPresent()) {
             commentLikeFilterRepository.deleteByCommentIdAndUserId(commentId, userId);
             commentLikeFilterRepository.decrementLikeCount(commentId);
         } else {
+            CommentLikeFilter newLikeFilter = CommentLikeFilter.builder()
+                    .comment(Comment.builder().id(commentId).build())
+                    .user(User.builder().id(userId).build())
+                    .build();
+            commentLikeFilterRepository.save(newLikeFilter);
             commentLikeFilterRepository.incrementLikeCount(commentId);
         }
     }
@@ -90,5 +167,16 @@ public class CommentServiceImpl implements CommentService {
             default -> Sort.unsorted();
         };
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+    }
+
+    @Override
+    public String generateAnonymousNickname(Long postId, String userId) {
+        List<Comment> userComments = commentRepository.findByPostIdAndUserIdAndAnonymous(postId, userId, true);
+        if (!userComments.isEmpty()) {
+            return userComments.get(0).getNickname();
+        } else {
+            long anonymousCount = commentRepository.countByPostIdAndAnonymous(postId, true);
+            return "익명 " + (anonymousCount + 1);
+        }
     }
 }

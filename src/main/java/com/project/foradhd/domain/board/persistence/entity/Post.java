@@ -2,6 +2,7 @@ package com.project.foradhd.domain.board.persistence.entity;
 
 import com.project.foradhd.domain.board.persistence.enums.CategoryName;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,10 +11,9 @@ import java.util.List;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "post")
@@ -23,8 +23,6 @@ public class Post extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
     private Long id;
-
-    private Long writerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
@@ -36,8 +34,6 @@ public class Post extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Comment> comments;
-
-    private String writerName;
 
     private String title;
 
@@ -73,4 +69,11 @@ public class Post extends BaseTimeEntity {
         if (this.scrapCount > 0) this.scrapCount--;
     }
 
+    public void incrementViewCount() {
+        this.viewCount++;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

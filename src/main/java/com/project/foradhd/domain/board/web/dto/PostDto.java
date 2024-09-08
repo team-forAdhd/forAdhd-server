@@ -11,9 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 public class PostDto {
     private Long id;
-    private Long writerId;
-    private String writerName;
-    private String categoryName;
+    private String userId;
+    private String category;
     private String title;
     private String content;
     private boolean anonymous;

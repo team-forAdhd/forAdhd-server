@@ -7,5 +7,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface PostScrapFilterService {
     void toggleScrap(Long postId, String userId);
+    long getCommentCount(Long postId);
     Page<PostScrapFilter> getScrapsByUser(String userId, Pageable pageable, SortOption sortOption);
 }

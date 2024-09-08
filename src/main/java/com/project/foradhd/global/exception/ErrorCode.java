@@ -41,9 +41,11 @@ public enum ErrorCode {
 
     //medicine
     NOT_FOUND_MEDICINE(NOT_FOUND, "존재하지 않는 약입니다."),
+    JSON_PARSE_ERROR(BAD_REQUEST,"파싱 에러가 발생했습니다"),
 
     //medicine_review
     NOT_FOUND_MEDICINE_REVIEW(NOT_FOUND, "존재하지 않는 약 리뷰입니다."),
+    FORBIDDEN_MEDICINE_REVIEW(FORBIDDEN, "약 리뷰에 접근할 수 있는 권한이 없습니다."),
     //S3
     EMPTY_FILE(BAD_REQUEST, "유효한 파일이어야 합니다."),
     NOT_FOUND_FILE_EXTENSION(BAD_REQUEST, "파일 확장자가 존재하지 않습니다."),
@@ -64,8 +66,10 @@ public enum ErrorCode {
     //comment
     NOT_FOUND_COMMENT(NOT_FOUND, "존재하지 않는 댓글입니다."),
     NOT_FOUND_COMMENT_LIKE(NOT_FOUND, "존재하지 않는 댓글 좋아요입니다."),
-    ALREADY_LIKED_COMMENT(CONFLICT, "이미 좋아요한 댓글입니다.");
+    ALREADY_LIKED_COMMENT(CONFLICT, "이미 좋아요한 댓글입니다."),
 
+    // notification
+    NOT_FOUND_NOTIFICATION(NOT_FOUND, "존재하지 않는 알림입니다.");
     private final HttpStatus status;
     private final String message;
 }
