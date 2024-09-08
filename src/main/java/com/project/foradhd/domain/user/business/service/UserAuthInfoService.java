@@ -12,4 +12,6 @@ public interface UserAuthInfoService {
     void updatePassword(String userId, String newPassword);
 
     AuthPassword getAuthPassword(String userId);
+
+    void withdraw(String userId);
 }

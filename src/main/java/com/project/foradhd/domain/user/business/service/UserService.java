@@ -15,13 +15,8 @@ import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.enums.Provider;
-import com.project.foradhd.domain.user.persistence.repository.PushNotificationApprovalRepository;
-import com.project.foradhd.domain.user.persistence.repository.TermsRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserPushNotificationApprovalRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserTermsApprovalRepository;
+import com.project.foradhd.domain.user.persistence.repository.*;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,6 +40,7 @@ public class UserService {
     private final UserTermsApprovalRepository userTermsApprovalRepository;
     private final PushNotificationApprovalRepository pushNotificationApprovalRepository;
     private final UserPushNotificationApprovalRepository userPushNotificationApprovalRepository;
+    private final UserDeviceRepository userDeviceRepository;
     private final UserAuthInfoService userAuthInfoService;
 
     public boolean checkNickname(String nickname) {
@@ -139,6 +135,23 @@ public class UserService {
     }
 
     @Transactional
+    public void withdraw(String userId) {
+        //유저, 인증 관련 데이터 삭제
+        userTermsApprovalRepository.deleteByUserId(userId);
+        userPushNotificationApprovalRepository.deleteByUserId(userId);
+        userDeviceRepository.deleteByUserId(userId);
+        userAuthInfoService.withdraw(userId);
+
+        //유저 정보 기본값으로 초기화
+        User user = getUser(userId);
+        UserProfile userProfile = getUserProfile(userId);
+        UserPrivacy userPrivacy = getUserPrivacy(userId);
+        user.withdraw();
+        userProfile.withdraw();
+        userPrivacy.withdraw();
+    }
+
+    @Transactional
     public void saveUserInfo(User user, UserPrivacy userPrivacy) {
         userRepository.save(user);
         userPrivacyRepository.save(userPrivacy);
@@ -157,6 +170,11 @@ public class UserService {
     public UserProfile getUserProfileFetch(String userId) {
         return userProfileRepository.findByUserIdFetch(userId)
             .orElseThrow(() -> new BusinessException(NOT_FOUND_USER_PROFILE));
+    }
+
+    public UserPrivacy getUserPrivacy(String userId) {
+        return userPrivacyRepository.findByUserId(userId)
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_USER_PRIVACY));
     }
 
     public Optional<User> getSignedUpUser(String email, Provider provider, String externalUserId) {

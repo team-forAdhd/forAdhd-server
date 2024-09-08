@@ -2,6 +2,7 @@ package com.project.foradhd.domain.auth.business.service.impl;
 
 import com.project.foradhd.domain.auth.persistence.entity.AuthPassword;
 import com.project.foradhd.domain.auth.persistence.repository.AuthPasswordRepository;
+import com.project.foradhd.domain.auth.persistence.repository.AuthSocialLoginRepository;
 import com.project.foradhd.domain.user.business.service.UserAuthInfoService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
@@ -18,6 +19,7 @@ import static com.project.foradhd.global.exception.ErrorCode.NOT_MATCH_USERNAME_
 @Service
 public class UserAuthInfoServiceImpl implements UserAuthInfoService {
 
+    private final AuthSocialLoginRepository authSocialLoginRepository;
     private final AuthPasswordRepository authPasswordRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -52,5 +54,12 @@ public class UserAuthInfoServiceImpl implements UserAuthInfoService {
     public AuthPassword getAuthPassword(String userId) {
         return authPasswordRepository.findByUserId(userId)
             .orElseThrow(() -> new BusinessException(NOT_FOUND_USER));
+    }
+
+    @Transactional
+    @Override
+    public void withdraw(String userId) {
+        authSocialLoginRepository.deleteByUserId(userId);
+        authPasswordRepository.deleteByUserId(userId);
     }
 }

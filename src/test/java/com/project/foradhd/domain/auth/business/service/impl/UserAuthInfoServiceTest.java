@@ -13,6 +13,7 @@ import static org.mockito.Mockito.times;
 
 import com.project.foradhd.domain.auth.persistence.entity.AuthPassword;
 import com.project.foradhd.domain.auth.persistence.repository.AuthPasswordRepository;
+import com.project.foradhd.domain.auth.persistence.repository.AuthSocialLoginRepository;
 import com.project.foradhd.domain.user.business.service.UserAuthInfoService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.config.PasswordEncoderConfig;
@@ -41,6 +42,9 @@ class UserAuthInfoServiceTest {
     UserAuthInfoService userAuthInfoService;
 
     @Mock
+    AuthSocialLoginRepository authSocialLoginRepository;
+
+    @Mock
     AuthPasswordRepository authPasswordRepository;
 
     @Autowired
@@ -52,7 +56,7 @@ class UserAuthInfoServiceTest {
     @BeforeEach
     void init() {
         MockitoAnnotations.openMocks(this);
-        userAuthInfoService = new UserAuthInfoServiceImpl(authPasswordRepository, passwordEncoder);
+        userAuthInfoService = new UserAuthInfoServiceImpl(authSocialLoginRepository, authPasswordRepository, passwordEncoder);
     }
 
     @DisplayName("일반 회원가입 시 비밀번호 저장 테스트")

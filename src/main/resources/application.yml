@@ -45,6 +45,11 @@ cloud:
     cloud-front:
       deploy-domain: ${CLOUD_FRONT_DEPLOY_DOMAIN}
 
+google:
+  places:
+    api-key: ${GOOGLE_PLACES_API_KEY}
+    url: ${GOOGLE_PLACES_URL}
+
 ---
 spring:
   config:

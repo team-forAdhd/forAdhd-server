@@ -18,6 +18,7 @@ public enum ErrorCode {
     //user
     NOT_FOUND_USER(NOT_FOUND, "존재하지 않는 유저입니다."),
     NOT_FOUND_USER_PROFILE(NOT_FOUND, "존재하지 않는 유저 프로필입니다."),
+    NOT_FOUND_USER_PRIVACY(NOT_FOUND, "존재하지 않는 유저 개인정보입니다."),
     ALREADY_EXISTS_EMAIL(CONFLICT, "이미 가입한 이메일입니다."),
     ALREADY_EXISTS_NICKNAME(CONFLICT, "이미 사용 중인 닉네임입니다."),
     NOT_FOUND_TERMS(NOT_FOUND, "존재하지 않는 이용약관입니다."),

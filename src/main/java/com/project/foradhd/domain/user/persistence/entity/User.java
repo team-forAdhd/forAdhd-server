@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 @AllArgsConstructor
@@ -37,6 +39,13 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean isVerifiedEmail = Boolean.FALSE;
 
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Boolean deleted = Boolean.FALSE;
+
+    private LocalDateTime deletedAt;
+
     public String getAuthority() {
         return this.role.getName();
     }
@@ -56,5 +65,13 @@ public class User extends BaseTimeEntity {
         if (hasProfile && isVerifiedEmail) {
             this.role = Role.USER;
         }
+    }
+
+    public void withdraw() {
+        this.email = "";
+        this.role = Role.ANONYMOUS;
+        this.isVerifiedEmail = false;
+        this.deleted = true;
+        this.deletedAt = LocalDateTime.now();
     }
 }

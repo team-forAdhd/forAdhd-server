@@ -27,5 +27,9 @@ public class HospitalListNearbyResponse {
         private Double distance;
         private HospitalOperationStatus operationStatus;
         private Boolean isBookmarked;
+
+        public void synchronizeOperationStatus(HospitalOperationStatus operationStatus) {
+            this.operationStatus = operationStatus;
+        }
     }
 }

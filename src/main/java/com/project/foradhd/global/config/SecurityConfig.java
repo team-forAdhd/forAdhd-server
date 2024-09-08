@@ -62,6 +62,7 @@ public class SecurityConfig {
 
     private static final String EMAIL_AUTH_API_PATH = "/api/v1/user/email-auth";
     private static final String SNS_SIGN_UP_API_PATH = "/api/v1/user/sns-sign-up";
+    private static final String WITHDRAW_API_PATH = "/api/v1/user/withdraw";
     private static final String LOGOUT_API_PATH = "/api/v1/auth/logout";
 
     private static final String CORS_ALLOWED_ORIGINS = "http://localhost:3000,http://localhost:8080";
@@ -92,6 +93,7 @@ public class SecurityConfig {
                 .requestMatchers("/error", "/favicon.ico").permitAll()
                     .requestMatchers("/api/v1/notifications/sse").permitAll()
                 .requestMatchers(EMAIL_AUTH_API_PATH, SNS_SIGN_UP_API_PATH, LOGOUT_API_PATH).hasRole(Role.GUEST.name())
+                .requestMatchers(EMAIL_AUTH_API_PATH, SNS_SIGN_UP_API_PATH, WITHDRAW_API_PATH, LOGOUT_API_PATH).hasRole(Role.GUEST.name())
                 .anyRequest().hasRole(Role.USER.name()))
             .sessionManagement(config -> config
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
