@@ -137,7 +137,7 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable, SortOption sortOption) {
         Sort sort = getSortByOption(sortOption);
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        return reviewRepository.findByUserId(userId, sortedPageable);
+        return reviewRepository.findByUserIdWithDetails(userId, sortedPageable);
     }
 
     private void updateMedicineRating(Medicine medicine) {
@@ -152,7 +152,7 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     public Page<MedicineReview> findReviewsByMedicineId(Long medicineId, Pageable pageable, SortOption sortOption) {
         Sort sort = getSortByOption(sortOption);
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        return reviewRepository.findByMedicineId(medicineId, sortedPageable);
+        return reviewRepository.findByMedicineIdWithDetails(medicineId, sortedPageable);
     }
     private Sort getSortByOption(SortOption sortOption) {
         switch (sortOption) {

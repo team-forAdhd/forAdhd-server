@@ -16,4 +16,3 @@ public interface MedicineReviewService {
     Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable, SortOption sortOption);
     Page<MedicineReview> findReviewsByMedicineId(Long medicineId, Pageable pageable, SortOption sortOption);
 }
-
