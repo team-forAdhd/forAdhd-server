@@ -127,7 +127,9 @@ public class HospitalCsvProcessor implements CommandLineRunner {
 
     private String requestPlaceId(String name) {
         GooglePlaceListResponse googlePlaceListResponse = googlePlacesClient.searchPlaces(name);
-        if (googlePlaceListResponse.getPlaces().size() == 1) {
+        if (googlePlaceListResponse != null &&
+                googlePlaceListResponse.getPlaces() != null &&
+                googlePlaceListResponse.getPlaces().size() == 1) {
             return googlePlaceListResponse.getPlaces().get(0).getId();
         }
         return null;
