@@ -7,9 +7,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SnsSignUpRequest {
 
     @NotBlank(message = "{nickname.notBlank}")
@@ -27,6 +33,9 @@ public class SnsSignUpRequest {
     private List<@Valid PushNotificationApprovalRequest> pushNotificationApprovals;
 
     @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class TermsApprovalRequest {
 
         @NotNull(message = "{terms.id.notNull}")
@@ -37,6 +46,9 @@ public class SnsSignUpRequest {
     }
 
     @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PushNotificationApprovalRequest {
 
         @NotNull(message = "{pushNotificationApproval.id.notNull}")
