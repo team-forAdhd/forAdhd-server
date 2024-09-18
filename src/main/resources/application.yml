@@ -59,6 +59,33 @@ google:
 spring:
   config:
     activate:
+      on-profile: init
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        highlight_sql: true
+        show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 100
+    database: mysql
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: false
+
+logging:
+  level:
+    root: info
+    org.hibernate.sql: info
+    org.hibernate.type.descriptor.sql: trace
+    com.project.foradhd: debug
+
+---
+spring:
+  config:
+    activate:
       on-profile: local
   jpa:
     hibernate:

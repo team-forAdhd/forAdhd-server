@@ -29,7 +29,7 @@ public class Hospital extends BaseTimeEntity {
     @Column(nullable = false, length = 500)
     private String address;
 
-    @Column(length = 11)
+    @Column(length = 20)
     private String phone;
 
     private String placeId;

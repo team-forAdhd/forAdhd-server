@@ -46,3 +46,6 @@ src/main/resources/static/keys/**
 ._.DS_Store
 **/.DS_Store
 **/._.DS_Store
+
+### .csv 파일 ###
+*.csv

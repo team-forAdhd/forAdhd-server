@@ -91,6 +91,9 @@ dependencies {
 
 	//Mybatis
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+
+	//OpenCSV
+	implementation 'com.opencsv:opencsv:5.7.1'
 }
 
 tasks.named('test') {
