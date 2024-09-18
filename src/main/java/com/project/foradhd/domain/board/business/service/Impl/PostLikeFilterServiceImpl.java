@@ -19,7 +19,7 @@ import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PostLikeFilterServiceImpl implements PostLikeFilterService {
 
     private final PostLikeFilterRepository postLikeFilterRepository;
@@ -27,6 +27,7 @@ public class PostLikeFilterServiceImpl implements PostLikeFilterService {
     private final UserService userService;
 
     @Override
+    @Transactional
     public void toggleLike(String userId, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(BOARD_NOT_FOUND));

@@ -1,12 +1,17 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.global.audit.BaseTimeEntity;
+import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -32,6 +37,12 @@ public class MedicineReview extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private Gender gender;
+
+    @Column(name = "nickname", length = 50)
+    private String nickname;
+
+    @Column(name = "profile_image", length = 255)
+    private String profileImage;
 
     @ElementCollection
     @CollectionTable(name = "medicine_co_medications", joinColumns = @JoinColumn(name = "review_id"))

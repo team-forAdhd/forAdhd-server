@@ -45,6 +45,11 @@ cloud:
     cloud-front:
       deploy-domain: ${CLOUD_FRONT_DEPLOY_DOMAIN}
 
+service:
+  medicine:
+    url: ${MEDICINE_SERVICE_URL}
+    key: ${MEDICINE_SERVICE_KEY}
+
 google:
   places:
     api-key: ${GOOGLE_PLACES_API_KEY}

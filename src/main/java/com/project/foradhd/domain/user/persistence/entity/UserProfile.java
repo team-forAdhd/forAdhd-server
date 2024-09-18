@@ -41,4 +41,9 @@ public class UserProfile extends BaseTimeEntity {
         this.profileImage = newUserProfile.getProfileImage();
         this.forAdhdType = newUserProfile.getForAdhdType();
     }
+
+    public void withdraw() {
+        this.nickname = "";
+        this.profileImage = "";
+    }
 }

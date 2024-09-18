@@ -30,25 +30,30 @@ public class RedisService {
         return getValue(redisKeyType.getKey(id));
     }
 
+    public <T> Optional<T> getValue(RedisKeyType redisKeyType, String id, Class<T> clazz) {
+        return getValue(redisKeyType, id)
+                .map(obj -> clazz.isInstance(obj) ? clazz.cast(obj) : null);
+    }
+
     @Transactional
-    public void setValue(String key, String value, long timeout, TimeUnit unit) {
+    public void setValue(String key, Object value, long timeout, TimeUnit unit) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         operations.set(key, value, timeout, unit);
     }
 
     @Transactional
-    public void setValue(RedisKeyType redisKeyType, String id, String value, long timeout, TimeUnit unit) {
+    public void setValue(RedisKeyType redisKeyType, String id, Object value, long timeout, TimeUnit unit) {
         setValue(redisKeyType.getKey(id), value, timeout, unit);
     }
 
     @Transactional
-    public void setValue(String key, String value, Duration timeout) {
+    public void setValue(String key, Object value, Duration timeout) {
         ValueOperations<String, Object> operations = redisTemplate.opsForValue();
         operations.set(key, value, timeout);
     }
 
     @Transactional
-    public void setValue(RedisKeyType redisKeyType, String id, String value, Duration timeout) {
+    public void setValue(RedisKeyType redisKeyType, String id, Object value, Duration timeout) {
         setValue(redisKeyType.getKey(id), value, timeout);
     }
 

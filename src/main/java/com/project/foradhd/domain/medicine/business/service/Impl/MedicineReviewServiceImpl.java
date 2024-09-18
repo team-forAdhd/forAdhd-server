@@ -1,18 +1,31 @@
 package com.project.foradhd.domain.medicine.business.service.Impl;
 
+import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.medicine.business.service.MedicineReviewService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
+import com.project.foradhd.domain.medicine.persistence.entity.MedicineReviewLike;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
+import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewLikeRepository;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewRepository;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
+import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
+import com.project.foradhd.domain.medicine.web.mapper.MedicineReviewMapper;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
+import com.project.foradhd.domain.user.persistence.entity.UserProfile;
+import com.project.foradhd.domain.user.persistence.enums.Gender;
+import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
+import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -25,48 +38,67 @@ import org.springframework.transaction.annotation.Transactional;
 public class MedicineReviewServiceImpl implements MedicineReviewService {
     private final MedicineReviewRepository reviewRepository;
     private final MedicineRepository medicineRepository;
+    private final MedicineReviewLikeRepository reviewLikeRepository;
     private final UserService userService;
 
     @Override
     @Transactional
-    public MedicineReview createReview(MedicineReviewRequest request) {
-        User user = userService.getUser(request.getUserId());
-        if (user == null) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_USER);
-        }
+    public MedicineReview createReview(MedicineReviewRequest request, String userId) {
+        User user = userService.getUser(userId);
 
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE));
 
-        List<Long> coMedications = request.getCoMedications() != null ? request.getCoMedications() : Collections.emptyList();
-
         MedicineReview review = MedicineReview.builder()
-                .user(user)
                 .medicine(medicine)
-                .coMedications(coMedications)
+                .user(user)
                 .content(request.getContent())
-                .images(request.getImages())
                 .grade(request.getGrade())
-                .helpCount(0)
+                .images(request.getImages())
+                .coMedications(request.getCoMedications())
                 .build();
 
-        return reviewRepository.save(review);
+        MedicineReview savedReview = reviewRepository.save(review);
+
+        // 약의 평균 별점을 업데이트
+        updateMedicineRating(medicine);
+
+        return savedReview;
     }
+
 
     @Override
     @Transactional
-    public void incrementHelpCount(Long reviewId) {
+    public void toggleHelpCount(Long reviewId, String userId) {
         MedicineReview review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW));
-        review = review.toBuilder().helpCount(review.getHelpCount() + 1).build();
+        User user = userService.getUser(userId);
+
+        if (reviewLikeRepository.existsByUserIdAndReviewId(userId, reviewId)) {
+            reviewLikeRepository.deleteByUserIdAndReviewId(userId, reviewId);
+            review = review.toBuilder().helpCount(review.getHelpCount() - 1).build();
+        } else {
+            MedicineReviewLike newLike = MedicineReviewLike.builder()
+                    .user(user)
+                    .review(review)
+                    .build();
+            reviewLikeRepository.save(newLike);
+            review = review.toBuilder().helpCount(review.getHelpCount() + 1).build();
+        }
+
         reviewRepository.save(review);
     }
 
     @Override
     @Transactional
-    public MedicineReview updateReview(Long reviewId, MedicineReviewRequest request) {
+    public MedicineReview updateReview(Long reviewId, MedicineReviewRequest request, String userId) {
         MedicineReview existingReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW));
+
+        // 리뷰 작성자와 요청한 유저가 같은지 확인
+        if (!existingReview.getUser().getId().equals(userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_MEDICINE_REVIEW);
+        }
 
         Medicine medicine = medicineRepository.findById(request.getMedicineId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE));
@@ -79,8 +111,14 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
                 .grade(request.getGrade())
                 .build();
 
-        return reviewRepository.save(updatedReview);
+        MedicineReview savedReview = reviewRepository.save(updatedReview);
+
+        // 약의 평균 별점을 업데이트
+        updateMedicineRating(medicine);
+
+        return savedReview;
     }
+
 
     @Override
     public void deleteReview(Long id) {
@@ -96,7 +134,38 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     }
 
     @Override
-    public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable) {
-        return reviewRepository.findByUserId(userId, pageable);
+    public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable, SortOption sortOption) {
+        Sort sort = getSortByOption(sortOption);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        return reviewRepository.findByUserId(userId, sortedPageable);
+    }
+
+    private void updateMedicineRating(Medicine medicine) {
+        double averageGrade = medicine.calculateAverageGrade();
+        Medicine updatedMedicine = medicine.toBuilder()
+                .rating(averageGrade)
+                .build();
+        medicineRepository.save(updatedMedicine);
+    }
+
+    @Override
+    public Page<MedicineReview> findReviewsByMedicineId(Long medicineId, Pageable pageable, SortOption sortOption) {
+        Sort sort = getSortByOption(sortOption);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        return reviewRepository.findByMedicineId(medicineId, sortedPageable);
+    }
+    private Sort getSortByOption(SortOption sortOption) {
+        switch (sortOption) {
+            case NEWEST_FIRST:
+                return Sort.by(Sort.Direction.DESC, "createdAt");
+            case OLDEST_FIRST:
+                return Sort.by(Sort.Direction.ASC, "createdAt");
+            case HIGHEST_GRADE:
+                return Sort.by(Sort.Direction.DESC, "grade");
+            case LOWEST_GRADE:
+                return Sort.by(Sort.Direction.ASC, "grade");
+            default:
+                return Sort.by(Sort.Direction.DESC, "createdAt");
+        }
     }
 }

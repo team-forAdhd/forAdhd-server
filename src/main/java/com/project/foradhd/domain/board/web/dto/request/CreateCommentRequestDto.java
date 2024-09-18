@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class CreateCommentRequestDto {
     private Long postId;
+    private Long parentCommentId;
     private String content;
     private boolean anonymous;
 }

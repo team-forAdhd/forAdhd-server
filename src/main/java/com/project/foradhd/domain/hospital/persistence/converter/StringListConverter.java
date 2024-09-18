@@ -14,11 +14,17 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
 
     @Override
     public String convertToDatabaseColumn(List<String> attribute) {
+        if (attribute == null) {
+            return null;
+        }
         return writeValueAsString(attribute);
     }
 
     @Override
     public List<String> convertToEntityAttribute(String column) {
+        if (column == null || column.isEmpty()) {
+            return null;
+        }
         return readValue(column, new TypeReference<>() {});
     }
 }

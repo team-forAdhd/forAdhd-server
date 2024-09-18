@@ -9,10 +9,12 @@ import com.project.foradhd.domain.hospital.persistence.entity.HospitalEvaluation
 import com.project.foradhd.domain.hospital.web.dto.request.*;
 import com.project.foradhd.domain.hospital.web.dto.response.*;
 import com.project.foradhd.domain.hospital.web.dto.response.HospitalListNearbyResponse.HospitalNearbyResponse;
+import com.project.foradhd.domain.hospital.web.enums.HospitalOperationStatus;
 import org.mapstruct.*;
 import org.mapstruct.MappingConstants.ComponentModel;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper(componentModel = ComponentModel.SPRING)
 public interface HospitalMapper {
@@ -156,4 +158,34 @@ public interface HospitalMapper {
     HospitalEvaluationReviewCreateData toHospitalEvaluationReviewCreateData(HospitalEvaluationReviewCreateRequest request);
 
     HospitalEvaluationReviewUpdateData toHospitalEvaluationReviewUpdateData(HospitalEvaluationReviewUpdateRequest request);
+
+    default void synchronizeOperationStatus(HospitalListNearbyResponse hospitalListNearbyResponse,
+                                            Map<String, HospitalOperationStatus> operationStatusByHospital) {
+        hospitalListNearbyResponse.getHospitalList()
+                .forEach(hospital -> {
+                    String hospitalId = hospital.getHospitalId();
+                    HospitalOperationStatus operationStatus = operationStatusByHospital.getOrDefault(hospitalId, HospitalOperationStatus.UNKNOWN);
+                    hospital.synchronizeOperationStatus(operationStatus);
+                });
+    }
+
+    default void synchronizeOperationStatus(HospitalListBookmarkResponse hospitalListBookmarkResponse,
+                                            Map<String, HospitalOperationStatus> operationStatusByHospital) {
+        hospitalListBookmarkResponse.getHospitalList()
+                .forEach(hospital -> {
+                    String hospitalId = hospital.getHospitalId();
+                    HospitalOperationStatus operationStatus = operationStatusByHospital.getOrDefault(hospitalId, HospitalOperationStatus.UNKNOWN);
+                    hospital.synchronizeOperationStatus(operationStatus);
+                });
+    }
+
+    default void synchronizeOperationDetails(HospitalDetailsResponse hospitalDetailsResponse, HospitalOperationDetailsData hospitalOperationDetails) {
+        HospitalOperationStatus operationStatus = hospitalOperationDetails.getOperationStatus();
+        Integer operationStartHour = hospitalOperationDetails.getOperationStartHour();
+        Integer operationStartMin = hospitalOperationDetails.getOperationStartMin();
+        Integer operationEndHour = hospitalOperationDetails.getOperationEndHour();
+        Integer operationEndMin = hospitalOperationDetails.getOperationEndMin();
+        hospitalDetailsResponse.synchronizeOperationDetails(operationStatus, operationStartHour, operationStartMin,
+                operationEndHour, operationEndMin);
+    }
 }

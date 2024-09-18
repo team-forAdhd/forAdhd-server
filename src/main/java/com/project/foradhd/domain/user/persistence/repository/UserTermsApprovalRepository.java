@@ -4,6 +4,7 @@ import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval.UserTermsApprovalId;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -17,4 +18,8 @@ public interface UserTermsApprovalRepository extends JpaRepository<UserTermsAppr
         order by t.seq
     """)
     List<UserTermsApproval> findByUserId(@Param("userId") String userId);
+
+    @Modifying
+    @Query("delete from UserTermsApproval uta where uta.id.user.id = :userId")
+    void deleteByUserId(@Param("userId") String userId);
 }

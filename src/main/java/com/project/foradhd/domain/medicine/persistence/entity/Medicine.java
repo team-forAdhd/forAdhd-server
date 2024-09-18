@@ -1,5 +1,7 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
+import com.project.foradhd.domain.medicine.persistence.enums.IngredientType;
+import com.project.foradhd.domain.medicine.persistence.enums.TabletType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +11,7 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Table(name = "medicine")
 public class Medicine {
 
@@ -31,6 +33,10 @@ public class Medicine {
     private String itemEngName; //제품영문명
     private double rating; // 별점
     private boolean isFavorite; // 즐겨찾기 여부
+    @Enumerated(EnumType.STRING)
+    private IngredientType ingredientType; // 성분 타입 (Enum)
+    @Enumerated(EnumType.STRING)
+    private TabletType tabletType; // 제형 타입 (Enum)
 
     @OneToMany(mappedBy = "medicine")
     private List<MedicineReview> reviews;
@@ -44,5 +50,4 @@ public class Medicine {
                 .average()
                 .orElse(0.0);
     }
-
 }

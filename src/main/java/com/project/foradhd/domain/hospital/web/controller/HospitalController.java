@@ -2,9 +2,12 @@ package com.project.foradhd.domain.hospital.web.controller;
 
 import com.project.foradhd.domain.hospital.business.dto.in.*;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
+import com.project.foradhd.domain.hospital.business.service.HospitalOperationService;
 import com.project.foradhd.domain.hospital.business.service.HospitalService;
+import com.project.foradhd.domain.hospital.persistence.entity.Hospital;
 import com.project.foradhd.domain.hospital.web.dto.request.*;
 import com.project.foradhd.domain.hospital.web.dto.response.*;
+import com.project.foradhd.domain.hospital.web.enums.HospitalOperationStatus;
 import com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter;
 import com.project.foradhd.domain.hospital.web.mapper.HospitalMapper;
 import com.project.foradhd.global.AuthUserId;
@@ -13,7 +16,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/hospitals")
@@ -21,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class HospitalController {
 
     private final HospitalService hospitalService;
+    private final HospitalOperationService hospitalOperationService;
     private final HospitalMapper hospitalMapper;
 
     @GetMapping("/nearby")
@@ -30,6 +38,15 @@ public class HospitalController {
         HospitalListNearbySearchCond searchCond = hospitalMapper.mapToSearchCond(request);
         HospitalListNearbyData hospitalListNearbyData = hospitalService.getHospitalListNearby(userId, searchCond, pageable);
         HospitalListNearbyResponse hospitalListNearbyResponse = hospitalMapper.toHospitalListNearbyResponse(hospitalListNearbyData);
+
+        Map<String, String> placeIdByHospital = hospitalListNearbyData.getHospitalList().stream()
+                .map(HospitalListNearbyData.HospitalNearbyData::getHospital)
+                .filter(hospital -> StringUtils.hasText(hospital.getPlaceId()))
+                .collect(Collectors.toMap(Hospital::getId, Hospital::getPlaceId));
+        Map<String, HospitalOperationStatus> operationStatusByHospital =
+                hospitalOperationService.getHospitalOperationStatus(placeIdByHospital);
+        hospitalMapper.synchronizeOperationStatus(hospitalListNearbyResponse, operationStatusByHospital);
+
         return ResponseEntity.ok(hospitalListNearbyResponse);
     }
 
@@ -49,6 +66,15 @@ public class HospitalController {
                                                                                 Pageable pageable) {
         HospitalListBookmarkData hospitalListBookmarkData = hospitalService.getHospitalListBookmark(userId, pageable);
         HospitalListBookmarkResponse hospitalListBookmarkResponse = hospitalMapper.toHospitalListBookmarkResponse(hospitalListBookmarkData);
+
+        Map<String, String> placeIdByHospital = hospitalListBookmarkData.getHospitalList().stream()
+                .map(HospitalListBookmarkData.HospitalBookmarkData::getHospital)
+                .filter(hospital -> StringUtils.hasText(hospital.getPlaceId()))
+                .collect(Collectors.toMap(Hospital::getId, Hospital::getPlaceId));
+        Map<String, HospitalOperationStatus> operationStatusByHospital =
+                hospitalOperationService.getHospitalOperationStatus(placeIdByHospital);
+        hospitalMapper.synchronizeOperationStatus(hospitalListBookmarkResponse, operationStatusByHospital);
+
         return ResponseEntity.ok(hospitalListBookmarkResponse);
     }
 
@@ -73,6 +99,11 @@ public class HospitalController {
                                                                     @PathVariable String hospitalId) {
         HospitalDetailsData hospitalDetailsData = hospitalService.getHospitalDetails(userId, hospitalId);
         HospitalDetailsResponse hospitalDetailsResponse = hospitalMapper.toHospitalDetailsResponse(hospitalDetailsData);
+
+        String placeId = hospitalDetailsData.getHospital().getPlaceId();
+        HospitalOperationDetailsData hospitalOperationDetails = hospitalOperationService.getHospitalOperationDetails(placeId);
+        hospitalMapper.synchronizeOperationDetails(hospitalDetailsResponse, hospitalOperationDetails);
+
         return ResponseEntity.ok(hospitalDetailsResponse);
     }
 

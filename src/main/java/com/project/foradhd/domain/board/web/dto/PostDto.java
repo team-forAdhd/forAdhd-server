@@ -11,11 +11,12 @@ import java.util.List;
 @AllArgsConstructor
 public class PostDto {
     private Long id;
-    private Long writerId;
-    private String writerName;
-    private String categoryName;
+    private String userId;
+    private String category;
     private String title;
     private String content;
+    private String nickname;
+    private String profileImage;
     private boolean anonymous;
     private List<String> images;
     private long likeCount;

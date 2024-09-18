@@ -20,7 +20,7 @@ public class PostScrapFilter extends BaseTimeEntity {
     @Column(name = "post_scrap_filter_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "post_id", referencedColumnName = "post_id")
     private Post post;
 

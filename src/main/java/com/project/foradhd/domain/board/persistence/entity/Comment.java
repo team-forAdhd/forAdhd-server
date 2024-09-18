@@ -6,13 +6,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "comment")
@@ -31,17 +31,21 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user; // 댓글 작성자 id
 
-    private String writerId;
-
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id", referencedColumnName = "comment_id", nullable = true)
     private Comment parentComment;
 
-    @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
-    private List<Comment> childComments;
+    @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> childComments = new ArrayList<>();
 
     private boolean anonymous;
     private long likeCount;
+    private String nickname;
+    private String profileImage;
+
+    public void setParentComment(Comment parentComment) {
+        this.parentComment = parentComment;
+    }
 }

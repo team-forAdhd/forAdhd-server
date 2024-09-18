@@ -1,11 +1,12 @@
 package com.project.foradhd.domain.medicine.web.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
+import lombok.*;
 
+import java.util.List;
 
-@Data
+@Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MedicineBookmarkResponse {
@@ -14,4 +15,13 @@ public class MedicineBookmarkResponse {
     private String engName;
     private String manufacturer;
     private String images;
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PagedMedicineBookmarkResponse {
+        private List<MedicineBookmarkResponse> data;
+        private PagingResponse paging;
+    }
 }
