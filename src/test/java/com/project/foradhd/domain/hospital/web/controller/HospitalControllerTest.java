@@ -1,6 +1,6 @@
 package com.project.foradhd.domain.hospital.web.controller;
 
-import com.project.foradhd.config.SecurityTestConfig;
+import com.project.foradhd.config.SecurityControllerTestConfig;
 import com.project.foradhd.config.user.WithMockTestUser;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.business.service.HospitalOperationService;
@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WithMockTestUser
-@ContextConfiguration(classes = SecurityTestConfig.class)
+@ContextConfiguration(classes = SecurityControllerTestConfig.class)
 @WebMvcTest(value = { HospitalController.class, HospitalMapper.class})
 class HospitalControllerTest {
 

@@ -1,6 +1,6 @@
 package com.project.foradhd.domain.auth.web.controller;
 
-import com.project.foradhd.config.SecurityTestConfig;
+import com.project.foradhd.config.SecurityControllerTestConfig;
 import com.project.foradhd.config.user.WithMockTestUser;
 import com.project.foradhd.domain.auth.business.dto.out.AuthTokenData;
 import com.project.foradhd.domain.auth.business.service.AuthService;
@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WithMockTestUser
-@ContextConfiguration(classes = SecurityTestConfig.class)
+@ContextConfiguration(classes = SecurityControllerTestConfig.class)
 @WebMvcTest(value = { AuthController.class, AuthMapper.class })
 class AuthControllerTest {
 

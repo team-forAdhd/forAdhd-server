@@ -1,6 +1,6 @@
 package com.project.foradhd.domain.user.web.controller;
 
-import com.project.foradhd.config.SecurityTestConfig;
+import com.project.foradhd.config.SecurityControllerTestConfig;
 import com.project.foradhd.config.user.WithMockTestUser;
 import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
 import com.project.foradhd.domain.user.business.dto.out.UserTokenData;
@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WithMockTestUser
-@ContextConfiguration(classes = SecurityTestConfig.class)
+@ContextConfiguration(classes = SecurityControllerTestConfig.class)
 @WebMvcTest(value = { UserController.class, UserMapper.class })
 class UserControllerTest {
 
