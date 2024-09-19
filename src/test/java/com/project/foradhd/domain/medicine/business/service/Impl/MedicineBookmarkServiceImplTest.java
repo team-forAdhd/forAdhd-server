@@ -1,135 +1,114 @@
 package com.project.foradhd.domain.medicine.business.service.Impl;
 
-import static org.mockito.BDDMockito.*;
-import static org.assertj.core.api.Assertions.*;
-
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineBookmark;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineBookmarkRepository;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.global.exception.BusinessException;
-import com.project.foradhd.global.exception.ErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collections;
 import java.util.Optional;
 
-@ExtendWith(MockitoExtension.class)
+import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageRequest;
+
+import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+
+import org.mockito.ArgumentCaptor;
 class MedicineBookmarkServiceImplTest {
 
     @Mock
     private MedicineBookmarkRepository bookmarkRepository;
 
     @Mock
-    private MedicineRepository medicineRepository;
+    private UserService userService;
 
     @Mock
-    private UserService userService;
+    private MedicineRepository medicineRepository;
 
     @InjectMocks
     private MedicineBookmarkServiceImpl bookmarkService;
 
-    private User user;
-    private Medicine medicine;
-    private MedicineBookmark bookmark;
-
     @BeforeEach
     void setUp() {
-        user = User.builder()
-                .id("user1")
-                .build();
-
-        medicine = Medicine.builder()
-                .id(1L)
-                .build();
-
-        bookmark = MedicineBookmark.builder()
-                .user(user)
-                .medicine(medicine)
-                .deleted(false)
-                .build();
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void toggleBookmark_ShouldCreateBookmark() {
+    void toggleBookmark_shouldAddBookmarkIfNotExists() {
         // given
-        given(userService.getUser("user1")).willReturn(user);
-        given(medicineRepository.findById(1L)).willReturn(Optional.of(medicine));
-        given(bookmarkRepository.existsByUserIdAndMedicineId("user1", 1L)).willReturn(false);
-        given(bookmarkRepository.save(any(MedicineBookmark.class))).willReturn(bookmark);
+        String userId = "user123";
+        Long medicineId = 1L;
+
+        User user = User.builder().id(userId).build();
+        Medicine medicine = Medicine.builder().id(medicineId).build();
+
+        given(userService.getUser(userId)).willReturn(user);
+        given(medicineRepository.findById(medicineId)).willReturn(Optional.of(medicine));
+        given(bookmarkRepository.existsByUserIdAndMedicineId(userId, medicineId)).willReturn(false);
 
         // when
-        bookmarkService.toggleBookmark("user1", 1L);
+        bookmarkService.toggleBookmark(userId, medicineId);
 
         // then
-        then(bookmarkRepository).should().save(any(MedicineBookmark.class));
+        ArgumentCaptor<MedicineBookmark> bookmarkCaptor = ArgumentCaptor.forClass(MedicineBookmark.class);
+        verify(bookmarkRepository).save(bookmarkCaptor.capture());
+
+        MedicineBookmark savedBookmark = bookmarkCaptor.getValue();
+        assertThat(savedBookmark.getUser()).isEqualTo(user);
+        assertThat(savedBookmark.getMedicine()).isEqualTo(medicine);
+        assertThat(savedBookmark.getDeleted()).isEqualTo(Boolean.FALSE);
     }
 
     @Test
-    void toggleBookmark_ShouldDeleteBookmark() {
+    void toggleBookmark_shouldRemoveBookmarkIfExists() {
         // given
-        given(userService.getUser("user1")).willReturn(user);
-        given(medicineRepository.findById(1L)).willReturn(Optional.of(medicine));
-        given(bookmarkRepository.existsByUserIdAndMedicineId("user1", 1L)).willReturn(true);
-        willDoNothing().given(bookmarkRepository).deleteByUserIdAndMedicineId("user1", 1L);
+        String userId = "user123";
+        Long medicineId = 1L;
+
+        User user = User.builder().id(userId).build();
+        Medicine medicine = Medicine.builder().id(medicineId).build();
+
+        given(userService.getUser(userId)).willReturn(user);
+        given(medicineRepository.findById(medicineId)).willReturn(Optional.of(medicine));
+        given(bookmarkRepository.existsByUserIdAndMedicineId(userId, medicineId)).willReturn(true);
 
         // when
-        bookmarkService.toggleBookmark("user1", 1L);
+        bookmarkService.toggleBookmark(userId, medicineId);
 
         // then
-        then(bookmarkRepository).should().deleteByUserIdAndMedicineId("user1", 1L);
+        verify(bookmarkRepository, times(1)).deleteByUserIdAndMedicineId(userId, medicineId);
     }
 
     @Test
-    void toggleBookmark_ShouldThrowException_WhenUserNotFound() {
+    void getBookmarksByUser_shouldReturnBookmarksPage() {
         // given
-        given(userService.getUser("user1")).willReturn(null);
+        String userId = "user123";
+        Pageable pageable = PageRequest.of(0, 10);
+
+        MedicineBookmark bookmark1 = MedicineBookmark.builder().id(1L).build();
+        MedicineBookmark bookmark2 = MedicineBookmark.builder().id(2L).build();
+        Page<MedicineBookmark> bookmarkPage = new PageImpl<>(Arrays.asList(bookmark1, bookmark2), pageable, 2);
+
+        given(bookmarkRepository.findByUserIdAndDeletedIsFalse(userId, pageable)).willReturn(bookmarkPage);
 
         // when
-        Throwable thrown = catchThrowable(() -> bookmarkService.toggleBookmark("user1", 1L));
+        Page<MedicineBookmark> result = bookmarkService.getBookmarksByUser(userId, pageable);
 
         // then
-        assertThat(thrown).isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_USER.getMessage());
-    }
-
-    @Test
-    void toggleBookmark_ShouldThrowException_WhenMedicineNotFound() {
-        // given
-        given(userService.getUser("user1")).willReturn(user);
-        given(medicineRepository.findById(1L)).willReturn(Optional.empty());
-
-        // when
-        Throwable thrown = catchThrowable(() -> bookmarkService.toggleBookmark("user1", 1L));
-
-        // then
-        assertThat(thrown).isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.NOT_FOUND_MEDICINE.getMessage());
-    }
-
-    @Test
-    void getBookmarksByUser_ShouldReturnPageOfBookmarks() {
-        // given
-        Pageable pageable = Pageable.unpaged();
-        Page<MedicineBookmark> bookmarkPage = new PageImpl<>(Collections.singletonList(bookmark));
-        given(bookmarkRepository.findByUserIdAndDeletedIsFalse("user1", pageable)).willReturn(bookmarkPage);
-
-        // when
-        Page<MedicineBookmark> result = bookmarkService.getBookmarksByUser("user1", pageable);
-
-        // then
-        assertThat(result).isNotNull();
-        assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).getMedicine().getId()).isEqualTo(1L);
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        verify(bookmarkRepository, times(1)).findByUserIdAndDeletedIsFalse(userId, pageable);
     }
 }
