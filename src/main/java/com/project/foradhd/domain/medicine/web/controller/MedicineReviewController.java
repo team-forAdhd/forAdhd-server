@@ -99,4 +99,10 @@ public class MedicineReviewController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/{id}/help")
+    public ResponseEntity<Void> toggleHelpCount(@PathVariable Long id, @AuthUserId String userId) {
+        reviewService.toggleHelpCount(id, userId);
+        return ResponseEntity.ok().build();
+    }
 }
