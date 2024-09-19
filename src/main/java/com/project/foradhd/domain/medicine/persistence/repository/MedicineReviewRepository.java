@@ -9,9 +9,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-
 public interface MedicineReviewRepository extends JpaRepository<MedicineReview, Long> {
     Page<MedicineReview> findByUserId(String userId, Pageable pageable);
+
     Page<MedicineReview> findByMedicineId(Long medicineId, Pageable pageable);
 
     @Query("""

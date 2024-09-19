@@ -3,6 +3,7 @@ package com.project.foradhd.domain.medicine.business.service;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
+import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

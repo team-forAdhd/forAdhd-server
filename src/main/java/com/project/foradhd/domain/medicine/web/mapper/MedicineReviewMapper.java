@@ -6,6 +6,7 @@ import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
 import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
@@ -16,6 +17,7 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
 public interface MedicineReviewMapper {
+
     @Mapping(target = "medicine.id", source = "medicineId")
     @Mapping(target = "ageRange", ignore = true)
     @Mapping(target = "gender", ignore = true)
@@ -29,13 +31,21 @@ public interface MedicineReviewMapper {
 
     @AfterMapping
     default void setAnonymousOrUserProfile(@MappingTarget MedicineReviewResponse.MedicineReviewResponseBuilder responseBuilder,
-                                           MedicineReview review, @Context UserService userService, @Context String userId) {
-        if (review.getUser() != null) {
-            User user = userService.getUser(userId);
-            UserProfile userProfile = userService.getUserProfile(userId);
+                                           MedicineReview review,
+                                           @Context UserProfileRepository userProfileRepository,
+                                           @Context UserPrivacyRepository userPrivacyRepository) {
+        User user = review.getUser();
+        if (user != null) {
+            UserProfile userProfile = userProfileRepository.findByUserId(user.getId()).orElse(null);
+            UserPrivacy userPrivacy = userPrivacyRepository.findByUserId(user.getId()).orElse(null);
+
             if (userProfile != null) {
                 responseBuilder.nickname(userProfile.getNickname());
                 responseBuilder.profileImage(userProfile.getProfileImage());
+            }
+            if (userPrivacy != null) {
+                responseBuilder.ageRange(userPrivacy.getAgeRange());
+                responseBuilder.gender(userPrivacy.getGender());
             }
         }
     }

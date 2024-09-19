@@ -11,7 +11,6 @@ import com.project.foradhd.domain.user.persistence.repository.UserProfileReposit
 import com.project.foradhd.global.AuthUserId;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -39,12 +38,6 @@ public class MedicineReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{id}/help")
-    public ResponseEntity<Void> toggleHelpCount(@PathVariable Long id, @AuthUserId String userId) {
-        reviewService.toggleHelpCount(id, userId);
-        return ResponseEntity.ok().build();
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<MedicineReviewResponse> updateReview(@PathVariable Long id, @RequestBody MedicineReviewRequest request, @AuthUserId String userId) {
         MedicineReview review = reviewService.updateReview(id, request, userId);
@@ -69,12 +62,6 @@ public class MedicineReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
-        reviewService.deleteReview(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/user/{userId}")
     public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getUserReviews(
             @AuthUserId String userId,
@@ -93,7 +80,6 @@ public class MedicineReviewController {
 
         return ResponseEntity.ok(response);
     }
-
 
     @GetMapping("/medicine/{medicineId}")
     public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getReviewsByMedicineId(
