@@ -62,7 +62,7 @@ public class MedicineReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/my-reviews")
     public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getUserReviews(
             @AuthUserId String userId,
             @RequestParam(defaultValue = "NEWEST_FIRST") SortOption sortOption,
