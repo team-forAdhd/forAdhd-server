@@ -1,0 +1,58 @@
+spring:
+  profiles:
+    default: local
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_ID}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  config:
+    import:
+      - application-oauth2.yml
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+  servlet:
+    multipart:
+      max-file-size: 5MB #하나의 파일 용량 제한
+      max-request-size: 10MB #하나의 요청 내 전체 파일 용량 제한
+      resolve-lazily: true #실제 파일에 접근하는 시점에 파일 용량 체크 (스프링 MVC에서 예외 throw)
+
+jwt:
+  expiry:
+    access-token: 10000 #10 sec
+    refresh-token: 30000 #30 sec
+  secret-key: JU8s5cNlQ0t9kXBTwXV0ufrmNs5hd88ual323D417bjcIlR8ck2wZ5P2dYYZUbFT #테스트용 키
+
+jasypt:
+  encryptor:
+    bean: jasyptEncryptor
+    key: ${JASYPT_ENCRYPTOR_KEY}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        highlight_sql: true
+        show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 100
+    database: mysql
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: false
+
+logging:
+  level:
+    root: info
+    org.hibernate.sql: info
+    org.hibernate.type.descriptor.sql: trace
+    com.project.foradhd: debug

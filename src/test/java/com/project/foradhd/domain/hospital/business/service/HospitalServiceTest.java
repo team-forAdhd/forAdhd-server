@@ -6,6 +6,7 @@ import com.project.foradhd.domain.hospital.business.dto.in.HospitalEvaluationRev
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewCreateData;
 import com.project.foradhd.domain.hospital.business.dto.in.HospitalReceiptReviewUpdateData;
 import com.project.foradhd.domain.hospital.business.dto.out.HospitalDetailsData;
+import com.project.foradhd.domain.hospital.business.service.impl.HospitalServiceImpl;
 import com.project.foradhd.domain.hospital.persistence.entity.*;
 import com.project.foradhd.domain.hospital.persistence.repository.*;
 import com.project.foradhd.global.exception.BusinessException;
@@ -38,7 +39,7 @@ import static org.mockito.Mockito.times;
 class HospitalServiceTest {
 
     @InjectMocks
-    HospitalService hospitalService;
+    HospitalServiceImpl hospitalService;
 
     @Mock
     HospitalRepository hospitalRepository;

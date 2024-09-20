@@ -1,6 +1,7 @@
 package com.project.foradhd.global.service;
 
 import com.project.foradhd.global.config.RedisConfig;
+import com.project.foradhd.global.service.impl.RedisService;
 import com.project.foradhd.tags.IntegrationTag;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

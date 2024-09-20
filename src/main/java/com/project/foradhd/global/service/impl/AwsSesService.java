@@ -1,8 +1,9 @@
-package com.project.foradhd.global.service;
+package com.project.foradhd.global.service.impl;
 
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.*;
 import com.project.foradhd.global.enums.EmailTemplate;
+import com.project.foradhd.global.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 @RequiredArgsConstructor
 @Service
-public class AwsSesService {
+public class AwsSesService implements EmailService {
 
     private final AmazonSimpleEmailService amazonSimpleEmailService;
     private final TemplateEngine templateEngine;
@@ -23,6 +24,7 @@ public class AwsSesService {
     @Value("${aws.ses.from}")
     private String from;
 
+    @Override
     public void sendEmail(EmailTemplate emailTemplate, Map<String, Object> variables, String... to) {
         String content = templateEngine.process(emailTemplate.getTemplate(), getContext(variables));
         SendEmailRequest sendEmailRequest = getSendEmailRequest(emailTemplate.getSubject(), content, to);

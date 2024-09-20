@@ -1,5 +1,6 @@
 package com.project.foradhd.global.util;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.project.foradhd.global.exception.InternalSystemException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -12,7 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class JsonUtil {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
     public static <T> T readValue(String content, Class<T> clazz) {
         try {

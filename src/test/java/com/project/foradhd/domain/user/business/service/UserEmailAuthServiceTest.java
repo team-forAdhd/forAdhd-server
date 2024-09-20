@@ -1,9 +1,10 @@
 package com.project.foradhd.domain.user.business.service;
 
 import com.project.foradhd.domain.user.business.dto.in.EmailAuthValidationData;
+import com.project.foradhd.domain.user.business.service.impl.UserEmailAuthServiceImpl;
 import com.project.foradhd.global.exception.BusinessException;
-import com.project.foradhd.global.service.AwsSesService;
-import com.project.foradhd.global.service.RedisService;
+import com.project.foradhd.global.service.CacheService;
+import com.project.foradhd.global.service.EmailService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static com.project.foradhd.global.enums.RedisKeyType.USER_EMAIL_AUTH_CODE;
+import static com.project.foradhd.global.enums.CacheKeyType.USER_EMAIL_AUTH_CODE;
 import static com.project.foradhd.global.exception.ErrorCode.EMAIL_AUTH_TIMEOUT;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -26,16 +27,16 @@ import static org.mockito.Mockito.never;
 class UserEmailAuthServiceTest {
 
     @InjectMocks
-    UserEmailAuthService userEmailAuthService;
+    UserEmailAuthServiceImpl userEmailAuthService;
 
     @Mock
     UserService userService;
 
     @Mock
-    AwsSesService awsSesService;
+    EmailService emailService;
 
     @Mock
-    RedisService redisService;
+    CacheService cacheService;
 
     @DisplayName("유저 이메일 인증코드 검증 테스트 : 실패 - 인증 가능 시간 초과")
     @Test
@@ -48,7 +49,7 @@ class UserEmailAuthServiceTest {
                 .email(email)
                 .authCode(authCode)
                 .build();
-        given(redisService.getValue(USER_EMAIL_AUTH_CODE, email)).willReturn(Optional.empty());
+        given(cacheService.getValue(USER_EMAIL_AUTH_CODE, email)).willReturn(Optional.empty());
 
         //when, then
         assertThatThrownBy(() -> userEmailAuthService.validateEmailAuth(userId, emailAuthValidationData))
@@ -70,7 +71,7 @@ class UserEmailAuthServiceTest {
                 .email(email)
                 .authCode(authCode)
                 .build();
-        given(redisService.getValue(USER_EMAIL_AUTH_CODE, email)).willReturn(Optional.of(savedAuthCode));
+        given(cacheService.getValue(USER_EMAIL_AUTH_CODE, email)).willReturn(Optional.of(savedAuthCode));
 
         //when, then
         assertThatThrownBy(() -> userEmailAuthService.validateEmailAuth(userId, emailAuthValidationData))

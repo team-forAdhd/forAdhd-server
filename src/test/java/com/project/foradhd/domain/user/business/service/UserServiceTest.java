@@ -22,6 +22,7 @@ import com.project.foradhd.domain.user.business.dto.in.PushNotificationApprovalU
 import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
+import com.project.foradhd.domain.user.business.service.impl.UserServiceImpl;
 import com.project.foradhd.domain.user.persistence.entity.PushNotificationApproval;
 import com.project.foradhd.domain.user.persistence.entity.Terms;
 import com.project.foradhd.domain.user.persistence.entity.User;
@@ -53,7 +54,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class UserServiceTest {
 
     @InjectMocks
-    UserService userService;
+    UserServiceImpl userService;
 
     @Mock
     UserRepository userRepository;
