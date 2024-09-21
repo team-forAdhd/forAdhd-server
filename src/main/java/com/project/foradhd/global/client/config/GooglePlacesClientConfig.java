@@ -16,7 +16,7 @@ public class GooglePlacesClientConfig {
     private static final String GOOGLE_LANGUAGE_CODE_PARAM = "ko";
     private static final String PLACES_SEARCH_PATH = "searchText";
 
-    @Value("${google.places.api-key}")
+    @Value("${google.api-key}")
     private String apiKey;
 
     @Bean
