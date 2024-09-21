@@ -4,8 +4,8 @@ spring:
       client:
         registration:
           kakao:
-            client-id: ENC(9Z6DKoVAi506YeSk/5sn+HjZ4zTtvbSciOFtWlKXSk1mmkvRZolPniTRNbGgDLz9)
-            client-secret: ENC(BBNo5ldktHfZhnmLejtKHCGjGWLHFu9iD7doNKrWz/2MNYjuNxFQe+9AB+FqA2XL)
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
             client-authentication-method: client_secret_post
             redirect-uri: ${KAKAO_REDIRECT_URI}
             authorization-grant-type: authorization_code
@@ -18,8 +18,8 @@ spring:
               - age_range
               - gender
           naver:
-            client-id: ENC(FGYIfJlxdtT4NyOxnV80uuttXOM8NI1FUcsBqSyUmtk=)
-            client-secret: ENC(9y68M+H96/5a0h6oX1zgAKCC27yBO5ll)
+            client-id: ${NAVER_CLIENT_ID}
+            client-secret: ${NAVER_CLIENT_SECRET}
             client-authentication-method: client_secret_post
             redirect-uri: ${NAVER_REDIRECT_URI}
             authorization-grant-type: authorization_code
@@ -32,8 +32,8 @@ spring:
               - age
               - gender
           google:
-            client-id: ENC(xFTwpvTGxef+wwSfLB8qByEeI2TYMcU3iL29iKCBWBOB8f4ZIx8+c52XhlOeykD0d9MxI3ImOu5Rm39LUEORl/7eMfO6W/xXxuhHKwl2eJjQlUmcy0LNSg==)
-            client-secret: ENC(FsYy9X+Zw3EEL69+6b2q1tm+DBsZA2fbKWh2MCKM8PWPqD7Ri1rC7hyxGeZCuH+D)
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             redirect-uri: ${GOOGLE_REDIRECT_URI}
             scope:
               - email
@@ -42,7 +42,7 @@ spring:
               - https://www.googleapis.com/auth/profile.agerange.read
               - https://www.googleapis.com/auth/user.gender.read
           apple:
-            client-id: ENC(VS8LFA0hL4ni+mPBHg78TtsQF4B6wB62JEbo7NMT3k8=)
+            client-id: ${APPLE_CLIENT_ID}
             client-authentication-method: client_secret_post
             redirect-uri: ${APPLE_REDIRECT_URI}
             authorization-grant-type: authorization_code
