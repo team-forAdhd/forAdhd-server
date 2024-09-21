@@ -12,7 +12,7 @@ public interface MedicineReviewService {
     MedicineReview createReview(MedicineReviewRequest request, String userId);
     void toggleHelpCount(Long reviewId, String userId);
     MedicineReview updateReview(Long reviewId, MedicineReviewRequest request, String userId);
-    void deleteReview(Long id);
+    void deleteReview(Long reviewId, String userId);
     Page<MedicineReview> findReviews(Pageable pageable);
     Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable, SortOption sortOption);
     Page<MedicineReview> findReviewsByMedicineId(Long medicineId, Pageable pageable, SortOption sortOption);

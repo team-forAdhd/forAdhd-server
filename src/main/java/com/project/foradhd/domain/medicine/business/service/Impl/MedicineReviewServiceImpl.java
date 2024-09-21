@@ -108,11 +108,23 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     }
 
     @Override
-    public void deleteReview(Long id) {
-        if (!reviewRepository.existsById(id)) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW);
+    @Transactional
+    public void deleteReview(Long reviewId, String userId) {
+        // 리뷰가 존재하는지 확인
+        MedicineReview review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW));
+
+        // 리뷰 작성자와 요청한 유저가 동일한지 확인
+        if (!review.getUser().getId().equals(userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_MEDICINE_REVIEW);
         }
-        reviewRepository.deleteById(id);
+
+        // 리뷰 삭제
+        reviewRepository.deleteById(reviewId);
+
+        // 약물의 평균 별점을 업데이트
+        Medicine medicine = review.getMedicine();
+        updateMedicineRating(medicine);
     }
 
     @Override

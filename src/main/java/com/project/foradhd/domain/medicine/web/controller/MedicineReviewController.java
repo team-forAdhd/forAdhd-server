@@ -44,6 +44,14 @@ public class MedicineReviewController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long reviewId,
+            @AuthUserId String userId) {
+        reviewService.deleteReview(reviewId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("")
     public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getReviews(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
