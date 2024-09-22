@@ -51,8 +51,8 @@ service:
     key: ${MEDICINE_SERVICE_KEY}
 
 google:
+  api-key: ${GOOGLE_API_KEY}
   places:
-    api-key: ${GOOGLE_PLACES_API_KEY}
     url: ${GOOGLE_PLACES_URL}
 
 ---

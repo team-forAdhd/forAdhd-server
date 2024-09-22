@@ -3,11 +3,9 @@ package com.project.foradhd.global.client.config;
 import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-@Configuration
 public class GooglePlacesClientConfig {
 
     private static final String HEADER_SEPARATOR = ",";
@@ -16,7 +14,7 @@ public class GooglePlacesClientConfig {
     private static final String GOOGLE_LANGUAGE_CODE_PARAM = "ko";
     private static final String PLACES_SEARCH_PATH = "searchText";
 
-    @Value("${google.places.api-key}")
+    @Value("${google.api-key}")
     private String apiKey;
 
     @Bean
