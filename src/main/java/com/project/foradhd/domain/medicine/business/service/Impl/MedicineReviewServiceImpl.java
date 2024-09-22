@@ -10,27 +10,16 @@ import com.project.foradhd.domain.medicine.persistence.repository.MedicineReview
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewRepository;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
-import com.project.foradhd.domain.medicine.web.mapper.MedicineReviewMapper;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
-import com.project.foradhd.domain.user.persistence.entity.UserProfile;
-import com.project.foradhd.domain.user.persistence.enums.Gender;
-import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
@@ -63,9 +52,8 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         // 약의 평균 별점을 업데이트
         updateMedicineRating(medicine);
 
-        return savedReview;
+        return savedReview; // DTO 변환 없이 엔티티를 반환
     }
-
 
     @Override
     @Transactional
@@ -116,16 +104,27 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         // 약의 평균 별점을 업데이트
         updateMedicineRating(medicine);
 
-        return savedReview;
+        return savedReview; // DTO 변환 없이 엔티티를 반환
     }
 
-
     @Override
-    public void deleteReview(Long id) {
-        if (!reviewRepository.existsById(id)) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW);
+    @Transactional
+    public void deleteReview(Long reviewId, String userId) {
+        // 리뷰가 존재하는지 확인
+        MedicineReview review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW));
+
+        // 리뷰 작성자와 요청한 유저가 동일한지 확인
+        if (!review.getUser().getId().equals(userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN_MEDICINE_REVIEW);
         }
-        reviewRepository.deleteById(id);
+
+        // 리뷰 삭제
+        reviewRepository.deleteById(reviewId);
+
+        // 약물의 평균 별점을 업데이트
+        Medicine medicine = review.getMedicine();
+        updateMedicineRating(medicine);
     }
 
     @Override
@@ -133,11 +132,19 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         return reviewRepository.findAll(pageable);
     }
 
+
     @Override
     public Page<MedicineReview> findReviewsByUserId(String userId, Pageable pageable, SortOption sortOption) {
         Sort sort = getSortByOption(sortOption);
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        return reviewRepository.findByUserId(userId, sortedPageable);
+        return reviewRepository.findByUserIdWithDetails(userId, sortedPageable); // 엔티티를 반환
+    }
+
+    @Override
+    public Page<MedicineReview> findReviewsByMedicineId(Long medicineId, Pageable pageable, SortOption sortOption) {
+        Sort sort = getSortByOption(sortOption);
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        return reviewRepository.findByMedicineIdWithDetails(medicineId, sortedPageable); // 엔티티를 반환
     }
 
     private void updateMedicineRating(Medicine medicine) {
@@ -148,12 +155,6 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         medicineRepository.save(updatedMedicine);
     }
 
-    @Override
-    public Page<MedicineReview> findReviewsByMedicineId(Long medicineId, Pageable pageable, SortOption sortOption) {
-        Sort sort = getSortByOption(sortOption);
-        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        return reviewRepository.findByMedicineId(medicineId, sortedPageable);
-    }
     private Sort getSortByOption(SortOption sortOption) {
         switch (sortOption) {
             case NEWEST_FIRST:

@@ -6,12 +6,10 @@ import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
 import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
 import com.project.foradhd.domain.medicine.web.mapper.MedicineReviewMapper;
-import com.project.foradhd.domain.user.persistence.repository.UserPrivacyRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
+import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.global.AuthUserId;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,27 +27,29 @@ public class MedicineReviewController {
 
     private final MedicineReviewService reviewService;
     private final MedicineReviewMapper reviewMapper;
-    private final UserProfileRepository userProfileRepository;
-    private final UserPrivacyRepository userPrivacyRepository;
+    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<MedicineReviewResponse> createReview(@RequestBody MedicineReviewRequest request, @AuthUserId String userId) {
         MedicineReview review = reviewService.createReview(request, userId);
-        MedicineReviewResponse response = reviewMapper.toResponseDto(review, userProfileRepository, userPrivacyRepository);
+        // 리뷰를 조회할 때마다 실시간으로 유저 정보를 매핑
+        MedicineReviewResponse response = reviewMapper.toResponseDto(review, userService);
         return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/{id}/help")
-    public ResponseEntity<Void> toggleHelpCount(@PathVariable Long id, @AuthUserId String userId) {
-        reviewService.toggleHelpCount(id, userId);
-        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<MedicineReviewResponse> updateReview(@PathVariable Long id, @RequestBody MedicineReviewRequest request, @AuthUserId String userId) {
         MedicineReview review = reviewService.updateReview(id, request, userId);
-        MedicineReviewResponse response = reviewMapper.toResponseDto(review, userProfileRepository, userPrivacyRepository);
+        MedicineReviewResponse response = reviewMapper.toResponseDto(review, userService);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long reviewId,
+            @AuthUserId String userId) {
+        reviewService.deleteReview(reviewId, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("")
@@ -57,7 +57,7 @@ public class MedicineReviewController {
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<MedicineReview> reviews = reviewService.findReviews(pageable);
         List<MedicineReviewResponse> reviewDtos = reviews.stream()
-                .map(review -> reviewMapper.toResponseDto(review, userProfileRepository, userPrivacyRepository))
+                .map(review -> reviewMapper.toResponseDto(review, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(reviews);
@@ -69,20 +69,18 @@ public class MedicineReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
-        reviewService.deleteReview(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/user/{userId}")
+    @GetMapping("/my-reviews")
     public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getUserReviews(
             @AuthUserId String userId,
             @RequestParam(defaultValue = "NEWEST_FIRST") SortOption sortOption,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        // MedicineReview 엔티티를 반환하도록 서비스 메서드 수정
         Page<MedicineReview> reviews = reviewService.findReviewsByUserId(userId, pageable, sortOption);
+
+        // 엔티티를 DTO로 변환
         List<MedicineReviewResponse> reviewDtos = reviews.stream()
-                .map(review -> reviewMapper.toResponseDto(review, userProfileRepository, userPrivacyRepository))
+                .map(review -> reviewMapper.toResponseDto(review, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(reviews);
@@ -102,7 +100,7 @@ public class MedicineReviewController {
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<MedicineReview> reviews = reviewService.findReviewsByMedicineId(medicineId, pageable, sortOption);
         List<MedicineReviewResponse> reviewDtos = reviews.stream()
-                .map(review -> reviewMapper.toResponseDto(review, userProfileRepository, userPrivacyRepository))
+                .map(review -> reviewMapper.toResponseDto(review, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(reviews);
@@ -112,5 +110,11 @@ public class MedicineReviewController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/help")
+    public ResponseEntity<Void> toggleHelpCount(@PathVariable Long id, @AuthUserId String userId) {
+        reviewService.toggleHelpCount(id, userId);
+        return ResponseEntity.ok().build();
     }
 }
