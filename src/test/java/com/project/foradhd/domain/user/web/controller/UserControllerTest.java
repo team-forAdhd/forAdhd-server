@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -78,7 +79,6 @@ class UserControllerTest {
         //given
         String nickname = "";
         NicknameCheckRequest request = new NicknameCheckRequest(nickname);
-        given(userService.checkNickname(anyString())).willReturn(true);
 
         //when, then
         mockMvc.perform(get("/api/v1/user/nickname-check")
@@ -87,6 +87,41 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andDo(print());
         then(userService).should(never()).checkNickname(nickname);
+    }
+
+    @DisplayName("유저 이메일 중복 체크 컨트롤러 테스트")
+    @Test
+    void check_email_test() throws Exception {
+        //given
+        String email = "jkde7721@naver.com";
+        EmailCheckRequest request = new EmailCheckRequest(email);
+        given(userService.checkEmail(anyString())).willReturn(true);
+
+        //when, then
+        mockMvc.perform(get("/api/v1/user/email-check")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtil.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isValidEmail")
+                        .value(true))
+                .andDo(print());
+        then(userService).should(times(1)).checkEmail(email);
+    }
+
+    @DisplayName("유저 이메일 중복 체크 컨트롤러 테스트 - 실패: 유효하지 않은 형식의 이메일 요청")
+    @Test
+    void check_email_test_fail_with_invalid_email() throws Exception {
+        //given
+        String email = "jkde7721$naver.com";
+        EmailCheckRequest request = new EmailCheckRequest(email);
+
+        //when, then
+        mockMvc.perform(get("/api/v1/user/email-check")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtil.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+        then(userService).should(never()).checkEmail(email);
     }
 
     @DisplayName("유저 프로필 조회 컨트롤러 테스트")
@@ -328,7 +363,7 @@ class UserControllerTest {
         EmailAuthValidationRequest request = new EmailAuthValidationRequest(email, authCode);
         User user = UserFixtures.toUser().build();
         UserTokenData userTokenData = new UserTokenData("accessToken", "refreshToken");
-        given(userEmailAuthService.validateEmailAuth(anyString(), any())).willReturn(user);
+        given(userEmailAuthService.validateEmailAuth(anyString(), any())).willReturn(Optional.of(user));
         given(userTokenService.generateToken(any())).willReturn(userTokenData);
 
         //when, then

@@ -88,14 +88,27 @@ class UserServiceTest {
     void check_nickname_test() {
         //given
         String nickname = "ForA";
-        given(userProfileRepository.findByNickname(nickname))
-            .willReturn(Optional.empty());
+        given(userProfileRepository.findByNickname(nickname)).willReturn(Optional.empty());
 
         //when
         boolean isValidNickname = userService.checkNickname(nickname);
 
         //then
         assertThat(isValidNickname).isTrue();
+    }
+
+    @DisplayName("유저 이메일 중복 여부 확인 로직 테스트")
+    @Test
+    void check_email_test() {
+        //given
+        String email = "jkde7721@naver.com";
+        given(userRepository.findByEmail(email)).willReturn(Optional.empty());
+
+        //when
+        boolean isValidEmail = userService.checkEmail(email);
+
+        //then
+        assertThat(isValidEmail).isTrue();
     }
 
     @DisplayName("일반 회원가입 테스트 - 성공")
