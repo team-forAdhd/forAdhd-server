@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static com.project.foradhd.global.enums.EmailTemplate.USER_EMAIL_AUTH_TEMPLATE;
 import static com.project.foradhd.global.enums.CacheKeyType.USER_EMAIL_AUTH_CODE;
@@ -35,7 +36,11 @@ public class UserEmailAuthServiceImpl implements UserEmailAuthService {
     @Override
     public void authenticateEmail(String userId, EmailAuthData emailAuthData) {
         String email = emailAuthData.getEmail();
-        userService.validateDuplicatedEmail(email, userId);
+        if (isAnonymousUser(userId)) { //일반 회원가입 시 이메일 인증
+            userService.validateDuplicatedEmail(email);
+        } else { //소셜 회원가입 후 이메일 인증
+            userService.validateDuplicatedEmail(email, userId);
+        }
 
         String authCode = EmailAuthCodeGenerator.generate();
         cacheService.setValue(USER_EMAIL_AUTH_CODE, email, authCode, AUTH_CODE_TIMEOUT_MIN, MINUTES);
@@ -44,11 +49,18 @@ public class UserEmailAuthServiceImpl implements UserEmailAuthService {
     }
 
     @Override
-    public User validateEmailAuth(String userId, EmailAuthValidationData emailAuthValidationData) {
+    public Optional<User> validateEmailAuth(String userId, EmailAuthValidationData emailAuthValidationData) {
         String email = emailAuthValidationData.getEmail();
         String authCode = emailAuthValidationData.getAuthCode();
         validateEmailAuthCode(email, authCode);
-        return userService.updateEmailAuth(userId, email);
+
+        if (isAnonymousUser(userId)) return Optional.empty();
+        User user = userService.updateEmailAuth(userId, email);
+        return Optional.of(user);
+    }
+
+    private boolean isAnonymousUser(String userId) {
+        return "anonymousUser".equals(userId);
     }
 
     private void validateEmailAuthCode(String email, String authCode) {

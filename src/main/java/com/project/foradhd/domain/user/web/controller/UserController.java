@@ -81,8 +81,9 @@ public class UserController {
     public ResponseEntity<EmailAuthValidationResponse> validateEmailAuth(@AuthUserId String userId,
                                                                 @RequestBody @Valid EmailAuthValidationRequest request) {
         EmailAuthValidationData emailAuthValidationData = userMapper.toEmailAuthValidationData(request);
-        User user = userEmailAuthService.validateEmailAuth(userId, emailAuthValidationData);
-        UserTokenData userTokenData = userTokenService.generateToken(user);
+        UserTokenData userTokenData = userEmailAuthService.validateEmailAuth(userId, emailAuthValidationData)
+                .map(userTokenService::generateToken)
+                .orElse(new UserTokenData());
         return ResponseEntity.ok(userMapper.toEmailAuthValidationResponse(userTokenData));
     }
 
