@@ -39,6 +39,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean checkEmail(String email) {
+        return userRepository.findByEmail(email).isEmpty();
+    }
+
+    @Override
     public UserProfileDetailsData getUserProfileDetails(String userId) {
         UserProfile userProfile = getUserProfileFetch(userId);
         return UserProfileDetailsData.builder()

@@ -44,8 +44,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 
@@ -55,6 +53,7 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private static final String NICKNAME_CHECK_API_PATH = "/api/v1/user/nickname-check";
+    private static final String EMAIL_CHECK_API_PATH = "/api/v1/user/email-check";
     private static final String SIGN_UP_API_PATH = "/api/v1/user/sign-up";
     private static final String LOGIN_API_PATH = "/api/v1/auth/login";
     private static final String AUTH_TOKEN_REISSUE_API_PATH = "/api/v1/auth/reissue";
@@ -88,8 +87,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(registry -> registry
-                .requestMatchers(NICKNAME_CHECK_API_PATH, SIGN_UP_API_PATH, LOGIN_API_PATH,
-                    AUTH_TOKEN_REISSUE_API_PATH, HEALTH_CHECK_API_PATH).permitAll()
+                .requestMatchers(NICKNAME_CHECK_API_PATH, EMAIL_CHECK_API_PATH, SIGN_UP_API_PATH, LOGIN_API_PATH,
+                        AUTH_TOKEN_REISSUE_API_PATH, HEALTH_CHECK_API_PATH).permitAll()
                 .requestMatchers("/error", "/favicon.ico").permitAll()
                     .requestMatchers("/api/v1/notifications/sse").permitAll()
                 .requestMatchers(EMAIL_AUTH_API_PATH, SNS_SIGN_UP_API_PATH, WITHDRAW_API_PATH, LOGOUT_API_PATH).hasRole(Role.GUEST.name())

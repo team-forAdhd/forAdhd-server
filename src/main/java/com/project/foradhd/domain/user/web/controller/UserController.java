@@ -39,6 +39,12 @@ public class UserController {
         return ResponseEntity.ok(new NicknameCheckResponse(isValidNickname));
     }
 
+    @GetMapping("/email-check")
+    public ResponseEntity<EmailCheckResponse> checkEmail(@RequestBody @Valid EmailCheckRequest request) {
+        boolean isValidEmail = userService.checkEmail(request.getEmail());
+        return ResponseEntity.ok(new EmailCheckResponse(isValidEmail));
+    }
+
     @GetMapping
     public ResponseEntity<UserProfileDetailsResponse> getUserProfileDetails(@AuthUserId String userId) {
         UserProfileDetailsData userProfileDetailsData = userService.getUserProfileDetails(userId);
