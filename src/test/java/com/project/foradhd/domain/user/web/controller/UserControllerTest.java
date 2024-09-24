@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.*;
@@ -338,7 +339,7 @@ class UserControllerTest {
         then(userEmailAuthService).should(times(1)).authenticateEmail(anyString(), any());
     }
 
-    @DisplayName("유저 이메일 인증용 메일 전송 컨트롤러 테스트 - 실패: 유효하지 않은 이메일")
+    @DisplayName("유저 이메일 인증용 메일 전송 컨트롤러 테스트 - 실패: 유효하지 않은 형식의 이메일")
     @Test
     void authenticate_email_test_fail_invalid_email() throws Exception {
         //given
@@ -376,6 +377,29 @@ class UserControllerTest {
                 .andDo(print());
         then(userEmailAuthService).should(times(1)).validateEmailAuth(anyString(), any());
         then(userTokenService).should(times(1)).generateToken(user);
+    }
+
+    @WithMockTestUser(userId = "anonymousUser")
+    @DisplayName("유저 이메일 인증 위한 인증 코드 검증 컨트롤러 테스트(익명 사용자인 경우)")
+    @Test
+    void validate_email_auth_test_with_anonymous_user() throws Exception {
+        //given
+        String anonymousUserId = "anonymousUser";
+        String email = "jkde7721@naver.com";
+        String authCode = "123456";
+        EmailAuthValidationRequest request = new EmailAuthValidationRequest(email, authCode);
+        given(userEmailAuthService.validateEmailAuth(eq(anonymousUserId), any())).willReturn(Optional.empty());
+
+        //when, then
+        mockMvc.perform(put("/api/v1/user/email-auth")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(JsonUtil.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value(nullValue()))
+                .andExpect(jsonPath("$.refreshToken").value(nullValue()))
+                .andDo(print());
+        then(userEmailAuthService).should(times(1)).validateEmailAuth(eq(anonymousUserId), any());
+        then(userTokenService).should(never()).generateToken(any());
     }
 
     @DisplayName("유저 이메일 인증 위한 인증 코드 검증 컨트롤러 테스트 - 실패: 유효하지 않은 인증 코드(6자리 숫자)")
