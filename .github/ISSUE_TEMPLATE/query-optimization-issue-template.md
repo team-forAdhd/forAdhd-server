@@ -1,6 +1,6 @@
 ---
 name: Query Optimization Issue Template
-about: 쿼리 최적화 이슈 템플릿
+about: 쿼리 최적화 제안을 위한 이슈 템플릿
 title: ''
 labels: ''
 assignees: ''
