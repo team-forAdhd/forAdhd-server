@@ -39,8 +39,8 @@ public interface UserMapper {
     default SignUpData toSignUpData(SignUpRequest request) {
         User user = User.builder()
             .email(request.getEmail())
-            .role(Role.GUEST)
-            .isVerifiedEmail(Boolean.FALSE)
+            .role(Role.USER) //일반 회원가입 시 이메일 인증이 선제조건
+            .isVerifiedEmail(Boolean.TRUE)
             .build();
         UserPrivacy userPrivacy = UserPrivacy.builder()
             .user(user)

@@ -21,6 +21,8 @@ public interface UserService {
 
     boolean checkNickname(String nickname);
 
+    boolean checkEmail(String email);
+
     UserProfileDetailsData getUserProfileDetails(String userId);
 
     User signUp(SignUpData signUpData);
