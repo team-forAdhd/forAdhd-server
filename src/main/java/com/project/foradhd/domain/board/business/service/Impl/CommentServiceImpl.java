@@ -3,11 +3,9 @@ package com.project.foradhd.domain.board.business.service.Impl;
 import com.project.foradhd.domain.board.business.service.CommentService;
 import com.project.foradhd.domain.board.persistence.entity.Comment;
 import com.project.foradhd.domain.board.persistence.entity.CommentLikeFilter;
-import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
-import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
@@ -19,7 +17,6 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -66,7 +63,7 @@ public class CommentServiceImpl implements CommentService {
 
         if (comment.isAnonymous()) {
             String anonymousNickname = generateAnonymousNickname(comment.getPost().getId(), userId);
-            String anonymousProfileImage = "http://example.com/anonymous-profile.png"; // 지정한 URL
+            String anonymousProfileImage = "image/default-profile.png";
 
             commentBuilder
                     .nickname(anonymousNickname)
