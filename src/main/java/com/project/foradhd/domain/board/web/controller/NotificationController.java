@@ -11,8 +11,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RestController
 @RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:8080"})
 public class NotificationController {
+
     private final NotificationService notificationService;
     private final SseEmitters sseEmitters;
 
