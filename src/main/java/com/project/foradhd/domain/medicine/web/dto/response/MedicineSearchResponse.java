@@ -22,5 +22,6 @@ public class MedicineSearchResponse {
         private String itemName;   // 약 이름
         private String itemEngName; // 약 영문명
         private String entpName;    // 제조사 이름
+        private Long medicineId;  // 약 ID
     }
 }

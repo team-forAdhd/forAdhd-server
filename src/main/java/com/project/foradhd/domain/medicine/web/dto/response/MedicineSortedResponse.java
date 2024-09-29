@@ -15,4 +15,5 @@ import java.util.List;
 public class MedicineSortedResponse {
     private String kind;
     private List<MedicineDto> medicineList;
+    private Long medicineId;
 }
