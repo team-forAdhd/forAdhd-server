@@ -11,8 +11,6 @@ import com.project.foradhd.domain.board.web.dto.response.PostSearchResponseDto;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
-import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
-import com.project.foradhd.domain.user.persistence.repository.UserRepository;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -23,9 +21,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Context;
 
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -87,7 +83,7 @@ public interface PostMapper {
     default void setAnonymousOrUserProfile(@MappingTarget PostResponseDto.PostListResponseDto.PostListResponseDtoBuilder dto, Post post, @Context UserService userService) {
         if (post.isAnonymous()) {
             dto.nickname("익명");
-            dto.profileImage("http://example.com/default-profile.png");
+            dto.profileImage("image/default-profile.png");
         } else if (post.getUser() != null) {
             UserProfile userProfile = userService.getUserProfile(post.getUser().getId());
             if (userProfile != null) {

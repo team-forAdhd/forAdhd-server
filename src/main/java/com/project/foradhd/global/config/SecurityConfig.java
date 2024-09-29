@@ -1,7 +1,6 @@
 package com.project.foradhd.global.config;
 
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.project.foradhd.domain.auth.converter.CustomOAuth2AuthorizationCodeGrantRequestEntityConverter;
@@ -41,11 +40,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -63,8 +57,6 @@ public class SecurityConfig {
     private static final String SNS_SIGN_UP_API_PATH = "/api/v1/user/sns-sign-up";
     private static final String WITHDRAW_API_PATH = "/api/v1/user/withdraw";
     private static final String LOGOUT_API_PATH = "/api/v1/auth/logout";
-
-    private static final String CORS_ALLOWED_ORIGINS = "http://localhost:3000,http://localhost:8080";
 
     private static final RequestMatcher loginMatcher = new AntPathRequestMatcher(LOGIN_API_PATH, POST.name());
     private static final RequestMatcher logoutMatcher = new AntPathRequestMatcher(LOGOUT_API_PATH, DELETE.name());
@@ -95,6 +87,9 @@ public class SecurityConfig {
                 .anyRequest().hasRole(Role.USER.name()))
             .sessionManagement(config -> config
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            //if Spring MVC is on classpath and no CorsConfigurationSource is provided,
+            //Spring Security will use CORS configuration provided to Spring MVC
+            .cors(withDefaults())
             .csrf(CsrfConfigurer::disable)
             .httpBasic(HttpBasicConfigurer::disable)
             .formLogin(FormLoginConfigurer::disable)
@@ -114,7 +109,6 @@ public class SecurityConfig {
             .exceptionHandling(config -> config
                 .authenticationEntryPoint(jwtAuthenticationFailureHandler)
                 .accessDeniedHandler(jwtAuthorizationFailureHandler))
-                .cors(withDefaults())
             .addFilter(loginAuthenticationFilter(authenticationManager(authenticationConfiguration)))
             .addFilterAfter(jwtAuthenticationFilter, LoginAuthenticationFilter.class);
         return http.build();
@@ -155,17 +149,5 @@ public class SecurityConfig {
         DefaultAuthorizationCodeTokenResponseClient oAuth2AccessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
         oAuth2AccessTokenResponseClient.setRequestEntityConverter(customOAuth2AuthorizationCodeGrantRequestEntityConverter);
         return oAuth2AccessTokenResponseClient;
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList(CORS_ALLOWED_ORIGINS.split(",")));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 }
