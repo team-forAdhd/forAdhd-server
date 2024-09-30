@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class MedicineDto {
+    private Long medicineId;
     @SerializedName("ITEM_SEQ") private String itemSeq;
     @SerializedName("ITEM_NAME") private String itemName;
     @SerializedName("ENTP_SEQ") private String entpSeq;

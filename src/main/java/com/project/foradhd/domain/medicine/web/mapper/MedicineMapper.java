@@ -15,11 +15,13 @@ import java.util.List;
 public interface MedicineMapper {
     Medicine toEntity(MedicineDto dto);
 
+    @Mapping(source = "id", target = "medicineId")
     MedicineDto toDto(Medicine entity);
 
     List<Medicine> toEntityList(List<MedicineDto> dtoList);
 
     List<MedicineResponse> toDtoList(List<Medicine> entityList);
+
     MedicineSearchResponse toResponseDto(Medicine entity);
     List<MedicineSearchResponse> toResponseDtoList(List<Medicine> entityList);
 
@@ -34,5 +36,6 @@ public interface MedicineMapper {
     @Mapping(source = "itemName", target = "itemName")
     @Mapping(source = "itemEngName", target = "itemEngName")
     @Mapping(source = "entpName", target = "entpName")
+    @Mapping(source = "id", target = "medicineId")
     MedicineSearchResponse.MedicineSearchListResponse toMedicineSearchListResponse(Medicine medicine);
 }
