@@ -1,9 +1,8 @@
 package com.project.foradhd.domain.auth.business.service.impl;
 
 import com.project.foradhd.domain.auth.business.service.OAuth2UserAttributesService;
-import com.project.foradhd.domain.auth.business.userdetails.client.GoogleOAuth2PeopleApiClient;
+import com.project.foradhd.domain.auth.business.userdetails.client.GoogleOAuth2PeopleClient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,6 @@ import java.util.Map;
 @Service
 public class GoogleOAuth2UserAttributesServiceImpl implements OAuth2UserAttributesService {
 
-    private static final String PERSON_FIELDS_PARAM = "birthdays,ageRanges,genders";
     private static final String AUTHORIZATION_HEADER_PREFIX = "Bearer ";
     private static final String DEFAULT_GENDER_VALUE = "unspecified";
 
@@ -39,27 +37,23 @@ public class GoogleOAuth2UserAttributesServiceImpl implements OAuth2UserAttribut
     private static final String AGE_RANGE_SET_KEY = "age_range";
     private static final String GENDER_SET_KEY = "gender";
 
-    private final GoogleOAuth2PeopleApiClient googleOAuth2PeopleApiClient;
+    private final GoogleOAuth2PeopleClient googleOAuth2PeopleClient;
 
     @Override
     public Map<String, Object> getAttributes(OAuth2UserRequest oAuth2UserRequest, Map<String, Object> attributes) {
         String accessToken = oAuth2UserRequest.getAccessToken().getTokenValue();
-        ResponseEntity<Map<String, Object>> response = googleOAuth2PeopleApiClient.getUserInfo(PERSON_FIELDS_PARAM,
-                AUTHORIZATION_HEADER_PREFIX + accessToken);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            attributes = new HashMap<>(attributes);
+        Map<String, Object> response = googleOAuth2PeopleClient.getUserInfo(AUTHORIZATION_HEADER_PREFIX + accessToken);
 
-            Map<String, Object> body = response.getBody();
-            attributes.put(BIRTH_SET_KEY, parseBirth(body));
-            attributes.put(AGE_RANGE_SET_KEY, parseAgeRange(body));
-            attributes.put(GENDER_SET_KEY, parseGender(body));
-        }
+        attributes = new HashMap<>(attributes); //기존 타입 java.util.Collections$UnmodifiableMap → 변경 가능한 타입으로 대체
+        attributes.put(BIRTH_SET_KEY, parseBirth(response));
+        attributes.put(AGE_RANGE_SET_KEY, parseAgeRange(response));
+        attributes.put(GENDER_SET_KEY, parseGender(response));
         return attributes;
     }
 
-    private LocalDate parseBirth(Map<String, Object> body) {
-        if (body.containsKey(BIRTHDAYS_GET_KEY)) {
-            ArrayList<Map<String, Object>> birthdays = (ArrayList) body.get(BIRTHDAYS_GET_KEY);
+    private LocalDate parseBirth(Map<String, Object> attributes) {
+        if (attributes.containsKey(BIRTHDAYS_GET_KEY)) {
+            ArrayList<Map<String, Object>> birthdays = (ArrayList) attributes.get(BIRTHDAYS_GET_KEY);
             return birthdays.stream()
                     .filter(this::isPrimaryMetadata)
                     .filter(this::hasBirthData)
@@ -83,9 +77,9 @@ public class GoogleOAuth2UserAttributesServiceImpl implements OAuth2UserAttribut
                 birthDate.containsKey(BIRTH_DAY_GET_KEY);
     }
 
-    private String parseAgeRange(Map<String, Object> body) {
-        if (body.containsKey(AGE_RANGES_GET_KEY)) {
-            ArrayList<Map<String, Object>> ageRanges = (ArrayList) body.get(AGE_RANGES_GET_KEY);
+    private String parseAgeRange(Map<String, Object> attributes) {
+        if (attributes.containsKey(AGE_RANGES_GET_KEY)) {
+            ArrayList<Map<String, Object>> ageRanges = (ArrayList) attributes.get(AGE_RANGES_GET_KEY);
             return ageRanges.stream()
                     .filter(this::isPrimaryMetadata)
                     .filter(this::hasAgeRangeData)
@@ -100,9 +94,9 @@ public class GoogleOAuth2UserAttributesServiceImpl implements OAuth2UserAttribut
         return ageRange.containsKey(AGE_RANGE_GET_KEY);
     }
 
-    private String parseGender(Map<String, Object> body) {
-        if (body.containsKey(GENDERS_GET_KEY)) {
-            ArrayList<Map<String, Object>> genders = (ArrayList) body.get(GENDERS_GET_KEY);
+    private String parseGender(Map<String, Object> attributes) {
+        if (attributes.containsKey(GENDERS_GET_KEY)) {
+            ArrayList<Map<String, Object>> genders = (ArrayList) attributes.get(GENDERS_GET_KEY);
             return genders.stream()
                     .filter(this::isPrimaryMetadata)
                     .filter(this::hasGenderData)
