@@ -57,7 +57,17 @@ google:
 
 cors:
   allowed:
-    origins: {CORS_ALLOWED_ORIGINS}
+    origins: ${CORS_ALLOWED_ORIGINS}
+
+log:
+  config:
+    path: ${LOG_PATH}
+    filename:
+      application: ${LOG_APPLICATION_FILENAME}
+      error: ${LOG_ERROR_FILENAME}
+    maxHistory: ${LOG_MAX_HISTORY}
+    maxFileSize: ${LOG_MAX_FILE_SIZE}
+    totalSizeCap: ${LOG_TOTAL_SIZE_CAP}
 
 ---
 spring:
