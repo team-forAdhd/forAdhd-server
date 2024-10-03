@@ -49,3 +49,6 @@ src/main/resources/static/keys/**
 
 ### .csv 파일 ###
 *.csv
+
+### .log 파일 ###
+*.log
