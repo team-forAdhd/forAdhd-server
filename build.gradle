@@ -94,6 +94,9 @@ dependencies {
 
 	//OpenCSV
 	implementation 'com.opencsv:opencsv:5.7.1'
+
+	//Spring AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
 tasks.named('test') {
