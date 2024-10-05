@@ -4,6 +4,8 @@ import com.project.foradhd.domain.hospital.business.dto.in.*;
 import com.project.foradhd.domain.hospital.business.dto.out.*;
 import com.project.foradhd.domain.hospital.persistence.entity.*;
 import com.project.foradhd.domain.hospital.web.enums.HospitalReviewFilter;
+import com.project.foradhd.global.util.GeoUtil;
+import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -21,7 +23,9 @@ public interface HospitalService {
 
     DoctorBriefListData getDoctorBriefList(String hospitalId);
 
-    HospitalDetailsData getHospitalDetails(String userId, String hospitalId);
+    HospitalDetailsData getHospitalDetails(String userId, String hospitalId, Double latitude, Double longitude);
+
+    Double getHospitalDistance(Double latitude, Double longitude, Point hospitalLocation);
 
     Hospital getHospital(String hospitalId);
 
