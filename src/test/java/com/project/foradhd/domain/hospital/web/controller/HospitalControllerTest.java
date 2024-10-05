@@ -310,11 +310,14 @@ class HospitalControllerTest {
         //given
         String hospitalId = "1";
         String placeId = "1";
+        Double latitude = 37.4867657;
+        Double longitude = 127.1031943;
         Hospital hospital = HospitalFixtures.toHospital().id(hospitalId).placeId(placeId).build();
         Doctor doctor1 = HospitalFixtures.toDoctor().id("1").name("의사1").build();
         Doctor doctor2 = HospitalFixtures.toDoctor().id("2").name("의사2").build();
         HospitalDetailsData hospitalDetailsData = HospitalDetailsData.builder()
                 .hospital(hospital)
+                .distance(15390.52854)
                 .isBookmarked(true)
                 .isEvaluationReviewed(true)
                 .doctorList(List.of(doctor1, doctor2))
@@ -328,11 +331,13 @@ class HospitalControllerTest {
                 .build();
         String phoneRegex = "^(010|02|031|032|033|041|042|043|044|051|052|053|054|055|061|062|063|064)(\\d{3,4})(\\d{4})$";
         String phoneFormat = "$1-$2-$3";
-        given(hospitalService.getHospitalDetails(anyString(), eq(hospitalId))).willReturn(hospitalDetailsData);
+        given(hospitalService.getHospitalDetails(anyString(), eq(hospitalId), eq(latitude), eq(longitude))).willReturn(hospitalDetailsData);
         given(hospitalOperationService.getHospitalOperationDetails(placeId)).willReturn(hospitalOperationDetails);
 
         //when, then
-        mockMvc.perform(get("/api/v1/hospitals/{hospitalId}", hospitalId))
+        mockMvc.perform(get("/api/v1/hospitals/{hospitalId}", hospitalId)
+                        .queryParam("latitude", String.valueOf(latitude))
+                        .queryParam("longitude", String.valueOf(longitude)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.hospitalId").value(hospital.getId()))
                 .andExpect(jsonPath("$.name").value(hospital.getName()))
@@ -342,6 +347,7 @@ class HospitalControllerTest {
                 .andExpect(jsonPath("$.longitude").value(hospital.getLocation().getX()))
                 .andExpect(jsonPath("$.totalReceiptReviewCount").value(hospital.getTotalReceiptReviewCount()))
                 .andExpect(jsonPath("$.totalEvaluationReviewCount").value(hospital.getTotalEvaluationReviewCount()))
+                .andExpect(jsonPath("$.distance").value(hospitalDetailsData.getDistance()))
                 .andExpect(jsonPath("$.isBookmarked").value(hospitalDetailsData.getIsBookmarked()))
                 .andExpect(jsonPath("$.isEvaluationReviewed").value(hospitalDetailsData.getIsEvaluationReviewed()))
                 .andExpect(jsonPath("$.operationStatus").value(hospitalOperationDetails.getOperationStatus().name()))
@@ -356,7 +362,7 @@ class HospitalControllerTest {
                 .andExpect(jsonPath("$.doctorList[0].totalReceiptReviewCount").value(doctor1.getTotalReceiptReviewCount()))
                 .andExpect(jsonPath("$.doctorList[0].profile").value(doctor1.getProfile()))
                 .andDo(print());
-        then(hospitalService).should(times(1)).getHospitalDetails(anyString(), eq(hospitalId));
+        then(hospitalService).should(times(1)).getHospitalDetails(anyString(), eq(hospitalId), eq(latitude), eq(longitude));
         then(hospitalOperationService).should(times(1)).getHospitalOperationDetails(eq(placeId));
     }
     
