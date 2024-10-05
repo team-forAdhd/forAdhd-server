@@ -11,14 +11,22 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
+    private static final String RESPONSE_LOG_FORMAT = """
+            [RESPONSE]
+            Status : {},
+            Body : {}
+            """;
     private final UserService userService;
     private final JwtService jwtService;
 
@@ -33,6 +41,8 @@ public class LoginAuthenticationSuccessHandler implements AuthenticationSuccessH
 
         Boolean hasVerifiedEmail = userService.hasVerifiedEmail(userDetails.getUserId());
         LoginResponse loginResponse = new LoginResponse(accessToken, refreshToken, hasVerifiedEmail);
+
+        log.info(RESPONSE_LOG_FORMAT, HttpStatus.OK, JsonUtil.writeValueAsString(loginResponse));
         response.setContentType(APPLICATION_JSON_VALUE);
         response.getWriter().write(JsonUtil.writeValueAsString(loginResponse));
     }

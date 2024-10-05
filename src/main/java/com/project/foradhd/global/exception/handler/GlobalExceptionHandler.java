@@ -102,5 +102,4 @@ public class GlobalExceptionHandler {
         }
         return defaultMessage;
     }
-
 }

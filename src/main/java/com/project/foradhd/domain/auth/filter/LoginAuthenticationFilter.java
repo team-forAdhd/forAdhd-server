@@ -15,10 +15,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Slf4j
 public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+    private static final String REQUEST_LOG_FORMAT = """
+            [REQUEST]
+            API : {} {}
+            ClientIp : {}
+            Body : {}
+            """;
+
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
         HttpServletResponse response) throws AuthenticationException {
         LoginRequest loginRequest = extractLoginRequest(request);
+        log.info(REQUEST_LOG_FORMAT, request.getMethod(), request.getRequestURI(), request.getRemoteAddr(),
+                JsonUtil.writeValueAsString(loginRequest));
+
         UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken
             .unauthenticated(loginRequest.getUsername(), loginRequest.getPassword());
         return getAuthenticationManager().authenticate(authRequest);
