@@ -96,8 +96,10 @@ public class HospitalController {
 
     @GetMapping("/{hospitalId}")
     public ResponseEntity<HospitalDetailsResponse> getHospitalDetails(@AuthUserId String userId,
-                                                                    @PathVariable String hospitalId) {
-        HospitalDetailsData hospitalDetailsData = hospitalService.getHospitalDetails(userId, hospitalId);
+                                                                    @PathVariable String hospitalId,
+                                                                    @ModelAttribute HospitalDetailsRequest request) {
+        HospitalDetailsData hospitalDetailsData = hospitalService.getHospitalDetails(userId, hospitalId,
+                request.getLatitude(), request.getLongitude());
         HospitalDetailsResponse hospitalDetailsResponse = hospitalMapper.toHospitalDetailsResponse(hospitalDetailsData);
 
         String placeId = hospitalDetailsData.getHospital().getPlaceId();

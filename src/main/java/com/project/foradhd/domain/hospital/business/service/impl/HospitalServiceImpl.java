@@ -16,8 +16,10 @@ import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
+import com.project.foradhd.global.util.GeoUtil;
 import com.project.foradhd.global.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -136,7 +138,7 @@ public class HospitalServiceImpl implements HospitalService {
     }
 
     @Override
-    public HospitalDetailsData getHospitalDetails(String userId, String hospitalId) {
+    public HospitalDetailsData getHospitalDetails(String userId, String hospitalId, Double latitude, Double longitude) {
         Hospital hospital = getHospital(hospitalId);
         List<Doctor> doctorList = doctorRepository.findAllByHospitalIdOrderByName(hospitalId);
         HospitalBookmark notHospitalBookmark = HospitalBookmark.builder().deleted(true).build();
@@ -145,10 +147,17 @@ public class HospitalServiceImpl implements HospitalService {
         boolean isEvaluationReviewed = hospitalEvaluationReviewRepository.findByUserIdAndHospitalId(userId, hospitalId).isPresent();
         return HospitalDetailsData.builder()
                 .hospital(hospital)
+                .distance(getHospitalDistance(latitude, longitude, hospital.getLocation()))
                 .isBookmarked(!hospitalBookmark.getDeleted())
                 .isEvaluationReviewed(isEvaluationReviewed)
                 .doctorList(doctorList)
                 .build();
+    }
+
+    @Override
+    public Double getHospitalDistance(Double latitude, Double longitude, Point hospitalLocation) {
+        return latitude == null || longitude == null ? null :
+                GeoUtil.calculateDistance(latitude, longitude, hospitalLocation.getY(), hospitalLocation.getX());
     }
 
     @Override

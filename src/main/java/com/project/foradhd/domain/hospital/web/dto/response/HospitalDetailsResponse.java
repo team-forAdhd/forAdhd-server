@@ -21,6 +21,7 @@ public class HospitalDetailsResponse {
     private Double longitude;
     private Integer totalReceiptReviewCount;
     private Integer totalEvaluationReviewCount;
+    private Double distance;
     private Boolean isBookmarked;
     private Boolean isEvaluationReviewed;
     private HospitalOperationStatus operationStatus;

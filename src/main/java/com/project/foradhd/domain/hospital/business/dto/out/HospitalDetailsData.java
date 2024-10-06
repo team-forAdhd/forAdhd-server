@@ -14,6 +14,7 @@ import java.util.List;
 public class HospitalDetailsData {
 
     private Hospital hospital;
+    private Double distance;
     private Boolean isBookmarked;
     private Boolean isEvaluationReviewed;
     private List<Doctor> doctorList;

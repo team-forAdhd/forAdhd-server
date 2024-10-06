@@ -83,6 +83,8 @@ class HospitalServiceTest {
         //given
         String userId = "userId";
         String hospitalId = "hospitalId";
+        Double latitude = 37.4867657;
+        Double longitude = 127.1031943;
         Doctor doctor = toDoctor().build();
         given(hospitalRepository.findById(hospitalId)).willReturn(Optional.of(toHospital().build()));
         given(doctorRepository.findAllByHospitalIdOrderByName(hospitalId)).willReturn(List.of(doctor));
@@ -90,13 +92,14 @@ class HospitalServiceTest {
         given(hospitalEvaluationReviewRepository.findByUserIdAndHospitalId(userId, hospitalId)).willReturn(Optional.empty());
 
         //when
-        HospitalDetailsData hospitalDetails = hospitalService.getHospitalDetails(userId, hospitalId);
+        HospitalDetailsData hospitalDetails = hospitalService.getHospitalDetails(userId, hospitalId, latitude, longitude);
 
         //then
         then(hospitalRepository).should(times(1)).findById(hospitalId);
         then(doctorRepository).should(times(1)).findAllByHospitalIdOrderByName(hospitalId);
         then(hospitalBookmarkRepository).should(times(1)).findById(userId, hospitalId);
         then(hospitalEvaluationReviewRepository).should(times(1)).findByUserIdAndHospitalId(userId, hospitalId);
+        assertThat(hospitalDetails.getDistance()).isNotNull();
         assertThat(hospitalDetails.getIsBookmarked()).isFalse();
         assertThat(hospitalDetails.getIsEvaluationReviewed()).isFalse();
     }
