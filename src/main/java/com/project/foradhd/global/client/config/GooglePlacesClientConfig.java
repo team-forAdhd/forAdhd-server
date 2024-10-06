@@ -18,14 +18,14 @@ public class GooglePlacesClientConfig {
     private String apiKey;
 
     @Bean
-    public RequestInterceptor googlePlacesRequestInterceptor() {
-        return restTemplate -> {
-            restTemplate.header("X-Goog-Api-Key", apiKey);
-            restTemplate.query("languageCode", GOOGLE_LANGUAGE_CODE_PARAM);
-            if (restTemplate.url().contains(PLACES_SEARCH_PATH)) {
-                restTemplate.header("X-Goog-FieldMask", GOOGLE_PLACES_SEARCH_FIELD_MASK_HEADER);
+    public RequestInterceptor googlePlacesClientRequestInterceptor() {
+        return requestTemplate -> {
+            requestTemplate.header("X-Goog-Api-Key", apiKey);
+            requestTemplate.query("languageCode", GOOGLE_LANGUAGE_CODE_PARAM);
+            if (requestTemplate.url().contains(PLACES_SEARCH_PATH)) {
+                requestTemplate.header("X-Goog-FieldMask", GOOGLE_PLACES_SEARCH_FIELD_MASK_HEADER);
             } else {
-                restTemplate.header("X-Goog-FieldMask", GOOGLE_PLACES_OPERATION_DETAILS_FIELD_MASK_HEADER);
+                requestTemplate.header("X-Goog-FieldMask", GOOGLE_PLACES_OPERATION_DETAILS_FIELD_MASK_HEADER);
             }
         };
     }

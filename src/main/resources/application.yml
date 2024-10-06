@@ -18,6 +18,10 @@ spring:
       max-file-size: 5MB #하나의 파일 용량 제한
       max-request-size: 10MB #하나의 요청 내 전체 파일 용량 제한
       resolve-lazily: true #실제 파일에 접근하는 시점에 파일 용량 체크 (스프링 MVC에서 예외 throw)
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
 jwt:
   expiry:
@@ -54,6 +58,8 @@ google:
   api-key: ${GOOGLE_API_KEY}
   places:
     url: ${GOOGLE_PLACES_URL}
+  people:
+    url: ${GOOGLE_PEOPLE_URL}
 
 cors:
   allowed:
