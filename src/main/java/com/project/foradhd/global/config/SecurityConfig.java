@@ -15,6 +15,7 @@ import com.project.foradhd.domain.auth.handler.OAuth2AuthenticationFailureHandle
 import com.project.foradhd.domain.auth.handler.OAuth2AuthenticationSuccessHandler;
 import com.project.foradhd.domain.user.persistence.enums.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
@@ -128,6 +129,24 @@ public class SecurityConfig {
         loginAuthenticationFilter.setAuthenticationSuccessHandler(loginAuthenticationSuccessHandler);
         loginAuthenticationFilter.setAuthenticationFailureHandler(loginAuthenticationFailureHandler);
         return loginAuthenticationFilter;
+    }
+
+    //LoginAuthenticationFilter 서블릿 컨테이너(ApplicationFilterChain)에 등록되지 않도록 설정
+    @Bean
+    public FilterRegistrationBean<LoginAuthenticationFilter> loginAuthenticationFilterRegistrationBean(AuthenticationManager authenticationManager) {
+        FilterRegistrationBean<LoginAuthenticationFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(loginAuthenticationFilter(authenticationManager));
+        filterRegistrationBean.setEnabled(false);
+        return filterRegistrationBean;
+    }
+
+    //JwtAuthenticationFilter 서블릿 컨테이너(ApplicationFilterChain)에 등록되지 않도록 설정
+    @Bean
+    public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilterRegistrationBean() {
+        FilterRegistrationBean<JwtAuthenticationFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(jwtAuthenticationFilter);
+        filterRegistrationBean.setEnabled(false);
+        return filterRegistrationBean;
     }
 
     @Bean

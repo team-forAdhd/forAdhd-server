@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 60초마다 설정 파일의 변경 확인하여 변경 시 재로딩 -->
+<configuration scan="true" scanPeriod="60 seconds">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" /> <!-- FILE_LOG_PATTERN 변수 사용 위해 -->
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" /> <!-- CONSOLE appender 사용 위해 -->
+
+    <!-- 로그 변수 값 설정 (application.yml 파일에서 설정) -->
+    <springProperty name="LOG_PATH" source="log.config.path"/>
+    <springProperty name="LOG_FILENAME" source="log.config.filename.application"/>
+    <springProperty name="LOG_ERROR_FILENAME" source="log.config.filename.error"/>
+    <springProperty name="LOG_MAX_HISTORY" source="log.config.maxHistory"/>
+    <springProperty name="LOG_MAX_FILE_SIZE" source="log.config.maxFileSize"/>
+    <springProperty name="LOG_TOTAL_SIZE_CAP" source="log.config.totalSizeCap"/>
+
+    <!-- spring profiles dev 또는 prod 경우 appender 설정 -->
+    <springProfile name="dev, prod">
+        <!-- 여러 파일을 순회하면서 로그 기록하는 appender -->
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!-- 로그 파일 이름 설정 -->
+            <file>${LOG_PATH}/${LOG_FILENAME}.log</file>
+            <!-- 로그 패턴 설정 -->
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+            <!-- 날짜가 바뀌거나 해당 파일 용량이 다 차면 다른 파일에 로그 기록 -->
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/${LOG_FILENAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <!-- 로그 파일 분할 기준 용량 -->
+                <maxFileSize>${LOG_MAX_FILE_SIZE}</maxFileSize>
+                <!-- 저장된 로그 파일 해당 기간(일 단위) 지나면 삭제 -->
+                <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+                <!-- 전체 로그 파일 크기 제한, 초과 시 가장 오래된 파일 삭제 -->
+                <totalSizeCap>${LOG_TOTAL_SIZE_CAP}</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+
+        <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!-- ERROR 레벨 로그만 필터링 -->
+            <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                <level>ERROR</level>
+                <onMatch>ACCEPT</onMatch>
+                <onMismatch>DENY</onMismatch>
+            </filter>
+
+            <file>${LOG_PATH}/${LOG_ERROR_FILENAME}.log</file>
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/${LOG_ERROR_FILENAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <maxFileSize>${LOG_MAX_FILE_SIZE}</maxFileSize>
+                <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+                <totalSizeCap>${LOG_TOTAL_SIZE_CAP}</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+    </springProfile>
+
+    <!-- spring profiles local 경우 root logger 설정 -->
+    <!-- local profiles: DEBUG 레벨 로그 콘솔에 출력 (기존 스프링 로그 방식과 동일) -->
+    <springProfile name="local">
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE" />
+        </root>
+    </springProfile>
+
+    <!-- spring profiles dev 경우 root logger 설정 -->
+    <!-- dev profiles: DEBUG 레벨 로그 콘솔에 출력 및 파일에 저장 + ERROR 레벨 로그 파일에 저장 -->
+    <springProfile name="dev">
+        <!-- root: 로그 레벨 전역 설정, logger: 로그 레벨 지역 설정 -->
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
+            <appender-ref ref="ERROR_FILE" />
+        </root>
+    </springProfile>
+
+    <!-- spring profiles prod 경우 root logger 설정 -->
+    <!-- prod profiles: INFO 레벨 로그 콘솔에 출력 및 파일에 저장 + ERROR 레벨 로그 파일에 저장 -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="FILE" />
+            <appender-ref ref="ERROR_FILE" />
+        </root>
+    </springProfile>
+</configuration>
