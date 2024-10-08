@@ -1,24 +1,31 @@
 <h1>ForA</h1>
 <h2>📝 기획 의도 (Purpose)</h2>
-![스크린샷 2024-09-30 오후 2 18 16](https://github.com/user-attachments/assets/be414870-7712-458a-85df-e93aa3b11396)
 
-프로젝트 ForA는 adhd를 가지고 있는 사람들을 위한 서비스로, 사용자들에게 병원 추천, 약 리뷰, 커뮤니티 기능 등을 제공합니다 (수정 예정)
+![스크린샷 2024-10-08 오후 5.56.46.png](..%2F..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2F52%2F3wjgb3014nb4ck6_b657wf680000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_vMK5cH%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202024-10-08%20%EC%98%A4%ED%9B%84%205.56.46.png)
+ADHD로 혼자 고민하지 말고, 'ForA'와 함께하세요!<br />
+여러분의 일상과 고민을 나누고,<br />
+ADHD를 잘 이해하고 치료하는 병원을 찾아보고,<br />
+약탭을 통해 복용 중인 약의 정보를 확인하고, 나에게 맞는 약을 찾아봐요!<br />
+
+'ForA'는 ADHD를 이해하고, 여러분과 함께 성장하고 싶은 서비스입니다. :)<br />
 
 
-<h2>프로젝트 소개 (Project Introduction)</h2>
+
+<h2>🖥️ 프로젝트 소개 (Project Introduction)</h2>
 
 <h3>📚 Tech Stack 📚</h3>
 <h3>✨ Platforms & Languages ✨</h3>
 
-<img src="https://img.shields.io/badge/Spring-6DB33F?style=flat&logo=Spring&logoColor=white" /> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=SpringSecurity&logoColor=white" /> <img src="https://img.shields.io/badge/jQuery-0769AD?style=flat&logo=jQuery&logoColor=white" /> <img src="https://img.shields.io/badge/QueryDsl-0769AD?style=flat&logoColor=white" /> <img src="https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazonwebservices&logoColor=white" /> <img src="https://img.shields.io/badge/S3-232F3E?style=flat&logo=amazons3&logoColor=white" /> <img src="https://img.shields.io/badge/RDS-527FFF?style=flat&logo=amazonrds&logoColor=white" /> <img src="https://img.shields.io/badge/SES-DD344C?style=flat&logo=amazonsimpleemailservice&logoColor=white" /> <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white" /> <img src="https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=jenkins&logoColor=white" />
+<img src="https://img.shields.io/badge/Spring-6DB33F?style=flat&logo=Spring&logoColor=white" /> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=SpringSecurity&logoColor=white" /> <img src="https://img.shields.io/badge/Spring OAuth2-6DB33F?style=flat&logo=Spring&logoColor=white" /> <img src="https://img.shields.io/badge/Spring data JPA-6DB33F?style=flat&logo=Spring&logoColor=white" /> <img src="https://img.shields.io/badge/QueryDsl-0769AD?style=flat&logoColor=white" /> <img src="https://img.shields.io/badge/MyBatis-0769AD?style=flat&logoColor=white" /> <img src="https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazonwebservices&logoColor=white" /> <img src="https://img.shields.io/badge/S3-232F3E?style=flat&logo=amazons3&logoColor=white" /> <img src="https://img.shields.io/badge/RDS-527FFF?style=flat&logo=amazonrds&logoColor=white" /> <img src="https://img.shields.io/badge/SES-DD344C?style=flat&logo=amazonsimpleemailservice&logoColor=white" /> <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white" /> <img src="https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=jenkins&logoColor=white" />
 
 
 <h3>🛠️ Tools 🛠️</h3>
 
-<img src="https://img.shields.io/badge/git-F05032?style=flat&logo=git&logoColor=white" /> <img src="https://img.shields.io/badge/github-181717?style=flat&logo=github&logoColor=white" /> <img src="https://img.shields.io/badge/intelliJ-000000?style=flat&logo=intellijidea&logoColor=white" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" /> <img src="https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white" /> <img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white" />
+<img src="https://img.shields.io/badge/git-F05032?style=flat&logo=git&logoColor=white" /> <img src="https://img.shields.io/badge/github-181717?style=flat&logo=github&logoColor=white" /> <img src="https://img.shields.io/badge/intelliJ-000000?style=flat&logo=intellijidea&logoColor=white" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" /> <img src="https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white" /> <img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white" /> <img src="https://img.shields.io/badge/Redis-FF4438?style=flat&logo=redis&logoColor=white" />
+
 
 <h3>🗂 DB 설계 (Database Design)</h3>
-<iframe width="600" height="336" src="https://www.erdcloud.com/p/ZDhxaytCGA66ZnZ3x" frameborder="0" allowfullscreen></iframe>
+<iframe width="600" height="1" src="https://www.erdcloud.com/p/ZDhxaytCGA66ZnZ3x" frameborder="0" allowfullscreen></iframe>
 ![For ADHD](https://github.com/user-attachments/assets/1b0d5218-4b65-4f7d-87b7-1da91e6d2e8a)
 
 
@@ -45,11 +52,19 @@
 ![스크린샷 2024-09-30 오후 2 26 50](https://github.com/user-attachments/assets/746e6e7c-fbad-462e-9184-2534ed4c7e32)
 
 
-<h3>팀원 및 역할 (Team Members & Roles)</h3>
-
-<table> <tbody> <td align="center"><a href=""><img src="" width="100px;" alt=""/><br /><sub><b>김다은 : 백엔드 개발</b></sub></a><br /></td> <td align="center"><a href=""><img src="" width="100px;" alt=""/><br /><sub><b>이서현 : 백엔드 개발</b></sub></a><br /></td> </tbody> </table>
-
-
+<h3>👥 팀원 및 역할 (Team Members & Roles)</h3>
+<table>
+  <tbody>
+    <tr>
+      <td align="center"><b>김다은</b></td>
+      <td align="center">여기에 역할 및 개발한 부분 작성해주시면 됩니다!</td>
+    </tr>
+    <tr>
+      <td align="center"><b>이서현</b></td>
+      <td align="center">게시글 탭, 메인 홈, 약 탭 작업</td>
+    </tr>
+  </tbody>
+</table>
 
 
 ## 코드 리뷰 규칙
