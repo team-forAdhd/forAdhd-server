@@ -24,6 +24,7 @@ public interface MedicineReviewMapper {
     @Mapping(target = "averageGrade", expression = "java(review.getMedicine().calculateAverageGrade())")
     @Mapping(target = "images", source = "review.images")
     @Mapping(target = "coMedications", source = "review.coMedications")
+    @Mapping(target = "userId", source = "user.id")
     MedicineReviewResponse toResponseDto(MedicineReview review, @Context UserService userService);
 
     @AfterMapping
