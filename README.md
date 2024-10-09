@@ -57,11 +57,11 @@ ADHD를 잘 이해하고 치료하는 병원을 찾아보고,<br />
   <tbody>
     <tr>
       <td align="center"><b>김다은</b></td>
-      <td align="center">여기에 역할 및 개발한 부분 작성해주시면 됩니다!</td>
+      <td align="center">룰 및 컨벤션 도입 추진, API & DB 설계, Spring Security & OAuth2 인증 및 인가 로직 구현, 유저 및 병원 도메인 구현, AWS 인프라 구축</td>
     </tr>
     <tr>
       <td align="center"><b>이서현</b></td>
-      <td align="center">게시글 탭, 메인 홈, 약 탭 작업</td>
+      <td align="center">API & DB 설계, 게시글 탭, 메인 홈, 약 탭 작업</td>
     </tr>
   </tbody>
 </table>
