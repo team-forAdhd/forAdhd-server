@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MedicineReviewResponse {
     private Long id;
+    private String userId;
     private Long medicineId;
     private String content;
     private List<String> images;
