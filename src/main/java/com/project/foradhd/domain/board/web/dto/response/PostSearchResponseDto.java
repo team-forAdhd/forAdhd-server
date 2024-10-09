@@ -23,6 +23,7 @@ public class PostSearchResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PostSearchListResponseDto {
+        private long id;
         private String title;
         private long viewCount;
         private long likeCount;
