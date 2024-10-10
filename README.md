@@ -30,7 +30,7 @@ ADHD를 잘 이해하고 치료하는 병원을 찾아보고,<br />
 
 
 <h3>📜 API 명세 (API Documentation)</h3>
-[[여기에 API 명세서 링크 또는 주요 API 설명을 추가]](https://app.getpostman.com/join-team?invite_code=36966018732ee80fa859f5c538e5aa4a&target_code=76a1f1e078264518c8778727096fc6c5)
+[[API 명세서]](https://documenter.getpostman.com/view/19763591/2sA2xnx9xP)
 
 <h3>🚀 구현 기능 (Implemented Features)</h3>
 
