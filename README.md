@@ -1,7 +1,7 @@
 <h1>ForA</h1>
 <h2>📝 기획 의도 (Purpose)</h2>
 
-![스크린샷 2024-10-08 오후 5.56.46.png](..%2F..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2F52%2F3wjgb3014nb4ck6_b657wf680000gn%2FT%2FTemporaryItems%2FNSIRD_screencaptureui_vMK5cH%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202024-10-08%20%EC%98%A4%ED%9B%84%205.56.46.png)
+![스크린샷 2024-10-17 오후 1.41.20.png](..%2F..%2F..%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202024-10-17%20%EC%98%A4%ED%9B%84%201.41.20.png)
 ADHD로 혼자 고민하지 말고, 'ForA'와 함께하세요!<br />
 여러분의 일상과 고민을 나누고,<br />
 ADHD를 잘 이해하고 치료하는 병원을 찾아보고,<br />
