@@ -1,4 +1,71 @@
-### For ADHD Server
+<h1>ForA</h1>
+<h2>📝 기획 의도 (Purpose)</h2>
+
+![스크린샷 2024-10-17 오후 1.41.20.png](..%2F..%2F..%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202024-10-17%20%EC%98%A4%ED%9B%84%201.41.20.png)
+ADHD로 혼자 고민하지 말고, 'ForA'와 함께하세요!<br />
+여러분의 일상과 고민을 나누고,<br />
+ADHD를 잘 이해하고 치료하는 병원을 찾아보고,<br />
+약탭을 통해 복용 중인 약의 정보를 확인하고, 나에게 맞는 약을 찾아봐요!<br />
+
+'ForA'는 ADHD를 이해하고, 여러분과 함께 성장하고 싶은 서비스입니다. :)<br />
+
+
+
+<h2>🖥️ 프로젝트 소개 (Project Introduction)</h2>
+
+<h3>📚 Tech Stack 📚</h3>
+<h3>✨ Platforms & Languages ✨</h3>
+
+<img src="https://img.shields.io/badge/Spring-6DB33F?style=flat&logo=Spring&logoColor=white" /> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat&logo=SpringSecurity&logoColor=white" /> <img src="https://img.shields.io/badge/Spring OAuth2-6DB33F?style=flat&logo=Spring&logoColor=white" /> <img src="https://img.shields.io/badge/Spring data JPA-6DB33F?style=flat&logo=Spring&logoColor=white" /> <img src="https://img.shields.io/badge/QueryDsl-0769AD?style=flat&logoColor=white" /> <img src="https://img.shields.io/badge/MyBatis-0769AD?style=flat&logoColor=white" /> <img src="https://img.shields.io/badge/AWS-232F3E?style=flat&logo=amazonwebservices&logoColor=white" /> <img src="https://img.shields.io/badge/S3-232F3E?style=flat&logo=amazons3&logoColor=white" /> <img src="https://img.shields.io/badge/RDS-527FFF?style=flat&logo=amazonrds&logoColor=white" /> <img src="https://img.shields.io/badge/SES-DD344C?style=flat&logo=amazonsimpleemailservice&logoColor=white" /> <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white" /> <img src="https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=jenkins&logoColor=white" />
+
+
+<h3>🛠️ Tools 🛠️</h3>
+
+<img src="https://img.shields.io/badge/git-F05032?style=flat&logo=git&logoColor=white" /> <img src="https://img.shields.io/badge/github-181717?style=flat&logo=github&logoColor=white" /> <img src="https://img.shields.io/badge/intelliJ-000000?style=flat&logo=intellijidea&logoColor=white" /> <img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" /> <img src="https://img.shields.io/badge/Postman-FF6C37?style=flat&logo=postman&logoColor=white" /> <img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white" /> <img src="https://img.shields.io/badge/Redis-FF4438?style=flat&logo=redis&logoColor=white" />
+
+
+<h3>🗂 DB 설계 (Database Design)</h3>
+<iframe width="600" height="1" src="https://www.erdcloud.com/p/ZDhxaytCGA66ZnZ3x" frameborder="0" allowfullscreen></iframe>
+![For ADHD](https://github.com/user-attachments/assets/1b0d5218-4b65-4f7d-87b7-1da91e6d2e8a)
+
+
+<h3>📜 API 명세 (API Documentation)</h3>
+[[API 명세서]](https://documenter.getpostman.com/view/19763591/2sA2xnx9xP)
+
+<h3>🚀 구현 기능 (Implemented Features)</h3>
+
+<h4>기능 1: 회원가입 및 로그인</h4>
+![스크린샷 2024-09-30 오후 2 23 06](https://github.com/user-attachments/assets/26b50317-f6e9-40cd-999a-ecf2ea917e94)
+![스크린샷 2024-09-30 오후 2 23 59](https://github.com/user-attachments/assets/75c0e9db-2f42-4466-b1e4-e5c0a0aab365)
+
+
+<h4>기능 2: 메인홈</h4>
+![스크린샷 2024-09-30 오후 2 24 50](https://github.com/user-attachments/assets/e682feaa-bfc2-4bc2-92ab-6f366a038093)
+
+<h4>기능 3: 커뮤니티 기능</h4>
+![스크린샷 2024-09-30 오후 2 25 26](https://github.com/user-attachments/assets/9d7c5a69-dfe8-4b17-bb6b-e226a7fb3fa9)
+
+<h4>기능 4: 병원 안내 및 리뷰</h4>
+![스크린샷 2024-09-30 오후 2 26 09](https://github.com/user-attachments/assets/22a054e5-f181-4686-a36d-b4e3a915b952)
+
+<h4>기능 5: 약 안내 및 리뷰</h4>
+![스크린샷 2024-09-30 오후 2 26 50](https://github.com/user-attachments/assets/746e6e7c-fbad-462e-9184-2534ed4c7e32)
+
+
+<h3>👥 팀원 및 역할 (Team Members & Roles)</h3>
+<table>
+  <tbody>
+    <tr>
+      <td align="center"><b>김다은</b></td>
+      <td align="center">룰 및 컨벤션 도입 추진, API & DB 설계, Spring Security & OAuth2 인증 및 인가 로직 구현, 유저 및 병원 도메인 구현, AWS 인프라 구축</td>
+    </tr>
+    <tr>
+      <td align="center"><b>이서현</b></td>
+      <td align="center">API & DB 설계, 게시글 탭, 메인 홈, 약 탭 작업</td>
+    </tr>
+  </tbody>
+</table>
+
 
 ## 코드 리뷰 규칙
 
