@@ -9,7 +9,6 @@ import com.project.foradhd.domain.medicine.persistence.repository.MedicineReposi
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewLikeRepository;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewRepository;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
-import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
