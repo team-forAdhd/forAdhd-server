@@ -1,7 +1,7 @@
 <h1>ForA</h1>
 <h2>📝 기획 의도 (Purpose)</h2>
 
-![스크린샷 2024-10-17 오후 1.41.20.png](..%2F..%2F..%2F%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202024-10-17%20%EC%98%A4%ED%9B%84%201.41.20.png)
+<img width="931" alt="스크린샷 2024-10-17 오후 1 41 20" src="https://github.com/user-attachments/assets/15621be7-eba0-43f3-a053-ace957bc9b07"><br/>
 ADHD로 혼자 고민하지 말고, 'ForA'와 함께하세요!<br />
 여러분의 일상과 고민을 나누고,<br />
 ADHD를 잘 이해하고 치료하는 병원을 찾아보고,<br />
@@ -25,31 +25,50 @@ ADHD를 잘 이해하고 치료하는 병원을 찾아보고,<br />
 
 
 <h3>🗂 DB 설계 (Database Design)</h3>
-<iframe width="600" height="1" src="https://www.erdcloud.com/p/ZDhxaytCGA66ZnZ3x" frameborder="0" allowfullscreen></iframe>
-![For ADHD](https://github.com/user-attachments/assets/1b0d5218-4b65-4f7d-87b7-1da91e6d2e8a)
+<a href="https://www.erdcloud.com/p/ZDhxaytCGA66ZnZ3x" target="_blank">
+  <img src="https://github.com/user-attachments/assets/1b0d5218-4b65-4f7d-87b7-1da91e6d2e8a" alt="For ADHD" width="600" height="400">
+</a>
 
 
 <h3>📜 API 명세 (API Documentation)</h3>
-[[API 명세서]](https://documenter.getpostman.com/view/19763591/2sA2xnx9xP)
+<a href="https://documenter.getpostman.com/view/19763591/2sA2xnx9xP" target="_blank">API 명세서</a>
+
+
 
 <h3>🚀 구현 기능 (Implemented Features)</h3>
 
-<h4>기능 1: 회원가입 및 로그인</h4>
-![스크린샷 2024-09-30 오후 2 23 06](https://github.com/user-attachments/assets/26b50317-f6e9-40cd-999a-ecf2ea917e94)
-![스크린샷 2024-09-30 오후 2 23 59](https://github.com/user-attachments/assets/75c0e9db-2f42-4466-b1e4-e5c0a0aab365)
+<h4>1️⃣ 기능 1: 회원가입 및 로그인</h4>
+<img width="951" alt="스크린샷 2024-10-22 오후 3 39 08" src="https://github.com/user-attachments/assets/9ecc406c-4cdb-45cb-a617-12488cd50c3b">
+<img width="856" alt="스크린샷 2024-10-22 오후 3 39 42" src="https://github.com/user-attachments/assets/72247426-5d3a-4cd8-8daa-89b201ae649a">
 
 
-<h4>기능 2: 메인홈</h4>
-![스크린샷 2024-09-30 오후 2 24 50](https://github.com/user-attachments/assets/e682feaa-bfc2-4bc2-92ab-6f366a038093)
+<h4>2️⃣기능 2: 메인홈</h4>
+<img width="658" alt="스크린샷 2024-10-22 오후 3 40 36" src="https://github.com/user-attachments/assets/e5a28d23-1868-474b-a746-d05f1aa0acbc">
 
-<h4>기능 3: 커뮤니티 기능</h4>
-![스크린샷 2024-09-30 오후 2 25 26](https://github.com/user-attachments/assets/9d7c5a69-dfe8-4b17-bb6b-e226a7fb3fa9)
+<h4>3️⃣기능 3: 커뮤니티 기능</h4>
+<img width="844" alt="스크린샷 2024-10-22 오후 3 41 01" src="https://github.com/user-attachments/assets/9e85f370-7b3c-444c-8872-2f65451a6e68">
+<img width="807" alt="스크린샷 2024-10-22 오후 3 41 29" src="https://github.com/user-attachments/assets/c75dd66e-73ce-4d62-9ec5-677e1febe653">
 
-<h4>기능 4: 병원 안내 및 리뷰</h4>
-![스크린샷 2024-09-30 오후 2 26 09](https://github.com/user-attachments/assets/22a054e5-f181-4686-a36d-b4e3a915b952)
 
-<h4>기능 5: 약 안내 및 리뷰</h4>
-![스크린샷 2024-09-30 오후 2 26 50](https://github.com/user-attachments/assets/746e6e7c-fbad-462e-9184-2534ed4c7e32)
+<h4>4️⃣기능 4: 병원 안내 및 리뷰</h4>
+<img width="675" alt="스크린샷 2024-10-22 오후 3 43 57" src="https://github.com/user-attachments/assets/35ec9888-a050-4f8e-9e74-5baabd8565ab">
+<img width="939" alt="스크린샷 2024-10-22 오후 3 43 31" src="https://github.com/user-attachments/assets/0d8fb7ab-47fb-43e5-930e-e28e6a457bae">
+<img width="921" alt="스크린샷 2024-10-22 오후 3 43 43" src="https://github.com/user-attachments/assets/63579442-3382-411d-aeef-6f1ab6f11e7b">
+
+
+<h4>5️⃣기능 5: 약 안내 및 리뷰</h4>
+<img width="929" alt="스크린샷 2024-10-22 오후 3 45 08" src="https://github.com/user-attachments/assets/75e2b1f5-9e4f-48a1-bd59-bbebd6c28f93">
+<img width="622" alt="스크린샷 2024-10-22 오후 3 45 30" src="https://github.com/user-attachments/assets/557ff9dc-e3f5-4fc3-ac40-9e96a2b64f45">
+<img width="917" alt="스크린샷 2024-10-22 오후 3 45 48" src="https://github.com/user-attachments/assets/059a9716-4c44-4de7-891d-5ed837610f93">
+
+
+<h4>6️⃣기능 6 : 마이페이지</h4>
+<img width="356" alt="스크린샷 2024-10-22 오후 3 46 08" src="https://github.com/user-attachments/assets/46e47836-58e1-4f86-ab5d-46f52e1de4c4">
+<img width="765" alt="스크린샷 2024-10-22 오후 3 46 23" src="https://github.com/user-attachments/assets/ff34c139-1bbd-450a-a055-c3f23d25a162">
+<img width="788" alt="스크린샷 2024-10-22 오후 3 46 35" src="https://github.com/user-attachments/assets/1098834e-0797-4ff7-8400-6ab5a2611650">
+<img width="871" alt="스크린샷 2024-10-22 오후 3 46 50" src="https://github.com/user-attachments/assets/585ecf09-9cdf-4d9d-b48d-6795d82fdc98">
+<img width="893" alt="스크린샷 2024-10-22 오후 3 47 04" src="https://github.com/user-attachments/assets/9146f928-3518-46fb-842c-f0358098ead4">
+
 
 
 <h3>👥 팀원 및 역할 (Team Members & Roles)</h3>
