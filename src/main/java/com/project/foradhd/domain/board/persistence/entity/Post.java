@@ -1,9 +1,8 @@
 package com.project.foradhd.domain.board.persistence.entity;
 
-import com.project.foradhd.domain.board.persistence.enums.CategoryName;
+import com.project.foradhd.domain.board.persistence.enums.Category;
 import com.project.foradhd.domain.hospital.persistence.converter.StringListConverter;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,7 +30,7 @@ public class Post extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
-    private CategoryName category;
+    private Category category;
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Comment> comments;

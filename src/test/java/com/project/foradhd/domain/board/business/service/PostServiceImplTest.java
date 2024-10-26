@@ -1,15 +1,12 @@
 package com.project.foradhd.domain.board.business.service;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.*;
 
 import com.project.foradhd.domain.board.business.service.Impl.PostServiceImpl;
 import com.project.foradhd.domain.board.fixtures.PostFixtures;
 import com.project.foradhd.domain.board.persistence.entity.Post;
-import com.project.foradhd.domain.board.persistence.enums.CategoryName;
+import com.project.foradhd.domain.board.persistence.enums.Category;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
-import com.project.foradhd.domain.board.persistence.repository.PostScrapFilterRepository;
-import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.domain.user.fixtures.UserFixtures;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.util.SseEmitters;
@@ -20,43 +17,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collections;
 import java.util.Optional;
 
-import static org.mockito.BDDMockito.*;
-import static org.assertj.core.api.Assertions.*;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
-
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -177,37 +147,37 @@ public class PostServiceImplTest {
     @Test
     public void shouldGetUserPostsByCategory() {
         User user = UserFixtures.toUser().build();
-        Post post = PostFixtures.toPost(user).category(CategoryName.TEENS).build();
+        Post post = PostFixtures.toPost(user).category(Category.TEENS).build();
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> postPage = new PageImpl<>(Arrays.asList(post));
 
-        given(postRepository.findByUserIdAndCategoryWithUserProfile(user.getId(), CategoryName.TEENS, pageable)).willReturn(postPage);
+        given(postRepository.findByUserIdAndCategoryWithUserProfile(user.getId(), Category.TEENS, pageable)).willReturn(postPage);
 
-        Page<Post> result = postService.getUserPostsByCategory(user.getId(), CategoryName.TEENS, pageable, SortOption.NEWEST_FIRST);
+        Page<Post> result = postService.getUserPostsByCategory(user.getId(), Category.TEENS, pageable, SortOption.NEWEST_FIRST);
 
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getCategory()).isEqualTo(CategoryName.TEENS);
+        assertThat(result.getContent().get(0).getCategory()).isEqualTo(Category.TEENS);
 
-        then(postRepository).should(times(1)).findByUserIdAndCategoryWithUserProfile(user.getId(), CategoryName.TEENS, pageable);
+        then(postRepository).should(times(1)).findByUserIdAndCategoryWithUserProfile(user.getId(), Category.TEENS, pageable);
     }
 
     @Test
     public void shouldListPostsByCategory() {
         User user = UserFixtures.toUser().build();
-        Post post = PostFixtures.toPost(user).category(CategoryName.TEENS).build();
+        Post post = PostFixtures.toPost(user).category(Category.TEENS).build();
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> postPage = new PageImpl<>(Arrays.asList(post));
 
-        given(postRepository.findByCategoryWithUserProfile(CategoryName.TEENS, pageable)).willReturn(postPage);
+        given(postRepository.findByCategoryWithUserProfile(Category.TEENS, pageable)).willReturn(postPage);
 
-        Page<Post> result = postService.listByCategory(CategoryName.TEENS, pageable);
+        Page<Post> result = postService.listByCategory(Category.TEENS, pageable);
 
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getCategory()).isEqualTo(CategoryName.TEENS);
+        assertThat(result.getContent().get(0).getCategory()).isEqualTo(Category.TEENS);
 
-        then(postRepository).should(times(1)).findByCategoryWithUserProfile(CategoryName.TEENS, pageable);
+        then(postRepository).should(times(1)).findByCategoryWithUserProfile(Category.TEENS, pageable);
     }
 
     @Test
@@ -246,18 +216,18 @@ public class PostServiceImplTest {
     @Test
     public void shouldGetTopPostsByCategory() {
         User user = UserFixtures.toUser().build();
-        Post post = PostFixtures.toPost(user).category(CategoryName.TEENS).build();
+        Post post = PostFixtures.toPost(user).category(Category.TEENS).build();
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> postPage = new PageImpl<>(Arrays.asList(post));
 
-        given(postRepository.findTopPostsByCategoryWithUserProfile(CategoryName.TEENS, pageable)).willReturn(postPage);
+        given(postRepository.findTopPostsByCategoryWithUserProfile(Category.TEENS, pageable)).willReturn(postPage);
 
-        Page<Post> result = postService.getTopPostsByCategory(CategoryName.TEENS, pageable);
+        Page<Post> result = postService.getTopPostsByCategory(Category.TEENS, pageable);
 
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
 
-        then(postRepository).should(times(1)).findTopPostsByCategoryWithUserProfile(CategoryName.TEENS, pageable);
+        then(postRepository).should(times(1)).findTopPostsByCategoryWithUserProfile(Category.TEENS, pageable);
         then(notificationService).should(times(1)).createNotification(user.getId(), "내 글이 TOP 10 게시물로 선정됐어요!");
         then(sseEmitters).should(times(1)).sendNotification(user.getId(), "내 글이 TOP 10 게시물로 선정됐어요!");
     }

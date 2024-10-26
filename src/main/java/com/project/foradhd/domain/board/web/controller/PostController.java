@@ -6,9 +6,8 @@ import com.project.foradhd.domain.board.business.service.PostSearchHistoryServic
 import com.project.foradhd.domain.board.business.service.PostService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
-import com.project.foradhd.domain.board.persistence.enums.CategoryName;
+import com.project.foradhd.domain.board.persistence.enums.Category;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
-import com.project.foradhd.domain.board.web.dto.PostDto;
 import com.project.foradhd.domain.board.web.dto.request.PostRequestDto;
 import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
@@ -17,15 +16,10 @@ import com.project.foradhd.domain.board.web.dto.response.PostSearchResponseDto;
 import com.project.foradhd.domain.board.web.mapper.PostMapper;
 import com.project.foradhd.domain.board.web.mapper.PostScrapFilterMapper;
 import com.project.foradhd.domain.user.business.service.UserService;
-import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
 import com.project.foradhd.global.AuthUserId;
-import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -113,7 +107,7 @@ public class PostController {
     // 카테고리별 게시글 조회 api
     @GetMapping("/category")
     public ResponseEntity<PostResponseDto> getPostsByCategory(
-            @RequestParam("category") CategoryName category,
+            @RequestParam("category") Category category,
             Pageable pageable) {
         Page<Post> postPage = postService.listByCategory(category, pageable);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = postPage.getContent().stream()
@@ -132,7 +126,7 @@ public class PostController {
 
     // 내가 작성한 게시글 조회 api
     @GetMapping("/my-posts")
-    public ResponseEntity<PostResponseDto> getUserPostsByCategory(@AuthUserId String userId, @RequestParam CategoryName category, Pageable pageable, @RequestParam SortOption sortOption) {
+    public ResponseEntity<PostResponseDto> getUserPostsByCategory(@AuthUserId String userId, @RequestParam Category category, Pageable pageable, @RequestParam SortOption sortOption) {
         Page<Post> userPosts = postService.getUserPostsByCategory(userId, category, pageable, sortOption);
         List<PostResponseDto.PostListResponseDto> postResponseDtoList = userPosts.getContent().stream()
                 .map(post -> postMapper.toPostListResponseDto(post, userService))
@@ -152,7 +146,7 @@ public class PostController {
     @GetMapping("/scraps")
     public ResponseEntity<PostScrapFilterResponseDto> getScrapsByUserAndCategory(
             @AuthUserId String userId,
-            @RequestParam CategoryName category,
+            @RequestParam Category category,
             Pageable pageable,
             @RequestParam(required = false, defaultValue = "NEWEST_FIRST") SortOption sortOption) {
         Page<PostScrapFilter> scraps = postScrapFilterService.getScrapsByUserAndCategory(userId, category, pageable, sortOption);
@@ -225,7 +219,7 @@ public class PostController {
     // 메인홈 - 카테고리별 실시간 랭킹
     @GetMapping("/main/top/category")
     public ResponseEntity<PostRankingResponseDto.PagedPostRankingResponseDto> getTopPostsByCategory(
-            @RequestParam("category") CategoryName category,
+            @RequestParam("category") Category category,
             Pageable pageable) {
         Page<Post> postPage = postService.getTopPostsByCategory(category, pageable);
 

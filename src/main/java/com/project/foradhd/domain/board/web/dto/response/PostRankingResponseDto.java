@@ -1,7 +1,7 @@
 package com.project.foradhd.domain.board.web.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.project.foradhd.domain.board.persistence.enums.CategoryName;
+import com.project.foradhd.domain.board.persistence.enums.Category;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
 import lombok.AllArgsConstructor;
@@ -20,7 +20,7 @@ public class PostRankingResponseDto {
     private Long id;
     private String userId;
     private String title;
-    private CategoryName category;
+    private Category category;
     private long viewCount;
     private long likeCount;
 

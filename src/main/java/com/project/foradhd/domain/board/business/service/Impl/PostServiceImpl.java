@@ -4,10 +4,9 @@ import com.project.foradhd.domain.board.business.service.NotificationService;
 import com.project.foradhd.domain.board.business.service.PostSearchHistoryService;
 import com.project.foradhd.domain.board.business.service.PostService;
 import com.project.foradhd.domain.board.persistence.entity.Post;
-import com.project.foradhd.domain.board.persistence.enums.CategoryName;
+import com.project.foradhd.domain.board.persistence.enums.Category;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.PostRepository;
-import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.util.SseEmitters;
 import lombok.RequiredArgsConstructor;
@@ -78,14 +77,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<Post> getUserPostsByCategory(String userId, CategoryName category, Pageable pageable, SortOption sortOption) {
+    public Page<Post> getUserPostsByCategory(String userId, Category category, Pageable pageable, SortOption sortOption) {
         pageable = applySorting(pageable, sortOption);
         return postRepository.findByUserIdAndCategoryWithUserProfile(userId, category, pageable);
     }
 
     // 글 카테고리별 정렬
     @Override
-    public Page<Post> listByCategory(CategoryName category, Pageable pageable) {
+    public Page<Post> listByCategory(Category category, Pageable pageable) {
         return postRepository.findByCategoryWithUserProfile(category, pageable);
     }
 
@@ -109,7 +108,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Page<Post> getTopPostsByCategory(CategoryName category, Pageable pageable) {
+    public Page<Post> getTopPostsByCategory(Category category, Pageable pageable) {
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber(), 10);
         Page<Post> topPosts = postRepository.findTopPostsByCategoryWithUserProfile(category, pageRequest);
         notifyUsersAboutTopPosts(topPosts.getContent());
