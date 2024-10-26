@@ -5,8 +5,6 @@ import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "post_search_history")
 @Getter
@@ -17,18 +15,13 @@ public class PostSearchHistory extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_search_history_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(nullable = false)
     private String term;
-
-    private LocalDateTime searchTime;
-
-    @PrePersist
-    protected void onCreate() {
-        this.searchTime = LocalDateTime.now();
-    }
 }
