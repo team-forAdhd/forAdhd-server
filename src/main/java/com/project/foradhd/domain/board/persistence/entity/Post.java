@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
@@ -35,28 +36,45 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Comment> comments;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false, columnDefinition = "longtext")
     private String content;
 
     private String nickname;
 
     private String profileImage;
 
-    private boolean anonymous;
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Boolean anonymous = Boolean.FALSE;
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = "varchar(1000)")
     private List<String> images = List.of();
 
-    private long likeCount;
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Integer likeCount = 0;
 
-    private long commentCount;
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Integer commentCount = 0;
 
-    private long scrapCount;
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Integer scrapCount = 0;
 
-    private long viewCount;
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Integer viewCount = 0;
 
     public void incrementLikeCount() {
         this.likeCount++;
