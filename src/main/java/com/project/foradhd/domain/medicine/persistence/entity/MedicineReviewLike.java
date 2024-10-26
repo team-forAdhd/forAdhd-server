@@ -1,6 +1,7 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,9 +13,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
-public class MedicineReviewLike {
-    @jakarta.persistence.Id
+@Builder
+public class MedicineReviewLike extends BaseTimeEntity {
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

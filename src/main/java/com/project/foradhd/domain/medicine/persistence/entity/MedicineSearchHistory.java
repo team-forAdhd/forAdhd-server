@@ -1,9 +1,9 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
 import com.project.foradhd.domain.user.persistence.entity.User;
+import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "medicine_search_history")
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MedicineSearchHistory {
+public class MedicineSearchHistory extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,5 +22,4 @@ public class MedicineSearchHistory {
     private User user;
 
     private String term;
-    private LocalDateTime searchedAt;
 }

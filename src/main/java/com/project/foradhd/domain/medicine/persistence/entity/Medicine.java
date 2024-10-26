@@ -2,6 +2,7 @@ package com.project.foradhd.domain.medicine.persistence.entity;
 
 import com.project.foradhd.domain.medicine.persistence.enums.IngredientType;
 import com.project.foradhd.domain.medicine.persistence.enums.TabletType;
+import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,9 +12,9 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder(toBuilder = true)
+@Builder
 @Table(name = "medicine")
-public class Medicine {
+public class Medicine extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
