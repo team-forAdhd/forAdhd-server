@@ -9,13 +9,11 @@ import lombok.*;
 import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
-@EntityListeners(AuditingEntityListener.class)
+@Builder
 @Entity
 @Table(name = "post")
 public class Post extends BaseTimeEntity {
