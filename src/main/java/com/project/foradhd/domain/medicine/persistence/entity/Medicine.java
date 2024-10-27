@@ -33,8 +33,8 @@ public class Medicine extends BaseTimeEntity {
     private String className; //분류명
     private String formCodeName; //제형코드명
     private String itemEngName; //제품영문명
-    private double rating; // 별점
-    private boolean isFavorite; // 즐겨찾기 여부
+    private Double rating; // 별점
+    private Boolean isFavorite; // 즐겨찾기 여부
     @Enumerated(EnumType.STRING)
     private IngredientType ingredientType; // 성분 타입 (Enum)
     @Enumerated(EnumType.STRING)

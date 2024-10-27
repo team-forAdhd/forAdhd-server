@@ -1,5 +1,6 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
+import com.project.foradhd.domain.hospital.persistence.converter.StringListConverter;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.global.audit.BaseTimeEntity;
@@ -45,17 +46,17 @@ public class MedicineReview extends BaseTimeEntity {
     private String profileImage;
 
     @ElementCollection
-    @CollectionTable(name = "medicine_co_medications", joinColumns = @JoinColumn(name = "review_id"))
+    @CollectionTable(name = "medicine_co_medications", joinColumns = @JoinColumn(name = "medicine_review_id"))
     @Column(name = "medicine_id")
     private List<Long> coMedications;
 
     @Column(nullable = false, columnDefinition = "longtext")
     private String content;
 
-    @ElementCollection
-    @CollectionTable(name = "medicine_review_images", joinColumns = @JoinColumn(name = "review_id"))
-    @Column(name = "image_url")
-    private List<String> images;
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(length = 1000)
+    private List<String> images = List.of();
 
     @Column(nullable = false)
     private Double grade;
