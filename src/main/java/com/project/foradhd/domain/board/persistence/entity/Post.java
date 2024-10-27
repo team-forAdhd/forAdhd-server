@@ -11,9 +11,9 @@ import java.util.List;
 import org.hibernate.annotations.ColumnDefault;
 
 @Getter
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "post")
 public class Post extends BaseTimeEntity {

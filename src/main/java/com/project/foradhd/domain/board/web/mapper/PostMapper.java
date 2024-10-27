@@ -81,7 +81,7 @@ public interface PostMapper {
 
     @AfterMapping
     default void setAnonymousOrUserProfile(@MappingTarget PostResponseDto.PostListResponseDto.PostListResponseDtoBuilder dto, Post post, @Context UserService userService) {
-        if (post.isAnonymous()) {
+        if (post.getAnonymous()) {
             dto.nickname("익명");
             dto.profileImage("image/default-profile.png");
         } else if (post.getUser() != null) {

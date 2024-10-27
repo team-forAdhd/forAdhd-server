@@ -8,20 +8,21 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "medicine_review_like")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class MedicineReviewLike extends BaseTimeEntity {
+@Entity
+@Table(name = "medicine_review_like_filter")
+public class MedicineReviewLikeFilter extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "medicine_review_like_filter_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "medicine_review_id")
     private MedicineReview review;
 
     @ManyToOne(fetch = FetchType.LAZY)

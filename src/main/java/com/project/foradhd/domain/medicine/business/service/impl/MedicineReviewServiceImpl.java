@@ -1,15 +1,14 @@
-package com.project.foradhd.domain.medicine.business.service.Impl;
+package com.project.foradhd.domain.medicine.business.service.impl;
 
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.medicine.business.service.MedicineReviewService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
-import com.project.foradhd.domain.medicine.persistence.entity.MedicineReviewLike;
+import com.project.foradhd.domain.medicine.persistence.entity.MedicineReviewLikeFilter;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewLikeRepository;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineReviewRepository;
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
-import com.project.foradhd.domain.medicine.web.dto.response.MedicineReviewResponse;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.exception.BusinessException;
@@ -23,12 +22,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class MedicineReviewServiceImpl implements MedicineReviewService {
+
+    private final UserService userService;
     private final MedicineReviewRepository reviewRepository;
     private final MedicineRepository medicineRepository;
     private final MedicineReviewLikeRepository reviewLikeRepository;
-    private final UserService userService;
 
     @Override
     @Transactional
@@ -66,7 +67,7 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
             reviewLikeRepository.deleteByUserIdAndReviewId(userId, reviewId);
             review = review.toBuilder().helpCount(review.getHelpCount() - 1).build();
         } else {
-            MedicineReviewLike newLike = MedicineReviewLike.builder()
+            MedicineReviewLikeFilter newLike = MedicineReviewLikeFilter.builder()
                     .user(user)
                     .review(review)
                     .build();
@@ -111,11 +112,11 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     @Transactional
     public void deleteReview(Long reviewId, String userId) {
         // 리뷰가 존재하는지 확인
-        MedicineReview review = reviewRepository.findById(reviewId)
+        MedicineReview medicineReview = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW));
 
         // 리뷰 작성자와 요청한 유저가 동일한지 확인
-        if (!review.getUser().getId().equals(userId)) {
+        if (!medicineReview.getUser().getId().equals(userId)) {
             throw new BusinessException(ErrorCode.FORBIDDEN_MEDICINE_REVIEW);
         }
 
@@ -123,7 +124,7 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
         reviewRepository.deleteById(reviewId);
 
         // 약물의 평균 별점을 업데이트
-        Medicine medicine = review.getMedicine();
+        Medicine medicine = medicineReview.getMedicine();
         updateMedicineRating(medicine);
     }
 

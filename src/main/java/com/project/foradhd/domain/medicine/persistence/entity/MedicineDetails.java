@@ -21,7 +21,7 @@ public class MedicineDetails extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "medicine_id")
     private Medicine medicine;
 
     private String content;

@@ -46,7 +46,7 @@ public class CommentServiceImpl implements CommentService {
                 .user(comment.getUser())
                 .content(comment.getContent())
                 .parentComment(comment.getParentComment())
-                .anonymous(comment.isAnonymous())
+                .anonymous(comment.getAnonymous())
                 .likeCount(comment.getLikeCount())
                 .nickname(comment.getNickname())
                 .profileImage(comment.getProfileImage())
@@ -61,7 +61,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment.CommentBuilder commentBuilder = comment.toBuilder().user(User.builder().id(userId).build());
 
-        if (comment.isAnonymous()) {
+        if (comment.getAnonymous()) {
             String anonymousNickname = generateAnonymousNickname(comment.getPost().getId(), userId);
             String anonymousProfileImage = "image/default-profile.png";
 

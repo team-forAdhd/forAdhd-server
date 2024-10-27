@@ -9,15 +9,16 @@ import lombok.*;
 import java.util.List;
 
 @Getter
-@Entity
-@AllArgsConstructor
+@Builder(toBuilder = true)
 @NoArgsConstructor
-@Builder
+@AllArgsConstructor
+@Entity
 @Table(name = "medicine")
 public class Medicine extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "medicine_id")
     private Long id;
     private String itemSeq; //품목일련번호
     private String itemName; //품목명

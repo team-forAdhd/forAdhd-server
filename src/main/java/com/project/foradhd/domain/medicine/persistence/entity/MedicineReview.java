@@ -1,47 +1,47 @@
 package com.project.foradhd.domain.medicine.persistence.entity;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
-import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
 import com.project.foradhd.global.audit.BaseTimeEntity;
-import com.project.foradhd.global.serializer.LocalDateTimeToEpochSecondSerializer;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.ColumnDefault;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity
-@Table(name = "medicine_review")
-@EntityListeners(AuditingEntityListener.class)
 @Getter
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@Entity
+@Table(name = "medicine_review")
 public class MedicineReview extends BaseTimeEntity {
 
-    @jakarta.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "medicine_review_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "medicine_id")
+    private Medicine medicine;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "age_range", length = 50)
+    @Column(nullable = false, length = 50)
     private String ageRange;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "gender")
-    private Gender gender;
+    @Builder.Default
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender = Gender.UNKNOWN;
 
-    @Column(name = "nickname", length = 50)
+    @Column(nullable = false, length = 50)
     private String nickname;
 
-    @Column(name = "profile_image", length = 255)
+    @Column(nullable = false)
     private String profileImage;
 
     @ElementCollection
@@ -49,12 +49,8 @@ public class MedicineReview extends BaseTimeEntity {
     @Column(name = "medicine_id")
     private List<Long> coMedications;
 
-    @Column(length = 1500, nullable = false)
+    @Column(nullable = false, columnDefinition = "longtext")
     private String content;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "medicine_id", referencedColumnName = "id")
-    private Medicine medicine;
 
     @ElementCollection
     @CollectionTable(name = "medicine_review_images", joinColumns = @JoinColumn(name = "review_id"))
@@ -62,8 +58,10 @@ public class MedicineReview extends BaseTimeEntity {
     private List<String> images;
 
     @Column(nullable = false)
-    private float grade;
+    private Double grade;
 
+    @Builder.Default
+    @ColumnDefault("0")
     @Column(nullable = false)
-    private int helpCount;
+    private Integer helpCount = 0;
 }

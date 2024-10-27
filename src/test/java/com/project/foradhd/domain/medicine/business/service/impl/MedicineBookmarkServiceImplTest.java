@@ -1,4 +1,4 @@
-package com.project.foradhd.domain.medicine.business.service.Impl;
+package com.project.foradhd.domain.medicine.business.service.impl;
 
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineBookmark;

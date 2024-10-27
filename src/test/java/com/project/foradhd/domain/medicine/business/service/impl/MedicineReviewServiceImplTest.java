@@ -1,4 +1,4 @@
-package com.project.foradhd.domain.medicine.business.service.Impl;
+package com.project.foradhd.domain.medicine.business.service.impl;
 
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;

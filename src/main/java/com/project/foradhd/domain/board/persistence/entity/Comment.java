@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "comment")
 public class Comment extends BaseTimeEntity {

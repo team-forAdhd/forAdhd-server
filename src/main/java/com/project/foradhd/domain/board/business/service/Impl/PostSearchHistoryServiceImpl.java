@@ -12,11 +12,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Service
 public class PostSearchHistoryServiceImpl implements PostSearchHistoryService {
 
     private final PostSearchHistoryRepository searchHistoryRepository;
@@ -40,9 +39,9 @@ public class PostSearchHistoryServiceImpl implements PostSearchHistoryService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
 
-        return searchHistoryRepository.findByUserOrderBySearchTimeDesc(user).stream()
+        return searchHistoryRepository.findByUserOrderByCreatedAtDesc(user).stream()
                 .map(PostSearchHistory::getTerm)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

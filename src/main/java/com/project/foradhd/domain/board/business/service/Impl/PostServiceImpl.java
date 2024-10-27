@@ -52,7 +52,7 @@ public class PostServiceImpl implements PostService {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .images(post.getImages())
-                .anonymous(post.isAnonymous())
+                .anonymous(post.getAnonymous())
                 .build();
 
         return postRepository.save(updatedPost);

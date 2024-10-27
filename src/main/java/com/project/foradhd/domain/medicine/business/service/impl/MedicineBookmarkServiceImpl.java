@@ -1,4 +1,4 @@
-package com.project.foradhd.domain.medicine.business.service.Impl;
+package com.project.foradhd.domain.medicine.business.service.impl;
 
 import com.project.foradhd.domain.medicine.business.service.MedicineBookmarkService;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
@@ -17,10 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class MedicineBookmarkServiceImpl implements MedicineBookmarkService {
-    private final MedicineBookmarkRepository bookmarkRepository;
+
     private final UserService userService;
+    private final MedicineBookmarkRepository bookmarkRepository;
     private final MedicineRepository medicineRepository;
 
     @Override
