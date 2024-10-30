@@ -33,8 +33,7 @@ public class MedicineServiceImpl implements MedicineService {
 
     private final MedicineRepository medicineRepository;
     private final MedicineMapper medicineMapper;
-    private final MedicineSearchHistoryService searchHistoryService;
-
+    private final MedicineSearchHistoryService medicineSearchHistoryService;
 
     @Value("${service.medicine.url}")
     private String SERVICE_URL;
@@ -152,7 +151,7 @@ public class MedicineServiceImpl implements MedicineService {
     @Transactional
     public List<Medicine> searchByItemName(String itemName, String userId) {
         // 검색어 저장 로직 추가
-        searchHistoryService.saveSearchTerm(userId, itemName);
+        medicineSearchHistoryService.saveSearchTerm(userId, itemName);
         return medicineRepository.findByItemNameContaining(itemName);
     }
 
@@ -175,6 +174,6 @@ public class MedicineServiceImpl implements MedicineService {
 
     @Override
     public List<String> getRecentSearchTerms(String userId) {
-        return searchHistoryService.getRecentSearchTerms(userId);
+        return medicineSearchHistoryService.getRecentSearchTerms(userId);
     }
 }
