@@ -19,23 +19,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-public class PostScrapFilterServiceImplTest {
+class PostScrapFilterServiceImplTest {
 
     @Mock
-    private PostScrapFilterRepository scrapFilterRepository;
+    PostScrapFilterRepository scrapFilterRepository;
 
     @Mock
-    private PostRepository postRepository;
+    PostRepository postRepository;
 
     @Mock
-    private UserService userService;
+    UserService userService;
 
     @InjectMocks
-    private PostScrapFilterServiceImpl postScrapFilterService;
+    PostScrapFilterServiceImpl postScrapFilterService;
 
     @Test
-    public void shouldAddNewScrapWhenNoneExists() {
-        // Given
+    void shouldAddNewScrapWhenNoneExists() {
+        //given
         Long postId = 1L;
         String userId = "user1";
         Post post = mock(Post.class); // Post 객체를 mock 객체로 변경
@@ -45,17 +45,17 @@ public class PostScrapFilterServiceImplTest {
         given(userService.getUser(userId)).willReturn(user);
         given(scrapFilterRepository.findByPostIdAndUserId(postId, userId)).willReturn(Optional.empty());
 
-        // When
+        //when
         postScrapFilterService.toggleScrap(postId, userId);
 
-        // Then
+        //then
         then(scrapFilterRepository).should().save(any(PostScrapFilter.class));
         then(post).should().incrementScrapCount(); // 이제 verify 사용 가능
     }
 
     @Test
-    public void shouldRemoveScrapWhenExists() {
-        // Given
+    void shouldRemoveScrapWhenExists() {
+        //given
         Long postId = 1L;
         String userId = "user1";
         Post post = mock(Post.class);
@@ -66,12 +66,11 @@ public class PostScrapFilterServiceImplTest {
         given(userService.getUser(userId)).willReturn(user);
         given(scrapFilterRepository.findByPostIdAndUserId(postId, userId)).willReturn(Optional.of(existingScrap));
 
-        // When
+        //when
         postScrapFilterService.toggleScrap(postId, userId);
 
-        // Then
+        //then
         then(scrapFilterRepository).should().delete(existingScrap);
         then(post).should().decrementScrapCount(); // 이제 verify 사용 가능
     }
-
 }

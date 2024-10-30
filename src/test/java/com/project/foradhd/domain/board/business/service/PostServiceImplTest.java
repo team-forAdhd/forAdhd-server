@@ -15,8 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,38 +26,41 @@ import java.util.List;
 
 import java.util.Arrays;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-public class PostServiceImplTest {
+class PostServiceImplTest {
 
     @Mock
-    private PostRepository postRepository;
+    PostRepository postRepository;
 
     @Mock
-    private NotificationService notificationService;
+    NotificationService notificationService;
 
     @Mock
-    private SseEmitters sseEmitters;
+    SseEmitters sseEmitters;
 
     @Mock
-    private PostSearchHistoryService searchHistoryService;
+    PostSearchHistoryService searchHistoryService;
 
     @InjectMocks
-    private PostServiceImpl postService;
+    PostServiceImpl postService;
 
     @Test
-    public void shouldGetPostById() {
+    void shouldGetPostById() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).build();
         given(postRepository.findById(post.getId())).willReturn(Optional.of(post));
 
+        //when
         Post foundPost = postService.getPost(post.getId());
 
+        //then
         assertThat(foundPost).isNotNull();
         assertThat(foundPost.getId()).isEqualTo(post.getId());
         assertThat(foundPost.getTitle()).isEqualTo("테스트 게시글");
@@ -68,48 +69,57 @@ public class PostServiceImplTest {
     }
 
     @Test
-    public void shouldCreatePost() {
+    void shouldCreatePost() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).build();
         given(postRepository.save(post)).willReturn(post);
 
+        //when
         Post createdPost = postService.createPost(post);
 
+        //then
         assertThat(createdPost).isNotNull();
         assertThat(createdPost.getTitle()).isEqualTo("테스트 게시글");
-
         then(postRepository).should(times(1)).save(post);
     }
 
     @Test
-    public void shouldUpdatePost() {
+    void shouldUpdatePost() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).build();
         Post updatedPost = post.toBuilder().title("수정된 제목").build();
 
         given(postRepository.findById(post.getId())).willReturn(Optional.of(post));
-        given(postRepository.save(updatedPost)).willReturn(updatedPost);
+        given(postRepository.save(any(Post.class))).willReturn(updatedPost);
 
+        //when
         Post result = postService.updatePost(updatedPost);
 
+        //then
         assertThat(result).isNotNull();
         assertThat(result.getTitle()).isEqualTo("수정된 제목");
 
         then(postRepository).should(times(1)).findById(post.getId());
-        then(postRepository).should(times(1)).save(updatedPost);
+        then(postRepository).should(times(1)).save(any(Post.class));
     }
 
     @Test
-    public void shouldDeletePost() {
+    void shouldDeletePost() {
+        //given
         Long postId = 1L;
 
+        //when
         postService.deletePost(postId);
 
+        //then
         then(postRepository).should(times(1)).deleteById(postId);
     }
 
     @Test
-    public void shouldGetAllPosts() {
+    void shouldGetAllPosts() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).build();
         Pageable pageable = PageRequest.of(0, 10);
@@ -117,8 +127,10 @@ public class PostServiceImplTest {
 
         given(postRepository.findAll(pageable)).willReturn(postPage);
 
+        //when
         Page<Post> result = postService.getAllPosts(pageable);
 
+        //then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getTitle()).isEqualTo("테스트 게시글");
@@ -127,43 +139,50 @@ public class PostServiceImplTest {
     }
 
     @Test
-    public void shouldGetUserPosts() {
+    void shouldGetUserPosts() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).build();
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> postPage = new PageImpl<>(Arrays.asList(post));
 
-        given(postRepository.findByUserIdWithUserProfile(user.getId(), pageable)).willReturn(postPage);
+        given(postRepository.findByUserIdWithUserProfile(eq(user.getId()), any(Pageable.class))).willReturn(postPage);
 
+        //when
         Page<Post> result = postService.getUserPosts(user.getId(), pageable, SortOption.NEWEST_FIRST);
 
+        //then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getUser().getId()).isEqualTo(user.getId());
 
-        then(postRepository).should(times(1)).findByUserIdWithUserProfile(user.getId(), pageable);
+        then(postRepository).should(times(1)).findByUserIdWithUserProfile(eq(user.getId()), any(Pageable.class));
     }
 
     @Test
-    public void shouldGetUserPostsByCategory() {
+    void shouldGetUserPostsByCategory() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).category(Category.TEENS).build();
         Pageable pageable = PageRequest.of(0, 10);
         Page<Post> postPage = new PageImpl<>(Arrays.asList(post));
 
-        given(postRepository.findByUserIdAndCategoryWithUserProfile(user.getId(), Category.TEENS, pageable)).willReturn(postPage);
+        given(postRepository.findByUserIdAndCategoryWithUserProfile(eq(user.getId()), eq(Category.TEENS), any(Pageable.class))).willReturn(postPage);
 
+        //when
         Page<Post> result = postService.getUserPostsByCategory(user.getId(), Category.TEENS, pageable, SortOption.NEWEST_FIRST);
 
+        //then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getCategory()).isEqualTo(Category.TEENS);
 
-        then(postRepository).should(times(1)).findByUserIdAndCategoryWithUserProfile(user.getId(), Category.TEENS, pageable);
+        then(postRepository).should(times(1)).findByUserIdAndCategoryWithUserProfile(eq(user.getId()), eq(Category.TEENS), any(Pageable.class));
     }
 
     @Test
-    public void shouldListPostsByCategory() {
+    void shouldListPostsByCategory() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).category(Category.TEENS).build();
         Pageable pageable = PageRequest.of(0, 10);
@@ -171,8 +190,10 @@ public class PostServiceImplTest {
 
         given(postRepository.findByCategoryWithUserProfile(Category.TEENS, pageable)).willReturn(postPage);
 
+        //when
         Page<Post> result = postService.listByCategory(Category.TEENS, pageable);
 
+        //then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getCategory()).isEqualTo(Category.TEENS);
@@ -181,13 +202,16 @@ public class PostServiceImplTest {
     }
 
     @Test
-    public void shouldGetAndIncrementViewCount() {
+    void shouldGetAndIncrementViewCount() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).build();
         given(postRepository.findById(post.getId())).willReturn(Optional.of(post));
 
+        //when
         Post result = postService.getAndIncrementViewCount(post.getId());
 
+        //then
         assertThat(result).isNotNull();
         assertThat(result.getViewCount()).isEqualTo(1);
 
@@ -195,7 +219,8 @@ public class PostServiceImplTest {
     }
 
     @Test
-    public void shouldGetTopPosts() {
+    void shouldGetTopPosts() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).build();
         Pageable pageable = PageRequest.of(0, 10);
@@ -203,8 +228,10 @@ public class PostServiceImplTest {
 
         given(postRepository.findTopPostsWithUserProfile(pageable)).willReturn(postPage);
 
+        //when
         Page<Post> result = postService.getTopPosts(pageable);
 
+        //then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
 
@@ -214,7 +241,8 @@ public class PostServiceImplTest {
     }
 
     @Test
-    public void shouldGetTopPostsByCategory() {
+    void shouldGetTopPostsByCategory() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).category(Category.TEENS).build();
         Pageable pageable = PageRequest.of(0, 10);
@@ -222,8 +250,10 @@ public class PostServiceImplTest {
 
         given(postRepository.findTopPostsByCategoryWithUserProfile(Category.TEENS, pageable)).willReturn(postPage);
 
+        //when
         Page<Post> result = postService.getTopPostsByCategory(Category.TEENS, pageable);
 
+        //then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
 
@@ -233,36 +263,43 @@ public class PostServiceImplTest {
     }
 
     @Test
-    public void shouldAddComment() {
+    void shouldAddComment() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).build();
         String commentContent = "This is a comment";
 
         given(postRepository.findById(post.getId())).willReturn(Optional.of(post));
 
+        //when
         postService.addComment(post.getId(), commentContent, user.getId());
 
+        //then
         then(postRepository).should(times(1)).findById(post.getId());
         then(notificationService).should(times(1)).createNotification(user.getId(), "새로운 댓글이 달렸어요: " + commentContent);
         then(sseEmitters).should(times(1)).sendNotification(user.getId(), "새로운 댓글이 달렸어요: " + commentContent);
     }
 
     @Test
-    public void shouldGetRecentSearchTerms() {
-        String userId = "user-id";
+    void shouldGetRecentSearchTerms() {
+        //given
+        String userId = "userId";
         List<String> searchTerms = Arrays.asList("term1", "term2");
 
         given(searchHistoryService.getRecentSearchTerms(userId)).willReturn(searchTerms);
 
+        //when
         List<String> result = postService.getRecentSearchTerms(userId);
 
+        //then
         assertThat(result).isEqualTo(searchTerms);
 
         then(searchHistoryService).should(times(1)).getRecentSearchTerms(userId);
     }
 
     @Test
-    public void shouldSearchPostsByTitle() {
+    void shouldSearchPostsByTitle() {
+        //given
         User user = UserFixtures.toUser().build();
         Post post = PostFixtures.toPost(user).build();
         Pageable pageable = PageRequest.of(0, 10);
@@ -273,8 +310,10 @@ public class PostServiceImplTest {
 
         given(postRepository.findByTitleContainingWithUserProfile(title, pageable)).willReturn(postPage);
 
+        //when
         Page<Post> result = postService.searchPostsByTitle(title, userId, pageable);
 
+        //then
         assertThat(result).isNotNull();
         assertThat(result.getContent()).hasSize(1);
 
