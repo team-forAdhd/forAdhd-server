@@ -65,4 +65,12 @@ public class MedicineReview extends BaseTimeEntity {
     @ColumnDefault("0")
     @Column(nullable = false)
     private Integer helpCount = 0;
+
+    public void incrementHelpCount() {
+        this.helpCount++;
+    }
+
+    public void decrementHelpCount() {
+        if (this.helpCount > 0) this.helpCount--;
+    }
 }

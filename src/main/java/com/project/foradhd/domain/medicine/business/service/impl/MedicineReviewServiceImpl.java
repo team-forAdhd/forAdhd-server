@@ -59,23 +59,21 @@ public class MedicineReviewServiceImpl implements MedicineReviewService {
     @Override
     @Transactional
     public void toggleHelpCount(Long reviewId, String userId) {
-        MedicineReview review = medicineReviewRepository.findById(reviewId)
+        MedicineReview medicineReview = medicineReviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_MEDICINE_REVIEW));
         User user = userService.getUser(userId);
 
-        if (medicineReviewLikeRepository.existsByUserIdAndReviewId(userId, reviewId)) {
-            medicineReviewLikeRepository.deleteByUserIdAndReviewId(userId, reviewId);
-            review = review.toBuilder().helpCount(review.getHelpCount() - 1).build();
+        if (medicineReviewLikeRepository.existsByUserIdAndMedicineReviewId(userId, reviewId)) {
+            medicineReviewLikeRepository.deleteByUserIdAndMedicineReviewId(userId, reviewId);
+            medicineReview.decrementHelpCount();
         } else {
             MedicineReviewLikeFilter newLike = MedicineReviewLikeFilter.builder()
                     .user(user)
-                    .review(review)
+                    .medicineReview(medicineReview)
                     .build();
             medicineReviewLikeRepository.save(newLike);
-            review = review.toBuilder().helpCount(review.getHelpCount() + 1).build();
+            medicineReview.incrementHelpCount();
         }
-
-        medicineReviewRepository.save(review);
     }
 
     @Override

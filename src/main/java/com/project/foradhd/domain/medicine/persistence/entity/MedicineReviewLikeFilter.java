@@ -23,7 +23,7 @@ public class MedicineReviewLikeFilter extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "medicine_review_id")
-    private MedicineReview review;
+    private MedicineReview medicineReview;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
