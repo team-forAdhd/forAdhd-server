@@ -1,22 +1,23 @@
-package com.project.foradhd.domain.medicine.business.service.impl;
+package com.project.foradhd.domain.medicine.business.service;
 
+import com.project.foradhd.domain.medicine.business.service.impl.MedicineBookmarkServiceImpl;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineBookmark;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineBookmarkRepository;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
-import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
@@ -27,28 +28,25 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
 import org.mockito.ArgumentCaptor;
+
+@ExtendWith(MockitoExtension.class)
 class MedicineBookmarkServiceImplTest {
 
     @Mock
-    private MedicineBookmarkRepository bookmarkRepository;
+    MedicineBookmarkRepository bookmarkRepository;
 
     @Mock
-    private UserService userService;
+    UserService userService;
 
     @Mock
-    private MedicineRepository medicineRepository;
+    MedicineRepository medicineRepository;
 
     @InjectMocks
-    private MedicineBookmarkServiceImpl bookmarkService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    MedicineBookmarkServiceImpl bookmarkService;
 
     @Test
     void toggleBookmark_shouldAddBookmarkIfNotExists() {
-        // given
+        //given
         String userId = "user123";
         Long medicineId = 1L;
 
@@ -59,10 +57,10 @@ class MedicineBookmarkServiceImplTest {
         given(medicineRepository.findById(medicineId)).willReturn(Optional.of(medicine));
         given(bookmarkRepository.existsByUserIdAndMedicineId(userId, medicineId)).willReturn(false);
 
-        // when
+        //when
         bookmarkService.toggleBookmark(userId, medicineId);
 
-        // then
+        //then
         ArgumentCaptor<MedicineBookmark> bookmarkCaptor = ArgumentCaptor.forClass(MedicineBookmark.class);
         verify(bookmarkRepository).save(bookmarkCaptor.capture());
 
@@ -74,7 +72,7 @@ class MedicineBookmarkServiceImplTest {
 
     @Test
     void toggleBookmark_shouldRemoveBookmarkIfExists() {
-        // given
+        //given
         String userId = "user123";
         Long medicineId = 1L;
 
@@ -85,16 +83,16 @@ class MedicineBookmarkServiceImplTest {
         given(medicineRepository.findById(medicineId)).willReturn(Optional.of(medicine));
         given(bookmarkRepository.existsByUserIdAndMedicineId(userId, medicineId)).willReturn(true);
 
-        // when
+        //when
         bookmarkService.toggleBookmark(userId, medicineId);
 
-        // then
+        //then
         verify(bookmarkRepository, times(1)).deleteByUserIdAndMedicineId(userId, medicineId);
     }
 
     @Test
     void getBookmarksByUser_shouldReturnBookmarksPage() {
-        // given
+        //given
         String userId = "user123";
         Pageable pageable = PageRequest.of(0, 10);
 
@@ -104,10 +102,10 @@ class MedicineBookmarkServiceImplTest {
 
         given(bookmarkRepository.findByUserIdAndDeletedIsFalse(userId, pageable)).willReturn(bookmarkPage);
 
-        // when
+        //when
         Page<MedicineBookmark> result = bookmarkService.getBookmarksByUser(userId, pageable);
 
-        // then
+        //then
         assertThat(result.getTotalElements()).isEqualTo(2);
         verify(bookmarkRepository, times(1)).findByUserIdAndDeletedIsFalse(userId, pageable);
     }
