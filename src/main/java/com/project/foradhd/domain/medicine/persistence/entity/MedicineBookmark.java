@@ -5,30 +5,30 @@ import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 
 @Getter
 @Builder
-@Entity
-@EntityListeners(AuditingEntityListener.class)
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "medicine_bookmark")
+@Entity
 public class MedicineBookmark extends BaseTimeEntity {
 
-    @jakarta.persistence.Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "medicine_bookmark_id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "medicine_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "medicine_id")
     private Medicine medicine;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Builder.Default
     @ColumnDefault("0")
-    private Boolean deleted;
+    @Column(nullable = false)
+    private Boolean deleted = Boolean.FALSE;
 }

@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MedicineSearchHistoryRepository extends JpaRepository<MedicineSearchHistory, Long> {
-    List<MedicineSearchHistory> findTop10ByUserOrderBySearchedAtDesc(User user);
+
+    List<MedicineSearchHistory> findTop10ByUserOrderByCreatedAtDesc(User user);
 }

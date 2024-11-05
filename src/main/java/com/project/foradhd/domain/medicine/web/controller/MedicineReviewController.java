@@ -25,22 +25,22 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/medicines/reviews")
 public class MedicineReviewController {
 
-    private final MedicineReviewService reviewService;
-    private final MedicineReviewMapper reviewMapper;
+    private final MedicineReviewService medicineReviewService;
+    private final MedicineReviewMapper medicineReviewMapper;
     private final UserService userService;
 
     @PostMapping
     public ResponseEntity<MedicineReviewResponse> createReview(@RequestBody MedicineReviewRequest request, @AuthUserId String userId) {
-        MedicineReview review = reviewService.createReview(request, userId);
+        MedicineReview review = medicineReviewService.createReview(request, userId);
         // 리뷰를 조회할 때마다 실시간으로 유저 정보를 매핑
-        MedicineReviewResponse response = reviewMapper.toResponseDto(review, userService);
+        MedicineReviewResponse response = medicineReviewMapper.toResponseDto(review, userService);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<MedicineReviewResponse> updateReview(@PathVariable Long id, @RequestBody MedicineReviewRequest request, @AuthUserId String userId) {
-        MedicineReview review = reviewService.updateReview(id, request, userId);
-        MedicineReviewResponse response = reviewMapper.toResponseDto(review, userService);
+        MedicineReview review = medicineReviewService.updateReview(id, request, userId);
+        MedicineReviewResponse response = medicineReviewMapper.toResponseDto(review, userService);
         return ResponseEntity.ok(response);
     }
 
@@ -48,21 +48,21 @@ public class MedicineReviewController {
     public ResponseEntity<Void> deleteReview(
             @PathVariable Long reviewId,
             @AuthUserId String userId) {
-        reviewService.deleteReview(reviewId, userId);
+        medicineReviewService.deleteReview(reviewId, userId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<MedicineReviewResponse.PagedMedicineReviewResponse> getReviews(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<MedicineReview> reviews = reviewService.findReviews(pageable);
-        List<MedicineReviewResponse> reviewDtos = reviews.stream()
-                .map(review -> reviewMapper.toResponseDto(review, userService))
-                .collect(Collectors.toList());
+        Page<MedicineReview> reviews = medicineReviewService.findReviews(pageable);
+        List<MedicineReviewResponse> reviewDtoList = reviews.stream()
+                .map(review -> medicineReviewMapper.toResponseDto(review, userService))
+                .toList();
 
         PagingResponse pagingResponse = PagingResponse.from(reviews);
         MedicineReviewResponse.PagedMedicineReviewResponse response = MedicineReviewResponse.PagedMedicineReviewResponse.builder()
-                .data(reviewDtos)
+                .data(reviewDtoList)
                 .paging(pagingResponse)
                 .build();
 
@@ -76,11 +76,11 @@ public class MedicineReviewController {
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         // MedicineReview 엔티티를 반환하도록 서비스 메서드 수정
-        Page<MedicineReview> reviews = reviewService.findReviewsByUserId(userId, pageable, sortOption);
+        Page<MedicineReview> reviews = medicineReviewService.findReviewsByUserId(userId, pageable, sortOption);
 
         // 엔티티를 DTO로 변환
         List<MedicineReviewResponse> reviewDtos = reviews.stream()
-                .map(review -> reviewMapper.toResponseDto(review, userService))
+                .map(review -> medicineReviewMapper.toResponseDto(review, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(reviews);
@@ -98,9 +98,9 @@ public class MedicineReviewController {
             @PathVariable Long medicineId,
             @RequestParam(defaultValue = "NEWEST_FIRST") SortOption sortOption,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<MedicineReview> reviews = reviewService.findReviewsByMedicineId(medicineId, pageable, sortOption);
+        Page<MedicineReview> reviews = medicineReviewService.findReviewsByMedicineId(medicineId, pageable, sortOption);
         List<MedicineReviewResponse> reviewDtos = reviews.stream()
-                .map(review -> reviewMapper.toResponseDto(review, userService))
+                .map(review -> medicineReviewMapper.toResponseDto(review, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(reviews);
@@ -114,7 +114,7 @@ public class MedicineReviewController {
 
     @PostMapping("/{id}/help")
     public ResponseEntity<Void> toggleHelpCount(@PathVariable Long id, @AuthUserId String userId) {
-        reviewService.toggleHelpCount(id, userId);
+        medicineReviewService.toggleHelpCount(id, userId);
         return ResponseEntity.ok().build();
     }
 }

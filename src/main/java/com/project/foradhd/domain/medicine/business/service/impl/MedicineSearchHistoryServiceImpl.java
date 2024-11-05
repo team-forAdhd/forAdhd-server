@@ -1,30 +1,20 @@
-package com.project.foradhd.domain.medicine.business.service.Impl;
+package com.project.foradhd.domain.medicine.business.service.impl;
 
 import com.project.foradhd.domain.medicine.business.service.MedicineSearchHistoryService;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineSearchHistory;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineSearchHistoryRepository;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.global.exception.BusinessException;
-import com.project.foradhd.global.exception.ErrorCode;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Service
 public class MedicineSearchHistoryServiceImpl implements MedicineSearchHistoryService {
 
     private final MedicineSearchHistoryRepository searchHistoryRepository;
@@ -37,7 +27,6 @@ public class MedicineSearchHistoryServiceImpl implements MedicineSearchHistorySe
         MedicineSearchHistory searchHistory = MedicineSearchHistory.builder()
                 .user(user)
                 .term(term)
-                .searchedAt(LocalDateTime.now())
                 .build();
         searchHistoryRepository.save(searchHistory);
     }
@@ -45,7 +34,7 @@ public class MedicineSearchHistoryServiceImpl implements MedicineSearchHistorySe
     @Override
     public List<String> getRecentSearchTerms(String userId) {
         User user = userService.getUser(userId);
-        return searchHistoryRepository.findTop10ByUserOrderBySearchedAtDesc(user)
+        return searchHistoryRepository.findTop10ByUserOrderByCreatedAtDesc(user)
                 .stream()
                 .map(MedicineSearchHistory::getTerm)
                 .collect(Collectors.toList());

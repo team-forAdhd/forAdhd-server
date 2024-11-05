@@ -2,21 +2,23 @@ package com.project.foradhd.domain.medicine.persistence.entity;
 
 import com.project.foradhd.domain.medicine.persistence.enums.IngredientType;
 import com.project.foradhd.domain.medicine.persistence.enums.TabletType;
+import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
 
 @Getter
-@Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "medicine")
-public class Medicine {
+public class Medicine extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "medicine_id")
     private Long id;
     private String itemSeq; //품목일련번호
     private String itemName; //품목명
@@ -31,8 +33,8 @@ public class Medicine {
     private String className; //분류명
     private String formCodeName; //제형코드명
     private String itemEngName; //제품영문명
-    private double rating; // 별점
-    private boolean isFavorite; // 즐겨찾기 여부
+    private Double rating; // 별점
+    private Boolean isFavorite; // 즐겨찾기 여부
     @Enumerated(EnumType.STRING)
     private IngredientType ingredientType; // 성분 타입 (Enum)
     @Enumerated(EnumType.STRING)

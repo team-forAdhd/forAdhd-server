@@ -7,9 +7,9 @@ import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
 import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
+import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
-import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
 import com.project.foradhd.global.exception.BusinessException;
 import com.project.foradhd.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -19,19 +19,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
-import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_USER_PROFILE;
 
-@Service
-@Transactional(readOnly=true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
 public class CommentServiceImpl implements CommentService {
 
+    private final UserService userService;
     private final CommentRepository commentRepository;
     private final CommentLikeFilterRepository commentLikeFilterRepository;
-    private final UserProfileRepository userProfileRepository;
 
     @Override
     public Comment getComment(Long commentId) {
@@ -46,7 +44,7 @@ public class CommentServiceImpl implements CommentService {
                 .user(comment.getUser())
                 .content(comment.getContent())
                 .parentComment(comment.getParentComment())
-                .anonymous(comment.isAnonymous())
+                .anonymous(comment.getAnonymous())
                 .likeCount(comment.getLikeCount())
                 .nickname(comment.getNickname())
                 .profileImage(comment.getProfileImage())
@@ -56,12 +54,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Comment createComment(Comment comment, String userId) {
-        UserProfile userProfile = userProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
+        UserProfile userProfile = userService.getUserProfile(userId);
 
         Comment.CommentBuilder commentBuilder = comment.toBuilder().user(User.builder().id(userId).build());
 
-        if (comment.isAnonymous()) {
+        if (comment.getAnonymous()) {
             String anonymousNickname = generateAnonymousNickname(comment.getPost().getId(), userId);
             String anonymousProfileImage = "image/default-profile.png";
 
@@ -108,8 +105,7 @@ public class CommentServiceImpl implements CommentService {
                 .anonymous(anonymous);
 
         if (!anonymous) {
-            UserProfile userProfile = userProfileRepository.findByUserId(userId)
-                    .orElseThrow(() -> new BusinessException(NOT_FOUND_USER_PROFILE));
+            UserProfile userProfile = userService.getUserProfile(userId);
             updatedCommentBuilder.nickname(userProfile.getNickname())
                     .profileImage(userProfile.getProfileImage());
         } else {
@@ -140,7 +136,7 @@ public class CommentServiceImpl implements CommentService {
                         .content(post.getContent())
                         .createdAt(post.getCreatedAt())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
         return new PageImpl<>(posts, sortedPageable, userComments.getTotalElements());
     }
 

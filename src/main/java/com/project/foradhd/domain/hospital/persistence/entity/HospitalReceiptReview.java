@@ -42,7 +42,7 @@ public class HospitalReceiptReview extends BaseTimeEntity {
 
     @Builder.Default
     @Convert(converter = StringListConverter.class)
-    @Column(columnDefinition = "varchar(1000)")
+    @Column(length = 1000)
     private List<String> images = List.of();
 
     private Long medicalExpense;

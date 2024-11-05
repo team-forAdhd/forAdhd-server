@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PostSearchHistoryRepository extends JpaRepository<PostSearchHistory, Long> {
-    List<PostSearchHistory> findByUserOrderBySearchTimeDesc(User user);
+
+    List<PostSearchHistory> findByUserOrderByCreatedAtDesc(User user);
 }

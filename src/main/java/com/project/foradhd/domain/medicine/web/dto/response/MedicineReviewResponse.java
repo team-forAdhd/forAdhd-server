@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MedicineReviewResponse {
+
     private Long id;
     private String userId;
     private Long medicineId;

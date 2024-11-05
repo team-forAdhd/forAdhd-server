@@ -1,6 +1,6 @@
 package com.project.foradhd.domain.board.web.dto.request;
 
-import com.project.foradhd.domain.board.persistence.enums.CategoryName;
+import com.project.foradhd.domain.board.persistence.enums.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,5 +15,5 @@ public class PostRequestDto {
     private String title;
     private String content;
     private boolean anonymous;
-    private CategoryName category;
+    private Category category;
 }

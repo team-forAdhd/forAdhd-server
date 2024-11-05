@@ -1,7 +1,7 @@
 package com.project.foradhd.domain.board.persistence.repository;
 
 import com.project.foradhd.domain.board.persistence.entity.Post;
-import com.project.foradhd.domain.board.persistence.enums.CategoryName;
+import com.project.foradhd.domain.board.persistence.enums.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,7 +29,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         JOIN UserProfile up ON up.user.id = u.id
         WHERE p.category = :category
         """)
-    Page<Post> findByCategoryWithUserProfile(@Param("category") CategoryName category, Pageable pageable);
+    Page<Post> findByCategoryWithUserProfile(@Param("category") Category category, Pageable pageable);
 
     @Query("""
         SELECT p FROM Post p
@@ -45,7 +45,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         JOIN UserProfile up ON up.user.id = u.id
         WHERE u.id = :userId AND p.category = :category
         """)
-    Page<Post> findByUserIdAndCategoryWithUserProfile(@Param("userId") String userId, @Param("category") CategoryName category, Pageable pageable);
+    Page<Post> findByUserIdAndCategoryWithUserProfile(@Param("userId") String userId, @Param("category") Category category, Pageable pageable);
 
     @Query("""
         SELECT p FROM Post p
@@ -62,7 +62,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         WHERE p.category = :category
         ORDER BY p.viewCount DESC
         """)
-    Page<Post> findTopPostsByCategoryWithUserProfile(@Param("category") CategoryName category, Pageable pageable);
+    Page<Post> findTopPostsByCategoryWithUserProfile(@Param("category") Category category, Pageable pageable);
 
     @Query("""
         SELECT p FROM Post p

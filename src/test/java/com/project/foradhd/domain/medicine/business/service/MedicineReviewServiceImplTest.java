@@ -1,6 +1,7 @@
-package com.project.foradhd.domain.medicine.business.service.Impl;
+package com.project.foradhd.domain.medicine.business.service;
 
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
+import com.project.foradhd.domain.medicine.business.service.impl.MedicineReviewServiceImpl;
 import com.project.foradhd.domain.medicine.persistence.entity.Medicine;
 import com.project.foradhd.domain.medicine.persistence.entity.MedicineReview;
 import com.project.foradhd.domain.medicine.persistence.repository.MedicineRepository;
@@ -9,9 +10,10 @@ import com.project.foradhd.domain.medicine.persistence.repository.MedicineReview
 import com.project.foradhd.domain.medicine.web.dto.request.MedicineReviewRequest;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,12 +23,16 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
-import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
 
+import static com.project.foradhd.domain.medicine.fixtures.MedicineFixtures.toMedicine;
+import static com.project.foradhd.domain.medicine.fixtures.MedicineFixtures.toMedicineReview;
+import static com.project.foradhd.domain.user.fixtures.UserFixtures.toUser;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verify;
@@ -35,33 +41,31 @@ import static org.mockito.Mockito.verify;
 class MedicineReviewServiceImplTest {
 
     @Mock
-    private MedicineReviewRepository reviewRepository;
+    MedicineReviewRepository medicineReviewRepository;
 
     @Mock
-    private MedicineRepository medicineRepository;
+    MedicineRepository medicineRepository;
 
     @Mock
-    private MedicineReviewLikeRepository reviewLikeRepository;
+    MedicineReviewLikeRepository medicineReviewLikeRepository;
 
     @Mock
-    private UserService userService;
+    UserService userService;
 
     @InjectMocks
-    private MedicineReviewServiceImpl reviewService;
+    MedicineReviewServiceImpl medicineReviewService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    @Captor
+    ArgumentCaptor<MedicineReview> medicineReviewArgumentCaptor;
 
     @Test
     void createReview_shouldReturnCreatedReview() {
-        // given
+        //given
         String userId = "user123";
         MedicineReviewRequest request = MedicineReviewRequest.builder()
                 .medicineId(1L)
                 .content("This is a review.")
-                .grade(4.5f)
+                .grade(4.5)
                 .images(Arrays.asList("image1", "image2"))
                 .build();
 
@@ -79,20 +83,20 @@ class MedicineReviewServiceImplTest {
 
         given(userService.getUser(userId)).willReturn(user);
         given(medicineRepository.findById(request.getMedicineId())).willReturn(Optional.of(medicine));
-        given(reviewRepository.save(review)).willReturn(review);
+        given(medicineReviewRepository.save(any(MedicineReview.class))).willReturn(review);
 
-        // when
-        MedicineReview createdReview = reviewService.createReview(request, userId);
+        //when
+        MedicineReview createdReview = medicineReviewService.createReview(request, userId);
 
-        // then
+        //then
         assertThat(createdReview).isNotNull();
         assertThat(createdReview.getContent()).isEqualTo("This is a review.");
-        verify(reviewRepository).save(review);
+        verify(medicineReviewRepository).save(any(MedicineReview.class));
     }
 
     @Test
     void toggleHelpCount_shouldIncrementHelpCount() {
-        // given
+        //given
         Long reviewId = 1L;
         String userId = "user123";
         User user = User.builder().id(userId).build();
@@ -101,54 +105,52 @@ class MedicineReviewServiceImplTest {
                 .helpCount(1)
                 .build();
 
-        given(reviewRepository.findById(reviewId)).willReturn(Optional.of(review));
+        given(medicineReviewRepository.findById(reviewId)).willReturn(Optional.of(review));
         given(userService.getUser(userId)).willReturn(user);
-        given(reviewLikeRepository.existsByUserIdAndReviewId(userId, reviewId)).willReturn(false);
-        given(reviewRepository.save(review)).willReturn(review);
+        given(medicineReviewLikeRepository.existsByUserIdAndMedicineReviewId(userId, reviewId)).willReturn(false);
 
-        // when
-        reviewService.toggleHelpCount(reviewId, userId);
+        //when
+        medicineReviewService.toggleHelpCount(reviewId, userId);
 
-        // then
+        //then
         assertThat(review.getHelpCount()).isEqualTo(2);
-        verify(reviewRepository).save(review);
     }
 
     @Test
     void updateReview_shouldUpdateExistingReview() {
-        // given
+        //given
         Long reviewId = 1L;
         String userId = "user123";
         MedicineReviewRequest request = MedicineReviewRequest.builder()
                 .medicineId(1L)
                 .content("Updated review.")
-                .grade(5.0f)
-                .build();
-
-        MedicineReview existingReview = MedicineReview.builder()
-                .id(reviewId)
-                .content("Old review")
+                .grade(5.0)
                 .build();
 
         Medicine medicine = Medicine.builder().id(1L).build();
         User user = User.builder().id(userId).build();
+        MedicineReview existingReview = MedicineReview.builder()
+                .id(reviewId)
+                .user(user)
+                .content("Old review")
+                .build();
 
-        given(reviewRepository.findById(reviewId)).willReturn(Optional.of(existingReview));
-        given(userService.getUser(userId)).willReturn(user);
+        given(medicineReviewRepository.findById(reviewId)).willReturn(Optional.of(existingReview));
         given(medicineRepository.findById(request.getMedicineId())).willReturn(Optional.of(medicine));
-        given(reviewRepository.save(existingReview)).willReturn(existingReview);
+        given(medicineReviewRepository.save(any(MedicineReview.class))).willReturn(existingReview);
 
-        // when
-        MedicineReview updatedReview = reviewService.updateReview(reviewId, request, userId);
+        //when
+        medicineReviewService.updateReview(reviewId, request, userId);
 
-        // then
+        //then
+        verify(medicineReviewRepository).save(medicineReviewArgumentCaptor.capture());
+        MedicineReview updatedReview = medicineReviewArgumentCaptor.getValue();
         assertThat(updatedReview.getContent()).isEqualTo("Updated review.");
-        verify(reviewRepository).save(existingReview);
     }
 
     @Test
     void findReviewsByUserId_shouldReturnPagedReviews() {
-        // given
+        //given
         String userId = "user123";
         Pageable pageable = PageRequest.of(0, 10);
         SortOption sortOption = SortOption.NEWEST_FIRST;
@@ -158,27 +160,36 @@ class MedicineReviewServiceImplTest {
                 .build();
 
         Page<MedicineReview> reviewPage = new PageImpl<>(Arrays.asList(review), pageable, 1);
-        given(reviewRepository.findByUserIdWithDetails(userId, pageable)).willReturn(reviewPage);
+        given(medicineReviewRepository.findByUserIdWithDetails(eq(userId), any(Pageable.class))).willReturn(reviewPage);
 
-        // when
-        Page<MedicineReview> result = reviewService.findReviewsByUserId(userId, pageable, sortOption);
+        //when
+        Page<MedicineReview> result = medicineReviewService.findReviewsByUserId(userId, pageable, sortOption);
 
-        // then
+        //then
         assertThat(result.getTotalElements()).isEqualTo(1);
-        verify(reviewRepository).findByUserIdWithDetails(userId, pageable);
+        verify(medicineReviewRepository).findByUserIdWithDetails(eq(userId), any(Pageable.class));
     }
 
     @Test
     void deleteReview_shouldDeleteReview() {
-        // given
-        Long reviewId = 1L;
-        given(reviewRepository.existsById(reviewId)).willReturn(true);
-        willDoNothing().given(reviewRepository).deleteById(reviewId);
+        //given
+        String userId = "userId";
+        Long medicineId = 1L;
+        Long medicineReviewId = 1L;
+        User user = toUser().id(userId).build();
+        Medicine medicine = toMedicine().id(medicineId).build();
+        MedicineReview medicineReview = toMedicineReview().id(medicineReviewId)
+                .user(user)
+                .medicine(medicine)
+                .build();
 
-        // when
-        reviewService.deleteReview(reviewId);
+        given(medicineReviewRepository.findById(medicineReviewId)).willReturn(Optional.of(medicineReview));
+        willDoNothing().given(medicineReviewRepository).deleteById(medicineReviewId);
 
-        // then
-        verify(reviewRepository).deleteById(reviewId);
+        //when
+        medicineReviewService.deleteReview(medicineReviewId, userId);
+
+        //then
+        verify(medicineReviewRepository).deleteById(medicineReviewId);
     }
 }

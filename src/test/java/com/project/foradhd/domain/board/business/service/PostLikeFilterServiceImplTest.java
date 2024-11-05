@@ -14,27 +14,27 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-public class PostLikeFilterServiceImplTest {
+class PostLikeFilterServiceImplTest {
 
     @Mock
-    private PostLikeFilterRepository postLikeFilterRepository;
+    PostLikeFilterRepository postLikeFilterRepository;
 
     @Mock
-    private PostRepository postRepository;
+    PostRepository postRepository;
 
     @Mock
-    private UserService userService;
+    UserService userService;
 
     @InjectMocks
-    private PostLikeFilterServiceImpl postLikeFilterService;
+    PostLikeFilterServiceImpl postLikeFilterService;
 
     @Test
     void shouldAddLikeWhenNotAlreadyLiked() {
+        //given
         String userId = "user1";
         Long postId = 1L;
         Post post = mock(Post.class);
@@ -44,8 +44,10 @@ public class PostLikeFilterServiceImplTest {
         given(userService.getUser(userId)).willReturn(user);
         given(postLikeFilterRepository.existsByUserIdAndPostId(userId, postId)).willReturn(false);
 
+        //when
         postLikeFilterService.toggleLike(userId, postId);
 
+        //then
         then(postLikeFilterRepository).should().save(any(PostLikeFilter.class));
         then(post).should().incrementLikeCount();
         then(postRepository).should().save(post);
@@ -53,6 +55,7 @@ public class PostLikeFilterServiceImplTest {
 
     @Test
     void shouldRemoveLikeWhenAlreadyLiked() {
+        //given
         String userId = "user1";
         Long postId = 1L;
         Post post = mock(Post.class);
@@ -62,12 +65,12 @@ public class PostLikeFilterServiceImplTest {
         given(userService.getUser(userId)).willReturn(user);
         given(postLikeFilterRepository.existsByUserIdAndPostId(userId, postId)).willReturn(true);
 
+        //when
         postLikeFilterService.toggleLike(userId, postId);
 
+        //then
         then(postLikeFilterRepository).should().deleteByUserIdAndPostId(userId, postId);
         then(post).should().decrementLikeCount();
         then(postRepository).should().save(post);
     }
-
-
 }

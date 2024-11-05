@@ -4,16 +4,15 @@ import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.global.audit.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
-@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "comment")
 public class Comment extends BaseTimeEntity {
@@ -31,21 +30,27 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user; // 댓글 작성자 id
 
+    @Column(nullable = false, columnDefinition = "longtext")
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id", referencedColumnName = "comment_id", nullable = true)
+    @JoinColumn(name = "parent_comment_id", referencedColumnName = "comment_id")
     private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> childComments = new ArrayList<>();
 
-    private boolean anonymous;
-    private long likeCount;
-    private String nickname;
-    private String profileImage;
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Boolean anonymous = Boolean.FALSE;
 
-    public void setParentComment(Comment parentComment) {
-        this.parentComment = parentComment;
-    }
+    @Builder.Default
+    @ColumnDefault("0")
+    @Column(nullable = false)
+    private Integer likeCount = 0;
+
+    private String nickname;
+
+    private String profileImage;
 }
