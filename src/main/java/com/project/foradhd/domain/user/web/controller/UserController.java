@@ -78,8 +78,7 @@ public class UserController {
     }
 
     @PostMapping("/block")
-    public ResponseEntity<Void> blockUser(@AuthUserId String userId,
-                                        @RequestBody @Valid UserBlockRequest request) {
+    public ResponseEntity<Void> blockUser(@AuthUserId String userId, @RequestBody @Valid UserBlockRequest request) {
         userService.blockUser(userId, request.getBlockedUserId(), request.getBlocked());
         return ResponseEntity.ok().build();
     }
