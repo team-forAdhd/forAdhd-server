@@ -26,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserPrivacyRepository userPrivacyRepository;
     private final UserProfileRepository userProfileRepository;
+    private final UserBlockedRepository userBlockedRepository;
     private final TermsRepository termsRepository;
     private final UserTermsApprovalRepository userTermsApprovalRepository;
     private final PushNotificationApprovalRepository pushNotificationApprovalRepository;
@@ -91,6 +92,24 @@ public class UserServiceImpl implements UserService {
         userTermsApprovalRepository.saveAll(userTermsApprovals);
         userPushNotificationApprovalRepository.saveAll(userPushNotificationApprovals);
         return user;
+    }
+
+    @Override
+    @Transactional
+    public void blockUser(String userId, String blockedUserId, Boolean blocked) {
+        User user = getUser(userId);
+        User blockedUser = getUser(blockedUserId);
+        userBlockedRepository.findByUserIdAndBlockedUserId(userId, blockedUserId)
+                .ifPresentOrElse(
+                        userBlocked -> userBlocked.updateBlocked(blocked),
+                        () -> {
+                            UserBlocked userBlocked = UserBlocked.builder()
+                                    .user(user)
+                                    .blockedUser(blockedUser)
+                                    .deleted(!blocked)
+                                    .build();
+                            userBlockedRepository.save(userBlocked);
+                        });
     }
 
     @Override

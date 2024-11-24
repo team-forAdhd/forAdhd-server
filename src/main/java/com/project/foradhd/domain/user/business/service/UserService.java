@@ -29,6 +29,8 @@ public interface UserService {
 
     User snsSignUp(String userId, SnsSignUpData snsSignUpData);
 
+    void blockUser(String userId, String blockedUserId, Boolean blocked);
+
     void updateProfile(String userId, ProfileUpdateData profileUpdateData);
 
     void updatePassword(String userId, PasswordUpdateData passwordUpdateData);
