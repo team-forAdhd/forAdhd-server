@@ -9,6 +9,8 @@ import org.hibernate.annotations.ColumnDefault;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = @UniqueConstraint(name = "user_and_blocked_user_unique",
+        columnNames = {"user_id", "blocked_user_id"}))
 @Entity
 public class UserBlocked extends BaseTimeEntity {
 
