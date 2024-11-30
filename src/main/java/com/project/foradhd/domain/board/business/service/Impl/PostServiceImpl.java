@@ -27,7 +27,7 @@ import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final PostSearchHistoryService searchHistoryService;
+    private final PostSearchHistoryService postSearchHistoryService;
     private final NotificationService notificationService;
     private final SseEmitters sseEmitters;
 
@@ -156,14 +156,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<String> getRecentSearchTerms(String userId) {
-        return searchHistoryService.getRecentSearchTerms(userId);
+        return postSearchHistoryService.getRecentSearchTerms(userId);
     }
 
     @Override
     @Transactional
     public Page<Post> searchPostsByTitle(String title, String userId, Pageable pageable) {
         // 검색어 저장 로직 추가
-        searchHistoryService.saveSearchTerm(userId, title);
+        postSearchHistoryService.saveSearchTerm(userId, title);
         return postRepository.findByTitleContainingWithUserProfile(title, pageable);
     }
 }

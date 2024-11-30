@@ -6,7 +6,7 @@ import com.project.foradhd.domain.board.persistence.entity.CommentLikeFilter;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
-import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.PostListResponseDto;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
@@ -118,7 +118,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Page<PostResponseDto.PostListResponseDto> getMyCommentedPosts(String userId, Pageable pageable, SortOption sortOption) {
+    public Page<PostListResponseDto.PostResponseDto> getMyCommentedPosts(String userId, Pageable pageable, SortOption sortOption) {
         Sort sort = switch (sortOption) {
             case OLDEST_FIRST -> Sort.by(Sort.Direction.ASC, "createdAt");
             case NEWEST_FIRST -> Sort.by(Sort.Direction.DESC, "createdAt");
@@ -127,10 +127,10 @@ public class CommentServiceImpl implements CommentService {
         Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
 
         Page<Comment> userComments = commentRepository.findByUserId(userId, sortedPageable);
-        List<PostResponseDto.PostListResponseDto> posts = userComments.stream()
+        List<PostListResponseDto.PostResponseDto> posts = userComments.stream()
                 .map(Comment::getPost)
                 .distinct()
-                .map(post -> PostResponseDto.PostListResponseDto.builder()
+                .map(post -> PostListResponseDto.PostResponseDto.builder()
                         .id(post.getId())
                         .title(post.getTitle())
                         .content(post.getContent())

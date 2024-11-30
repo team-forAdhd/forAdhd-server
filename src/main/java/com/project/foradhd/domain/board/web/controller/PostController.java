@@ -9,8 +9,8 @@ import com.project.foradhd.domain.board.persistence.entity.PostScrapFilter;
 import com.project.foradhd.domain.board.persistence.enums.Category;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.web.dto.request.PostRequestDto;
+import com.project.foradhd.domain.board.web.dto.response.PostListResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
-import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostScrapFilterResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostSearchResponseDto;
 import com.project.foradhd.domain.board.web.mapper.PostMapper;
@@ -41,17 +41,18 @@ public class PostController {
     private final PostSearchHistoryService searchHistoryService;
     private final UserService userService;
 
+    //TODO
     // 게시글 개별 조회 api
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponseDto.PostListResponseDto> getPost(@PathVariable Long postId) {
+    public ResponseEntity<PostListResponseDto.PostResponseDto> getPost(@PathVariable Long postId) {
         Post post = postService.getPost(postId);
-        PostResponseDto.PostListResponseDto response = postMapper.toPostListResponseDto(post, userService);
+        PostListResponseDto.PostResponseDto response = postMapper.toPostListResponseDto(post, userService);
         return ResponseEntity.ok(response);
     }
 
     // 게시글 작성 api
     @PostMapping
-    public ResponseEntity<PostResponseDto.PostListResponseDto> createPost(@RequestBody PostRequestDto postRequestDto, @AuthUserId String userId) {
+    public ResponseEntity<PostListResponseDto.PostResponseDto> createPost(@RequestBody PostRequestDto postRequestDto, @AuthUserId String userId) {
         Post post = postMapper.toEntity(postRequestDto, userId, userService);
         Post createdPost = postService.createPost(post);
         return ResponseEntity.status(HttpStatus.CREATED).body(postMapper.toPostListResponseDto(createdPost, userService));
@@ -59,7 +60,7 @@ public class PostController {
 
     // 게시글 수정 api
     @PutMapping("/{postId}")
-    public ResponseEntity<PostResponseDto.PostListResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto postRequestDto) {
+    public ResponseEntity<PostListResponseDto.PostResponseDto> updatePost(@PathVariable Long postId, @RequestBody PostRequestDto postRequestDto) {
         Post existingPost = postService.getPost(postId);
         Post updatedPost = Post.builder()
                 .id(existingPost.getId())
@@ -86,17 +87,18 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    //TODO
     // 전체 게시글 조회 api
     @GetMapping("/all")
-    public ResponseEntity<PostResponseDto> getAllPosts(Pageable pageable) {
+    public ResponseEntity<PostListResponseDto> getAllPosts(Pageable pageable) {
         Page<Post> postPage = postService.getAllPosts(pageable);
-        List<PostResponseDto.PostListResponseDto> postResponseDtoList = postPage.getContent().stream()
+        List<PostListResponseDto.PostResponseDto> postResponseDtoList = postPage.getContent().stream()
                 .map(post -> postMapper.toPostListResponseDto(post, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(postPage);
 
-        PostResponseDto response = PostResponseDto.builder()
+        PostListResponseDto response = PostListResponseDto.builder()
                 .postList(postResponseDtoList)
                 .paging(pagingResponse)
                 .build();
@@ -104,19 +106,20 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    //TODO
     // 카테고리별 게시글 조회 api
     @GetMapping("/category")
-    public ResponseEntity<PostResponseDto> getPostsByCategory(
+    public ResponseEntity<PostListResponseDto> getPostsByCategory(
             @RequestParam("category") Category category,
             Pageable pageable) {
         Page<Post> postPage = postService.listByCategory(category, pageable);
-        List<PostResponseDto.PostListResponseDto> postResponseDtoList = postPage.getContent().stream()
+        List<PostListResponseDto.PostResponseDto> postResponseDtoList = postPage.getContent().stream()
                 .map(post -> postMapper.toPostListResponseDto(post, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(postPage);
 
-        PostResponseDto response = PostResponseDto.builder()
+        PostListResponseDto response = PostListResponseDto.builder()
                 .postList(postResponseDtoList)
                 .paging(pagingResponse)
                 .build();
@@ -124,17 +127,18 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    //TODO
     // 내가 작성한 게시글 조회 api
     @GetMapping("/my-posts")
-    public ResponseEntity<PostResponseDto> getUserPostsByCategory(@AuthUserId String userId, @RequestParam Category category, Pageable pageable, @RequestParam SortOption sortOption) {
+    public ResponseEntity<PostListResponseDto> getUserPostsByCategory(@AuthUserId String userId, @RequestParam Category category, Pageable pageable, @RequestParam SortOption sortOption) {
         Page<Post> userPosts = postService.getUserPostsByCategory(userId, category, pageable, sortOption);
-        List<PostResponseDto.PostListResponseDto> postResponseDtoList = userPosts.getContent().stream()
+        List<PostListResponseDto.PostResponseDto> postResponseDtoList = userPosts.getContent().stream()
                 .map(post -> postMapper.toPostListResponseDto(post, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(userPosts);
 
-        PostResponseDto response = PostResponseDto.builder()
+        PostListResponseDto response = PostListResponseDto.builder()
                 .postList(postResponseDtoList)
                 .paging(pagingResponse)
                 .build();
@@ -142,6 +146,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    //TODO
     // 내가 스크랩한 게시글 조회 api
     @GetMapping("/scraps")
     public ResponseEntity<PostScrapFilterResponseDto> getScrapsByUserAndCategory(
@@ -178,17 +183,18 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
+    //TODO
     // 내가 좋아요한 게시글 조회 api
     @GetMapping("/liked")
-    public ResponseEntity<PostResponseDto> getLikedPostsByUser(@AuthUserId String userId, Pageable pageable) {
+    public ResponseEntity<PostListResponseDto> getLikedPostsByUser(@AuthUserId String userId, Pageable pageable) {
         Page<Post> likedPosts = postLikeFilterService.getLikedPostsByUser(userId, pageable);
-        List<PostResponseDto.PostListResponseDto> postResponseDtoList = likedPosts.getContent().stream()
+        List<PostListResponseDto.PostResponseDto> postResponseDtoList = likedPosts.getContent().stream()
                 .map(post -> postMapper.toPostListResponseDto(post, userService))
                 .collect(Collectors.toList());
 
         PagingResponse pagingResponse = PagingResponse.from(likedPosts);
 
-        PostResponseDto response = PostResponseDto.builder()
+        PostListResponseDto response = PostListResponseDto.builder()
                 .postList(postResponseDtoList)
                 .paging(pagingResponse)
                 .build();
@@ -196,6 +202,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    //TODO
     // 메인홈 - 실시간 랭킹
     @GetMapping("/main/top")
     public ResponseEntity<PostRankingResponseDto.PagedPostRankingResponseDto> getTopPosts(Pageable pageable) {
@@ -216,6 +223,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    //TODO
     // 메인홈 - 카테고리별 실시간 랭킹
     @GetMapping("/main/top/category")
     public ResponseEntity<PostRankingResponseDto.PagedPostRankingResponseDto> getTopPostsByCategory(
@@ -238,6 +246,7 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    //TODO
     // 게시글 검색 api
     @GetMapping("/search")
     public ResponseEntity<PostSearchResponseDto> searchPostsByTitle(

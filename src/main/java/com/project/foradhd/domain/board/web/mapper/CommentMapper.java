@@ -3,7 +3,7 @@ package com.project.foradhd.domain.board.web.mapper;
 import com.project.foradhd.domain.board.persistence.entity.Comment;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
-import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.CommentListResponseDto;
 import com.project.foradhd.domain.user.persistence.entity.User;
 import com.project.foradhd.domain.user.persistence.entity.UserProfile;
 import com.project.foradhd.domain.user.persistence.repository.UserProfileRepository;
@@ -43,13 +43,13 @@ public interface CommentMapper {
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "parentComment.id", target = "parentCommentId")
     @Mapping(source = "childComments", target = "children", qualifiedByName = "mapChildComments")
-    CommentResponseDto.CommentListResponseDto commentToCommentListResponseDto(Comment comment);
+    CommentListResponseDto.CommentResponseDto commentToCommentListResponseDto(Comment comment);
 
-    default CommentResponseDto.CommentListResponseDto commentToCommentListResponseDtoWithChildren(Comment comment) {
+    default CommentListResponseDto.CommentResponseDto commentToCommentListResponseDtoWithChildren(Comment comment) {
         if (comment.getParentComment() != null) { // 자식 댓글인 경우
             return commentToCommentListResponseDto(comment);
         } else { // 부모 댓글인 경우
-            return CommentResponseDto.CommentListResponseDto.builder()
+            return CommentListResponseDto.CommentResponseDto.builder()
                     .id(comment.getId())
                     .content(comment.getContent())
                     .userId(comment.getUser().getId())
@@ -68,11 +68,11 @@ public interface CommentMapper {
         }
     }
 
-    default CommentResponseDto toResponseDto(List<Comment> comments, PagingResponse paging) {
-        List<CommentResponseDto.CommentListResponseDto> commentList = comments.stream()
+    default CommentListResponseDto toResponseDto(List<Comment> comments, PagingResponse paging) {
+        List<CommentListResponseDto.CommentResponseDto> commentList = comments.stream()
                 .map(this::commentToCommentListResponseDtoWithChildren)
                 .collect(Collectors.toList());
-        return CommentResponseDto.builder()
+        return CommentListResponseDto.builder()
                 .commentList(commentList)
                 .paging(paging)
                 .build();
@@ -103,7 +103,7 @@ public interface CommentMapper {
     }
 
     @Named("mapChildComments")
-    default List<CommentResponseDto.CommentListResponseDto> mapChildComments(List<Comment> childComments) {
+    default List<CommentListResponseDto.CommentResponseDto> mapChildComments(List<Comment> childComments) {
         if (childComments == null) {
             return null;
         }

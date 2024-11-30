@@ -4,9 +4,9 @@ import com.project.foradhd.domain.board.persistence.entity.Comment;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.web.dto.PostDto;
 import com.project.foradhd.domain.board.web.dto.request.PostRequestDto;
-import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.CommentListResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.PostListResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
-import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostSearchResponseDto;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
@@ -63,7 +63,7 @@ public interface PostMapper {
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "nickname", target = "nickname")
     @Mapping(source = "profileImage", target = "profileImage")
-    PostResponseDto.PostListResponseDto toPostListResponseDto(Post post, @Context UserService userService);
+    PostListResponseDto.PostResponseDto toPostListResponseDto(Post post, @Context UserService userService);
 
     @AfterMapping
     default void setUsers(@MappingTarget Post.PostBuilder postBuilder, @Context String userId, @Context UserService userService) {
@@ -80,7 +80,7 @@ public interface PostMapper {
     }
 
     @AfterMapping
-    default void setAnonymousOrUserProfile(@MappingTarget PostResponseDto.PostListResponseDto.PostListResponseDtoBuilder dto, Post post, @Context UserService userService) {
+    default void setAnonymousOrUserProfile(@MappingTarget PostListResponseDto.PostResponseDto.PostResponseDtoBuilder dto, Post post, @Context UserService userService) {
         if (post.getAnonymous()) {
             dto.nickname("익명");
             dto.profileImage("image/default-profile.png");
@@ -93,7 +93,7 @@ public interface PostMapper {
         }
     }
 
-    default List<CommentResponseDto.CommentListResponseDto> mapCommentList(List<Comment> comments) {
+    default List<CommentListResponseDto.CommentResponseDto> mapCommentList(List<Comment> comments) {
         if (comments == null) return null;
         CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
         return comments.stream()

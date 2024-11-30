@@ -16,16 +16,16 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostResponseDto {
+public class PostListResponseDto {
 
-    private List<PostListResponseDto> postList;
+    private List<PostResponseDto> postList;
     private PagingResponse paging;
 
     @Getter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class PostListResponseDto {
+    public static class PostResponseDto {
         private Long id;
         private String userId;
         private String title;
@@ -37,7 +37,7 @@ public class PostResponseDto {
         private long scrapCount;
         private long viewCount;
         private Category category;
-        private List<CommentResponseDto.CommentListResponseDto> comments;
+        private List<CommentListResponseDto.CommentResponseDto> comments;
         private String nickname;
         private String profileImage;
 
