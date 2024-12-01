@@ -40,6 +40,7 @@ public class PostListResponseDto {
         private List<CommentListResponseDto.CommentResponseDto> comments;
         private String nickname;
         private String profileImage;
+        private Boolean isBlocked;
 
         @JsonSerialize(using = LocalDateTimeToEpochSecondSerializer.class)
         private LocalDateTime createdAt;

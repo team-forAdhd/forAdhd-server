@@ -7,7 +7,7 @@ import com.project.foradhd.domain.board.web.dto.request.CreateCommentRequestDto;
 import com.project.foradhd.domain.board.web.dto.response.CommentListResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostListResponseDto;
 import com.project.foradhd.domain.board.web.mapper.CommentMapper;
-import com.project.foradhd.domain.user.persistence.repository.UserRepository;
+import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.global.AuthUserId;
 import com.project.foradhd.global.paging.web.dto.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,13 +26,14 @@ public class CommentController {
 
     private final CommentService commentService;
     private final CommentMapper commentMapper;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     // 개별 댓글 조회 API
     @GetMapping("/{commentId}")
-    public ResponseEntity<CommentListResponseDto.CommentResponseDto> getComment(@PathVariable Long commentId) {
+    public ResponseEntity<CommentListResponseDto.CommentResponseDto> getComment(@PathVariable Long commentId, @AuthUserId String userId) {
         Comment comment = commentService.getComment(commentId);
-        return ResponseEntity.ok(commentMapper.commentToCommentListResponseDto(comment));
+        List<String> blockedUserIdList = userService.getBlockedUserIdList(userId);
+        return ResponseEntity.ok(commentMapper.commentToCommentResponseDto(comment, blockedUserIdList));
     }
 
     // 댓글 작성 API
@@ -41,7 +41,8 @@ public class CommentController {
     public ResponseEntity<CommentListResponseDto.CommentResponseDto> createComment(@RequestBody CreateCommentRequestDto createCommentRequestDto, @AuthUserId String userId) {
         Comment comment = commentMapper.createCommentRequestDtoToComment(createCommentRequestDto, userId);
         Comment createdComment = commentService.createComment(comment, userId);
-        CommentListResponseDto.CommentResponseDto response = commentMapper.commentToCommentListResponseDto(createdComment);
+        List<String> blockedUserIdList = userService.getBlockedUserIdList(userId);
+        CommentListResponseDto.CommentResponseDto response = commentMapper.commentToCommentResponseDto(createdComment, blockedUserIdList);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -72,8 +73,9 @@ public class CommentController {
                 createCommentRequest.isAnonymous(),
                 userId);
 
+        List<String> blockedUserIdList = userService.getBlockedUserIdList(userId);
         // 매퍼를 이용해 엔티티를 DTO로 변환하여 반환
-        return ResponseEntity.ok(commentMapper.commentToCommentListResponseDto(updatedComment));
+        return ResponseEntity.ok(commentMapper.commentToCommentResponseDto(updatedComment, blockedUserIdList));
     }
 
     // 나의 댓글
@@ -99,16 +101,18 @@ public class CommentController {
     public ResponseEntity<CommentListResponseDto> getCommentsByPost(
             @PathVariable Long postId,
             Pageable pageable,
-            @RequestParam(required = false) SortOption sortOption) {
+            @RequestParam(required = false) SortOption sortOption,
+            @AuthUserId String userId) {
 
         if (sortOption == null) {
             sortOption = SortOption.NEWEST_FIRST;
         }
 
         Page<Comment> comments = commentService.getCommentsByPost(postId, pageable, sortOption);
+        List<String> blockedUserIdList = userService.getBlockedUserIdList(userId);
         List<CommentListResponseDto.CommentResponseDto> commentList = comments.getContent().stream()
-                .map(commentMapper::commentToCommentListResponseDto)
-                .collect(Collectors.toList());
+                .map(comment -> commentMapper.commentToCommentResponseDto(comment, blockedUserIdList))
+                .toList();
 
         PagingResponse pagingResponse = PagingResponse.from(comments);
 

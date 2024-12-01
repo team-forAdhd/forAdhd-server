@@ -34,5 +34,6 @@ public class CommentListResponseDto {
         private final List<CommentResponseDto> children;
         private final String nickname;
         private final String profileImage;
+        private Boolean isBlocked;
     }
 }

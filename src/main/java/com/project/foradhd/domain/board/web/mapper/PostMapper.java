@@ -24,7 +24,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.stream.Collectors;
 
-
 @Mapper(componentModel = "spring", uses = {CommentMapper.class})
 public interface PostMapper {
 
@@ -58,12 +57,12 @@ public interface PostMapper {
         }
     }
 
-    @Mapping(target = "comments", expression = "java(mapCommentList(post.getComments()))")
+    @Mapping(target = "comments", expression = "java(mapCommentList(post.getComments(), blockedUserIdList))")
     @Mapping(target = "commentCount", expression = "java(calculateCommentCount(post.getComments()))")
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "nickname", target = "nickname")
     @Mapping(source = "profileImage", target = "profileImage")
-    PostListResponseDto.PostResponseDto toPostListResponseDto(Post post, @Context UserService userService);
+    PostListResponseDto.PostResponseDto toPostResponseDto(Post post, @Context UserService userService, @Context List<String> blockedUserIdList);
 
     @AfterMapping
     default void setUsers(@MappingTarget Post.PostBuilder postBuilder, @Context String userId, @Context UserService userService) {
@@ -93,11 +92,17 @@ public interface PostMapper {
         }
     }
 
-    default List<CommentListResponseDto.CommentResponseDto> mapCommentList(List<Comment> comments) {
-        if (comments == null) return null;
+    @AfterMapping
+    default void setIsBlockedPost(@MappingTarget PostListResponseDto.PostResponseDto.PostResponseDtoBuilder dto, Post post, @Context List<String> blockedUserIdList) {
+        boolean isBlocked = blockedUserIdList.contains(post.getUser().getId());
+        dto.isBlocked(isBlocked);
+    }
+
+    default List<CommentListResponseDto.CommentResponseDto> mapCommentList(List<Comment> comments, List<String> blockedUserIdList) {
+        if (comments == null) return List.of();
         CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
         return comments.stream()
-                .map(commentMapper::commentToCommentListResponseDto)
+                .map(comment -> commentMapper.commentToCommentResponseDto(comment, blockedUserIdList))
                 .collect(Collectors.toList());
     }
 
