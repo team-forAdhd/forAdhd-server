@@ -113,6 +113,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserBlocked> getUserBlockedList(String userId) {
+        return userBlockedRepository.findByUserId(userId);
+    }
+
+    @Override
+    public List<String> getBlockedUserIdList(String userId) {
+        return getUserBlockedList(userId).stream()
+                .map(userBlocked -> userBlocked.getBlockedUser().getId())
+                .toList();
+    }
+
+    @Override
     @Transactional
     public void updateProfile(String userId, ProfileUpdateData profileUpdateData) {
         UserProfile newUserProfile = profileUpdateData.getUserProfile();
