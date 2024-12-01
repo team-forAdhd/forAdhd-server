@@ -32,7 +32,7 @@ public class UserBlocked extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
 
-    public void updateBlocked(boolean blocked) {
-        this.deleted = !blocked;
+    public void updateIsBlocked(boolean isBlocked) {
+        this.deleted = !isBlocked;
     }
 }

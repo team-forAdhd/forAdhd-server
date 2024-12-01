@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
+import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_POST;
 
 
 @Service
@@ -30,7 +30,7 @@ public class PostLikeFilterServiceImpl implements PostLikeFilterService {
     @Transactional
     public void toggleLike(String userId, Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessException(BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_POST));
 
         User user = userService.getUser(userId);
 

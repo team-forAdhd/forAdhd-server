@@ -96,17 +96,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void blockUser(String userId, String blockedUserId, Boolean blocked) {
+    public void blockUser(String userId, String blockedUserId, Boolean isBlocked) {
         User user = getUser(userId);
         User blockedUser = getUser(blockedUserId);
         userBlockedRepository.findByUserIdAndBlockedUserId(userId, blockedUserId)
                 .ifPresentOrElse(
-                        userBlocked -> userBlocked.updateBlocked(blocked),
+                        userBlocked -> userBlocked.updateIsBlocked(isBlocked),
                         () -> {
                             UserBlocked userBlocked = UserBlocked.builder()
                                     .user(user)
                                     .blockedUser(blockedUser)
-                                    .deleted(!blocked)
+                                    .deleted(!isBlocked)
                                     .build();
                             userBlockedRepository.save(userBlocked);
                         });

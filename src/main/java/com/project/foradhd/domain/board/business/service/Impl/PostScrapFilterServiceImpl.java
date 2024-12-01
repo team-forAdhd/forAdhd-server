@@ -34,7 +34,7 @@ public class PostScrapFilterServiceImpl implements PostScrapFilterService {
     @Transactional
     public void toggleScrap(Long postId, String userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_POST));
         User user = userService.getUser(userId);
 
         postScrapFilterRepository.findByPostIdAndUserId(postId, userId)

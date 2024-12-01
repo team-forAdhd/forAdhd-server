@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
+import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_POST;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getPost(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessException(BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_POST));
     }
 
     @Override
@@ -126,7 +126,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public void addComment(Long postId, String commentContent, String userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessException(BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_POST));
 
         String message = "새로운 댓글이 달렸어요: " + commentContent;
         notificationService.createNotification(post.getUser().getId(), message);

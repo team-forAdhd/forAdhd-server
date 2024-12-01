@@ -239,7 +239,7 @@ class UserServiceTest {
         //given
         String userId = "userId";
         String blockedUserId = "blockedUserId";
-        boolean blocked = true;
+        boolean isBlocked = true;
         User user = toUser().id(userId).build();
         User blockedUser = toUser().id(blockedUserId).build();
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
@@ -247,14 +247,14 @@ class UserServiceTest {
         given(userBlockedRepository.findByUserIdAndBlockedUserId(userId, blockedUserId)).willReturn(Optional.empty());
 
         //when
-        userService.blockUser(userId, blockedUserId, blocked);
+        userService.blockUser(userId, blockedUserId, isBlocked);
 
         //then
         then(userBlockedRepository).should(times(1)).save(userBlockedArgumentCaptor.capture());
         UserBlocked userBlocked = userBlockedArgumentCaptor.getValue();
         assertThat(userBlocked.getUser()).isEqualTo(user);
         assertThat(userBlocked.getBlockedUser()).isEqualTo(blockedUser);
-        assertThat(userBlocked.getDeleted()).isEqualTo(!blocked);
+        assertThat(userBlocked.getDeleted()).isEqualTo(!isBlocked);
     }
 
     @DisplayName("유저 차단 테스트 - 성공: 기존 차단 내역 있는 경우")
@@ -263,7 +263,7 @@ class UserServiceTest {
         //given
         String userId = "userId";
         String blockedUserId = "blockedUserId";
-        boolean blocked = true;
+        boolean isBlocked = true;
         User user = toUser().id(userId).build();
         User blockedUser = toUser().id(blockedUserId).build();
         UserBlocked userBlocked = UserBlocked.builder()
@@ -275,10 +275,10 @@ class UserServiceTest {
         given(userBlockedRepository.findByUserIdAndBlockedUserId(userId, blockedUserId)).willReturn(Optional.of(userBlocked));
 
         //when
-        userService.blockUser(userId, blockedUserId, blocked);
+        userService.blockUser(userId, blockedUserId, isBlocked);
 
         //then
-        assertThat(userBlocked.getDeleted()).isEqualTo(!blocked);
+        assertThat(userBlocked.getDeleted()).isEqualTo(!isBlocked);
     }
 
     @DisplayName("프로필 수정 테스트")

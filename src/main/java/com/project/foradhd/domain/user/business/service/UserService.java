@@ -29,7 +29,7 @@ public interface UserService {
 
     User snsSignUp(String userId, SnsSignUpData snsSignUpData);
 
-    void blockUser(String userId, String blockedUserId, Boolean blocked);
+    void blockUser(String userId, String blockedUserId, Boolean isBlocked);
 
     void updateProfile(String userId, ProfileUpdateData profileUpdateData);
 

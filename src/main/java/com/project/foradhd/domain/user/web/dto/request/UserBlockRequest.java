@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class UserBlockRequest {
 
     private String blockedUserId;
-    private Boolean blocked;
+    private Boolean isBlocked;
 }
