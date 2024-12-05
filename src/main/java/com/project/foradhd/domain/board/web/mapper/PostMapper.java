@@ -4,9 +4,9 @@ import com.project.foradhd.domain.board.persistence.entity.Comment;
 import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.web.dto.PostDto;
 import com.project.foradhd.domain.board.web.dto.request.PostRequestDto;
-import com.project.foradhd.domain.board.web.dto.response.CommentResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.CommentListResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.PostListResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostRankingResponseDto;
-import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
 import com.project.foradhd.domain.board.web.dto.response.PostSearchResponseDto;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.persistence.entity.User;
@@ -23,7 +23,6 @@ import org.mapstruct.Context;
 import org.mapstruct.factory.Mappers;
 
 import java.util.stream.Collectors;
-
 
 @Mapper(componentModel = "spring", uses = {CommentMapper.class})
 public interface PostMapper {
@@ -58,12 +57,12 @@ public interface PostMapper {
         }
     }
 
-    @Mapping(target = "comments", expression = "java(mapCommentList(post.getComments()))")
+    @Mapping(target = "comments", expression = "java(mapCommentList(post.getComments(), blockedUserIdList))")
     @Mapping(target = "commentCount", expression = "java(calculateCommentCount(post.getComments()))")
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "nickname", target = "nickname")
     @Mapping(source = "profileImage", target = "profileImage")
-    PostResponseDto.PostListResponseDto toPostListResponseDto(Post post, @Context UserService userService);
+    PostListResponseDto.PostResponseDto toPostResponseDto(Post post, @Context UserService userService, @Context List<String> blockedUserIdList);
 
     @AfterMapping
     default void setUsers(@MappingTarget Post.PostBuilder postBuilder, @Context String userId, @Context UserService userService) {
@@ -80,7 +79,7 @@ public interface PostMapper {
     }
 
     @AfterMapping
-    default void setAnonymousOrUserProfile(@MappingTarget PostResponseDto.PostListResponseDto.PostListResponseDtoBuilder dto, Post post, @Context UserService userService) {
+    default void setAnonymousOrUserProfile(@MappingTarget PostListResponseDto.PostResponseDto.PostResponseDtoBuilder dto, Post post, @Context UserService userService) {
         if (post.getAnonymous()) {
             dto.nickname("익명");
             dto.profileImage("image/default-profile.png");
@@ -93,11 +92,17 @@ public interface PostMapper {
         }
     }
 
-    default List<CommentResponseDto.CommentListResponseDto> mapCommentList(List<Comment> comments) {
-        if (comments == null) return null;
+    @AfterMapping
+    default void setIsBlockedPost(@MappingTarget PostListResponseDto.PostResponseDto.PostResponseDtoBuilder dto, Post post, @Context List<String> blockedUserIdList) {
+        boolean isBlocked = blockedUserIdList.contains(post.getUser().getId());
+        dto.isBlocked(isBlocked);
+    }
+
+    default List<CommentListResponseDto.CommentResponseDto> mapCommentList(List<Comment> comments, List<String> blockedUserIdList) {
+        if (comments == null) return List.of();
         CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
         return comments.stream()
-                .map(commentMapper::commentToCommentListResponseDto)
+                .map(comment -> commentMapper.commentToCommentResponseDto(comment, blockedUserIdList))
                 .collect(Collectors.toList());
     }
 

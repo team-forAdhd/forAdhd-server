@@ -26,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserPrivacyRepository userPrivacyRepository;
     private final UserProfileRepository userProfileRepository;
+    private final UserBlockedRepository userBlockedRepository;
     private final TermsRepository termsRepository;
     private final UserTermsApprovalRepository userTermsApprovalRepository;
     private final PushNotificationApprovalRepository pushNotificationApprovalRepository;
@@ -91,6 +92,36 @@ public class UserServiceImpl implements UserService {
         userTermsApprovalRepository.saveAll(userTermsApprovals);
         userPushNotificationApprovalRepository.saveAll(userPushNotificationApprovals);
         return user;
+    }
+
+    @Override
+    @Transactional
+    public void blockUser(String userId, String blockedUserId, Boolean isBlocked) {
+        User user = getUser(userId);
+        User blockedUser = getUser(blockedUserId);
+        userBlockedRepository.findByUserIdAndBlockedUserId(userId, blockedUserId)
+                .ifPresentOrElse(
+                        userBlocked -> userBlocked.updateIsBlocked(isBlocked),
+                        () -> {
+                            UserBlocked userBlocked = UserBlocked.builder()
+                                    .user(user)
+                                    .blockedUser(blockedUser)
+                                    .deleted(!isBlocked)
+                                    .build();
+                            userBlockedRepository.save(userBlocked);
+                        });
+    }
+
+    @Override
+    public List<UserBlocked> getUserBlockedList(String userId) {
+        return userBlockedRepository.findByUserId(userId);
+    }
+
+    @Override
+    public List<String> getBlockedUserIdList(String userId) {
+        return getUserBlockedList(userId).stream()
+                .map(userBlocked -> userBlocked.getBlockedUser().getId())
+                .toList();
     }
 
     @Override

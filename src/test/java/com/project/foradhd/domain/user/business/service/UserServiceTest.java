@@ -23,14 +23,8 @@ import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
 import com.project.foradhd.domain.user.business.service.impl.UserServiceImpl;
-import com.project.foradhd.domain.user.persistence.entity.PushNotificationApproval;
-import com.project.foradhd.domain.user.persistence.entity.Terms;
-import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
-import com.project.foradhd.domain.user.persistence.entity.UserProfile;
-import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval;
+import com.project.foradhd.domain.user.persistence.entity.*;
 import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval.UserPushNotificationApprovalId;
-import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
 import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval.UserTermsApprovalId;
 import com.project.foradhd.domain.user.persistence.enums.ForAdhdType;
 import com.project.foradhd.domain.user.persistence.enums.Gender;
@@ -45,6 +39,8 @@ import com.project.foradhd.global.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -66,6 +62,9 @@ class UserServiceTest {
     UserProfileRepository userProfileRepository;
 
     @Mock
+    UserBlockedRepository userBlockedRepository;
+
+    @Mock
     TermsRepository termsRepository;
 
     @Mock
@@ -82,6 +81,9 @@ class UserServiceTest {
 
     @Mock
     UserAuthInfoService userAuthInfoService;
+
+    @Captor
+    ArgumentCaptor<UserBlocked> userBlockedArgumentCaptor;
 
     @DisplayName("유저 닉네임 중복 여부 확인 로직 테스트")
     @Test
@@ -229,6 +231,54 @@ class UserServiceTest {
         then(userProfileRepository).should(times(1)).save(newUserProfile);
         then(userTermsApprovalRepository).should(times(1)).saveAll(newUserTermsApprovals);
         then(userPushNotificationApprovalRepository).should(times(1)).saveAll(newUserPushNotificationApprovals);
+    }
+
+    @DisplayName("유저 차단 테스트 - 성공: 기존 차단 내역 없는 경우")
+    @Test
+    void block_user_not_exists() {
+        //given
+        String userId = "userId";
+        String blockedUserId = "blockedUserId";
+        boolean isBlocked = true;
+        User user = toUser().id(userId).build();
+        User blockedUser = toUser().id(blockedUserId).build();
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(userRepository.findById(blockedUserId)).willReturn(Optional.of(blockedUser));
+        given(userBlockedRepository.findByUserIdAndBlockedUserId(userId, blockedUserId)).willReturn(Optional.empty());
+
+        //when
+        userService.blockUser(userId, blockedUserId, isBlocked);
+
+        //then
+        then(userBlockedRepository).should(times(1)).save(userBlockedArgumentCaptor.capture());
+        UserBlocked userBlocked = userBlockedArgumentCaptor.getValue();
+        assertThat(userBlocked.getUser()).isEqualTo(user);
+        assertThat(userBlocked.getBlockedUser()).isEqualTo(blockedUser);
+        assertThat(userBlocked.getDeleted()).isEqualTo(!isBlocked);
+    }
+
+    @DisplayName("유저 차단 테스트 - 성공: 기존 차단 내역 있는 경우")
+    @Test
+    void block_user_exists() {
+        //given
+        String userId = "userId";
+        String blockedUserId = "blockedUserId";
+        boolean isBlocked = true;
+        User user = toUser().id(userId).build();
+        User blockedUser = toUser().id(blockedUserId).build();
+        UserBlocked userBlocked = UserBlocked.builder()
+                .user(user)
+                .blockedUser(blockedUser)
+                .build();
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(userRepository.findById(blockedUserId)).willReturn(Optional.of(blockedUser));
+        given(userBlockedRepository.findByUserIdAndBlockedUserId(userId, blockedUserId)).willReturn(Optional.of(userBlocked));
+
+        //when
+        userService.blockUser(userId, blockedUserId, isBlocked);
+
+        //then
+        assertThat(userBlocked.getDeleted()).isEqualTo(!isBlocked);
     }
 
     @DisplayName("프로필 수정 테스트")

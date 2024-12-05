@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
+import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_POST;
 
 @Service
 @RequiredArgsConstructor
@@ -27,14 +27,14 @@ import static com.project.foradhd.global.exception.ErrorCode.BOARD_NOT_FOUND;
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-    private final PostSearchHistoryService searchHistoryService;
+    private final PostSearchHistoryService postSearchHistoryService;
     private final NotificationService notificationService;
     private final SseEmitters sseEmitters;
 
     @Override
     public Post getPost(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessException(BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_POST));
     }
 
     @Override
@@ -126,7 +126,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public void addComment(Long postId, String commentContent, String userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessException(BOARD_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(NOT_FOUND_POST));
 
         String message = "새로운 댓글이 달렸어요: " + commentContent;
         notificationService.createNotification(post.getUser().getId(), message);
@@ -156,14 +156,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<String> getRecentSearchTerms(String userId) {
-        return searchHistoryService.getRecentSearchTerms(userId);
+        return postSearchHistoryService.getRecentSearchTerms(userId);
     }
 
     @Override
     @Transactional
     public Page<Post> searchPostsByTitle(String title, String userId, Pageable pageable) {
         // 검색어 저장 로직 추가
-        searchHistoryService.saveSearchTerm(userId, title);
+        postSearchHistoryService.saveSearchTerm(userId, title);
         return postRepository.findByTitleContainingWithUserProfile(title, pageable);
     }
 }

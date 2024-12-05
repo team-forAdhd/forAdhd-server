@@ -77,6 +77,12 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/block")
+    public ResponseEntity<Void> blockUser(@AuthUserId String userId, @RequestBody @Valid UserBlockRequest request) {
+        userService.blockUser(userId, request.getBlockedUserId(), request.getIsBlocked());
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/email-auth")
     public ResponseEntity<EmailAuthValidationResponse> validateEmailAuth(@AuthUserId String userId,
                                                                 @RequestBody @Valid EmailAuthValidationRequest request) {

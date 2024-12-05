@@ -60,7 +60,7 @@ public enum ErrorCode {
     SYSTEM_ERROR(INTERNAL_SERVER_ERROR, "시스템 에러입니다."),
 
     //board
-    BOARD_NOT_FOUND(NOT_FOUND, "존재하지 않는 게시물입니다."),
+    NOT_FOUND_POST(NOT_FOUND, "존재하지 않는 게시글입니다."),
     ACCESS_DENIED(FORBIDDEN, "접근 권한이 없습니다."),
 
     //comment

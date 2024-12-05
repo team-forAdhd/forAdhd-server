@@ -7,11 +7,7 @@ import com.project.foradhd.domain.user.business.dto.in.SignUpData;
 import com.project.foradhd.domain.user.business.dto.in.SnsSignUpData;
 import com.project.foradhd.domain.user.business.dto.in.TermsApprovalsUpdateData;
 import com.project.foradhd.domain.user.business.dto.out.UserProfileDetailsData;
-import com.project.foradhd.domain.user.persistence.entity.User;
-import com.project.foradhd.domain.user.persistence.entity.UserPrivacy;
-import com.project.foradhd.domain.user.persistence.entity.UserProfile;
-import com.project.foradhd.domain.user.persistence.entity.UserPushNotificationApproval;
-import com.project.foradhd.domain.user.persistence.entity.UserTermsApproval;
+import com.project.foradhd.domain.user.persistence.entity.*;
 import com.project.foradhd.domain.user.persistence.enums.Provider;
 
 import java.util.List;
@@ -28,6 +24,12 @@ public interface UserService {
     User signUp(SignUpData signUpData);
 
     User snsSignUp(String userId, SnsSignUpData snsSignUpData);
+
+    void blockUser(String userId, String blockedUserId, Boolean isBlocked);
+
+    List<UserBlocked> getUserBlockedList(String userId);
+
+    List<String> getBlockedUserIdList(String userId);
 
     void updateProfile(String userId, ProfileUpdateData profileUpdateData);
 

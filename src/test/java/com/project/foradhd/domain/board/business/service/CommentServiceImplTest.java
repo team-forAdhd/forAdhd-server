@@ -18,7 +18,7 @@ import com.project.foradhd.domain.board.persistence.entity.Post;
 import com.project.foradhd.domain.board.persistence.enums.SortOption;
 import com.project.foradhd.domain.board.persistence.repository.CommentLikeFilterRepository;
 import com.project.foradhd.domain.board.persistence.repository.CommentRepository;
-import com.project.foradhd.domain.board.web.dto.response.PostResponseDto;
+import com.project.foradhd.domain.board.web.dto.response.PostListResponseDto;
 import com.project.foradhd.domain.user.business.service.UserService;
 import com.project.foradhd.domain.user.fixtures.UserFixtures;
 import com.project.foradhd.domain.user.persistence.entity.User;
@@ -149,7 +149,7 @@ class CommentServiceImplTest {
         given(commentRepository.findByUserId(eq(user.getId()), any(Pageable.class))).willReturn(commentPage);
 
         //when
-        Page<PostResponseDto.PostListResponseDto> result = commentService.getMyCommentedPosts(user.getId(), pageable, SortOption.NEWEST_FIRST);
+        Page<PostListResponseDto.PostResponseDto> result = commentService.getMyCommentedPosts(user.getId(), pageable, SortOption.NEWEST_FIRST);
 
         //then
         assertThat(result).isNotNull();
