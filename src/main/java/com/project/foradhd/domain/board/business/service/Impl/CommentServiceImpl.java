@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
+import static org.springframework.data.jpa.repository.query.QueryUtils.applySorting;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -143,12 +144,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Page<Comment> getCommentsByPost(Long postId, Pageable pageable, SortOption sortOption) {
-        return commentRepository.findRootCommentsByPostId(postId, pageable);
-    }
-
-    @Transactional
-    public List<Comment> getChildComments(Long parentCommentId) {
-        return commentRepository.findChildCommentsByParentCommentId(parentCommentId);
+        pageable = applySorting(pageable, sortOption);
+        return commentRepository.findByPostId(postId, pageable);
     }
 
     @Override
