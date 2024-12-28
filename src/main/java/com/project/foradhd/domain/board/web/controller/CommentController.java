@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -123,6 +124,7 @@ public class CommentController {
 
         return ResponseEntity.ok(response);
     }
+
 
     // 댓글 좋아요 토글
     @PostMapping("/{commentId}/like")

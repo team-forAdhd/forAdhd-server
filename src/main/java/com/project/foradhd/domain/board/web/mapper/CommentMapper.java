@@ -50,26 +50,20 @@ public interface CommentMapper {
     }
 
     default CommentListResponseDto.CommentResponseDto commentToCommentListResponseDtoWithChildren(Comment comment, List<String> blockedUserIdList) {
-        if (comment.getParentComment() != null) { // 자식 댓글인 경우
-            return commentToCommentResponseDto(comment, blockedUserIdList);
-        } else { // 부모 댓글인 경우
-            return CommentListResponseDto.CommentResponseDto.builder()
-                    .id(comment.getId())
-                    .content(comment.getContent())
-                    .userId(comment.getUser().getId())
-                    .postId(comment.getPost().getId())
-                    .anonymous(comment.getAnonymous())
-                    .likeCount(comment.getLikeCount())
-                    .createdAt(comment.getCreatedAt())
-                    .lastModifiedAt(comment.getLastModifiedAt())
-                    .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
-                    .children(comment.getChildComments().stream()
-                            .map(childComment -> commentToCommentResponseDto(childComment, blockedUserIdList))
-                            .toList())
-                    .nickname(comment.getNickname())
-                    .profileImage(comment.getProfileImage())
-                    .build();
-        }
+        return CommentListResponseDto.CommentResponseDto.builder()
+                .id(comment.getId())
+                .content(comment.getContent())
+                .userId(comment.getUser() != null ? comment.getUser().getId() : null)
+                .postId(comment.getPost().getId())
+                .anonymous(comment.getAnonymous())
+                .likeCount(comment.getLikeCount())
+                .createdAt(comment.getCreatedAt())
+                .lastModifiedAt(comment.getLastModifiedAt())
+                .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
+                .children(comment.getChildComments() != null ? mapChildComments(comment.getChildComments(), blockedUserIdList) : List.of())
+                .nickname(comment.getNickname())
+                .profileImage(comment.getProfileImage())
+                .build();
     }
 
     @Named("mapPost")

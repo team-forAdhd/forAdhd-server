@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.project.foradhd.global.exception.ErrorCode.NOT_FOUND_COMMENT;
+import static org.springframework.data.jpa.repository.query.QueryUtils.applySorting;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

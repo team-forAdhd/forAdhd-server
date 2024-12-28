@@ -101,10 +101,14 @@ public interface PostMapper {
     default List<CommentListResponseDto.CommentResponseDto> mapCommentList(List<Comment> comments, List<String> blockedUserIdList) {
         if (comments == null) return List.of();
         CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
+
+        // 부모 댓글만 매핑
         return comments.stream()
+                .filter(comment -> comment.getParentComment() == null) // 부모 댓글만 필터링
                 .map(comment -> commentMapper.commentToCommentResponseDto(comment, blockedUserIdList))
                 .collect(Collectors.toList());
     }
+
 
     default long calculateCommentCount(List<Comment> comments) {
         if (comments == null) return 0;
