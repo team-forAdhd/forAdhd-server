@@ -15,13 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
@@ -34,13 +28,13 @@ public class UserController {
     private final UserMapper userMapper;
 
     @GetMapping("/nickname-check")
-    public ResponseEntity<NicknameCheckResponse> checkNickname(@RequestBody @Valid NicknameCheckRequest request) {
+    public ResponseEntity<NicknameCheckResponse> checkNickname(@ModelAttribute @Valid NicknameCheckRequest request) {
         boolean isValidNickname = userService.checkNickname(request.getNickname());
         return ResponseEntity.ok(new NicknameCheckResponse(isValidNickname));
     }
 
     @GetMapping("/email-check")
-    public ResponseEntity<EmailCheckResponse> checkEmail(@RequestBody @Valid EmailCheckRequest request) {
+    public ResponseEntity<EmailCheckResponse> checkEmail(@ModelAttribute @Valid EmailCheckRequest request) {
         boolean isValidEmail = userService.checkEmail(request.getEmail());
         return ResponseEntity.ok(new EmailCheckResponse(isValidEmail));
     }
