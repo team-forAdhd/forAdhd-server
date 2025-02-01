@@ -23,7 +23,7 @@ import java.util.*;
 public class AwsS3Service implements FileStorageService {
 
     private static final String FILE_EXTENSION_SEPARATOR = ".";
-    private static final List<String> ALLOWED_IMAGE_FILE_EXTENSION_LIST = Arrays.asList("jpg", "jpeg", "png", "gif");
+    private static final List<String> ALLOWED_IMAGE_FILE_EXTENSION_LIST = Arrays.asList("jpg", "jpeg", "png", "gif", "heic", "heif");
     private final AmazonS3 amazonS3;
 
     @Value("${cloud.aws.s3.bucket}")
