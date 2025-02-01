@@ -7,5 +7,5 @@ import java.util.List;
 @Getter
 public class ImageDeleteRequest {
 
-    List<String> imagePathList;
+    private List<String> imagePathList;
 }

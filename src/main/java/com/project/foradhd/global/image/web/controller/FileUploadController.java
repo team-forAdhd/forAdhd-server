@@ -7,7 +7,6 @@ import com.project.foradhd.global.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,9 +18,8 @@ public class FileUploadController {
     private final FileStorageService fileStorageService;
 
     @PostMapping
-    public ResponseEntity<ImageUploadResponse> uploadImages(@RequestPart List<MultipartFile> imageFileList,
-                                                            @RequestPart ImageUploadRequest request) {
-        List<String> imagePathList = fileStorageService.uploadImages(request.getImagePathPrefix(), imageFileList);
+    public ResponseEntity<ImageUploadResponse> uploadImages(@ModelAttribute ImageUploadRequest request) {
+        List<String> imagePathList = fileStorageService.uploadImages(request.getImagePathPrefix(), request.getImageFileList());
         return ResponseEntity.ok(new ImageUploadResponse(imagePathList));
     }
 
